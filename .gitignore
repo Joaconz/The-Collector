@@ -1,0 +1,13 @@
+# Crear el .gitignore en la raíz con las exclusiones solicitadas
+cat <<EOF > "/Users/joaquin/Desktop/UADE/API/The Collector/.gitignore"
+# Local AI Agent configuration and instructions
+agents/
+instructions/
+contexto_proyecto_tpo.md
+
+# OS files
+.DS_Store
+
+# Endpoints documentation (opcional, si prefieres que solo sea local también)
+# backend/endpoints_tpo.md
+EOF
