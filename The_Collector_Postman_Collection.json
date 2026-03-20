@@ -1,86 +1,121 @@
 {
   "info": {
-    "name": "The Collector - TPO",
-    "description": "Endpoints iniciales para el primer avance del TPO de The Collector",
+    "name": "The Collector - TPO V2",
+    "description": "Endpoints expandidos para el primer avance",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Health Check (Status)",
+      "name": "Status",
       "request": {
         "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/status",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "status"
-          ]
-        }
-      },
-      "response": []
+        "url": {"raw": "http://localhost:8080/status", "host": ["localhost"], "port": "8080", "path": ["status"]}
+      }
     },
     {
-      "name": "Catálogo de Productos",
+      "name": "Auth",
       "item": [
         {
-          "name": "Listar Productos",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/api/productos",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "productos"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Crear Producto",
+          "name": "Register",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Anillo de Zafiro Vintage\",\n  \"descripcion\": \"Anillo del siglo XVIII con incrustaciones\",\n  \"precio\": 8500.0,\n  \"historia\": \"Perteneció a una familia noble de Venecia.\",\n  \"stock\": 1,\n  \"categoria\": \"JOYERIA\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/productos",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "productos"
-              ]
-            }
-          },
-          "response": []
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"email\": \"user@test.com\", \"password\": \"1234\", \"nombre\": \"Joaquin\"}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/auth/register", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "register"]}
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"email\": \"user@test.com\", \"password\": \"1234\"}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/auth/login", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "login"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/productos", "host": ["localhost"], "port": "8080", "path": ["api", "productos"]}}
+        },
+        {
+          "name": "Obtener por Id",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"]}}
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"nombre\": \"Item Prueba\"}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/productos", "host": ["localhost"], "port": "8080", "path": ["api", "productos"]}
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"precio\": 1000}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"]}
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {"method": "DELETE", "url": {"raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"]}}
+        }
+      ]
+    },
+    {
+      "name": "Órdenes",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/ordenes", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes"]}}
+        },
+        {
+          "name": "Obtener por Id",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/ordenes/100", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes", "100"]}}
+        },
+        {
+          "name": "Crear (Checkout)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"items\": [1, 2]}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/ordenes", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Publicaciones",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"]}}
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"productoId\": 1}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"]}
+          }
+        },
+        {
+          "name": "Cambiar Estado",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"estado\": \"PAUSADA\"}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "http://localhost:8080/api/publicaciones/1", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1"]}
+          }
         }
       ]
     }

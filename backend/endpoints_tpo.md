@@ -1,62 +1,27 @@
 # Endpoints Iniciales del Backend - The Collector
 
-A continuación se detallan los endpoints de prueba definidos para representar las operaciones principales del proyecto en esta etapa inicial. No se encuentran completamente implementados con acceso a base de datos, pero sirven como base funcional.
+A continuación se detallan los endpoints de prueba definidos para representar las operaciones principales del proyecto en esta etapa inicial. Utilizan datos mockeados provistos por la capa Service.
 
-## 1. Verificación de Estado (Health Check)
-- **Endpoint:** `GET /status`
-- **Descripción:** Verifica que el servidor de Spring Boot se encuentre en ejecución y respondiendo.
-- **Respuesta de ejemplo:**
-```json
-{
-  "status": "UP",
-  "message": "The Collector API is running."
-}
-```
+## 1. Auth (Simulado)
+- **POST `/api/auth/register`**: Registra un nuevo usuario.
+- **POST `/api/auth/login`**: Realiza el login y retorna un JWT simulado.
 
-## 2. Catálogo de Productos
-Estos endpoints representan el recurso principal del sistema: el producto coleccionable.
+## 2. Productos
+- **GET `/api/productos`**: Lista los productos del catálogo.
+- **GET `/api/productos/{id}`**: Obtiene el detalle de un producto específico.
+- **POST `/api/productos`**: Crea un nuevo producto.
+- **PUT `/api/productos/{id}`**: Actualiza los datos de un producto.
+- **DELETE `/api/productos/{id}`**: Elimina un producto.
 
-### Listar Productos
-- **Endpoint:** `GET /api/productos`
-- **Descripción:** Devuelve una lista de los productos disponibles. En el futuro, este endpoint soportará filtros por categoría, rango de precios, etc.
-- **Respuesta de ejemplo:**
-```json
-[
-  {
-    "id": 1,
-    "nombre": "Reloj Vintage Rolex",
-    "precio": 5000
-  },
-  {
-    "id": 2,
-    "nombre": "Cuadro Renacentista",
-    "precio": 15000
-  }
-]
-```
+## 3. Órdenes
+- **GET `/api/ordenes`**: Lista las órdenes del usuario autenticado.
+- **GET `/api/ordenes/{id}`**: Obtiene el detalle de una orden (ítems, estado).
+- **POST `/api/ordenes`**: Crea una nueva orden a partir del carrito (checkout).
 
-### Crear Producto
-- **Endpoint:** `POST /api/productos`
-- **Descripción:** Permite a un usuario con rol VENDEDOR crear un nuevo producto coleccionable.
-- **Cuerpo de la petición (ejemplo):**
-```json
-{
-  "nombre": "Moneda Antigua Romana",
-  "descripcion": "Moneda de plata del siglo I",
-  "precio": 1200,
-  "historia": "Encontrada en ruinas italianas...",
-  "stock": 1,
-  "categoria": "numismatica"
-}
-```
-- **Respuesta de ejemplo:**
-```json
-{
-  "message": "Producto creado exitosamente",
-  "producto": {
-    "nombre": "Moneda Antigua Romana",
-    "precio": 1200,
-    ...
-  }
-}
-```
+## 4. Publicaciones
+- **GET `/api/publicaciones`**: Lista todas las publicaciones activas.
+- **POST `/api/publicaciones`**: Crea una nueva publicación en el catálogo.
+- **PUT `/api/publicaciones/{id}`**: Actualiza el estado de una publicación (ej. PAUSADA, VENDIDA).
+
+## 5. Health Check
+- **GET `/status`**: Verifica que la API está funcionando.
