@@ -11,7 +11,6 @@ import com.uade.tpo.thecollector.backend.exception.ResourceNotFoundException;
 import com.uade.tpo.thecollector.backend.dto.usuario.AuthResponseDTO;
 import com.uade.tpo.thecollector.backend.dto.usuario.LoginRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.usuario.RegisterRequestDTO;
-import com.uade.tpo.thecollector.backend.model.Rol;
 import com.uade.tpo.thecollector.backend.model.Usuario;
 import com.uade.tpo.thecollector.backend.repository.UsuarioRepository;
 
