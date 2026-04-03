@@ -12,10 +12,8 @@ llamada "historia del producto" que enriquece la experiencia más allá de un e-
 - **Marketplace abierto:** cualquier usuario puede convertirse en vendedor y publicar sus piezas.
 - **Piezas únicas:** el stock es típicamente 1 por publicación. El sistema soporta stock > 1
   pero el flujo está diseñado para exclusividad.
-- **Lista de deseos como carrito:** el comprador agrega piezas a su lista de deseos y desde
-  ahí genera una reserva. No hay "agregar múltiples cantidades de la misma pieza".
-- **Flujo de compra en 2 pasos:** el comprador reserva → el vendedor confirma o rechaza.
-  El stock se bloquea al reservar y se descuenta definitivamente al confirmar.
+- **Carrito de compras:** el comprador agrega piezas al carrito y desde ahí realiza el checkout.
+  El checkout descuenta el stock. No hay procesamiento de pago real.
 - **Sistema de ofertas:** el comprador puede hacer una oferta con precio distinto al publicado.
   El vendedor puede aceptar, rechazar o contraofertar.
 - **Favoritos / Lista de deseos:** el comprador guarda piezas de interés. Desde la lista de
@@ -28,12 +26,10 @@ llamada "historia del producto" que enriquece la experiencia más allá de un e-
 | Backend | Java 17 + Spring Boot 3 |
 | Persistencia | Spring Data JPA + Hibernate |
 | Base de datos | PostgreSQL |
-| Seguridad | JWT stateless (Bearer token) |
+| Seguridad | Spring Security + JWT stateless (Bearer token) |
 | Frontend | React 18 + Vite |
 | Estilos | Tailwind CSS |
-| Estado global | Redux Toolkit |
-| Testing backend | JUnit 5 + Mockito |
-| Testing frontend | Vitest + React Testing Library |
+| Estado global | Redux Toolkit (desde Entrega 6) |
 
 ---
 
@@ -49,39 +45,56 @@ thecollector/
 │   └── src/
 │       ├── main/
 │       │   ├── java/com/thecollector/
-│       │   │   ├── auth/            # JWT, filtros, SecurityConfig
-│       │   │   ├── usuario/         # entidad, repo, service, controller, DTO
-│       │   │   ├── producto/
-│       │   │   ├── publicacion/
-│       │   │   ├── reserva/         # flujo reserva + confirmación del vendedor
-│       │   │   ├── oferta/          # flujo oferta / contraoferta
-│       │   │   ├── favorito/        # lista de deseos
-│       │   │   └── config/          # CORS, beans globales
+│       │   │   ├── controller/
+│       │   │   ├── service/
+│       │   │   ├── repository/
+│       │   │   ├── model/
+│       │   │   ├── dto/
+│       │   │   │   ├── usuario/
+│       │   │   │   ├── producto/
+│       │   │   │   ├── publicacion/
+│       │   │   │   ├── carrito/
+│       │   │   │   ├── reserva/
+│       │   │   │   ├── oferta/
+│       │   │   │   └── favorito/
+│       │   │   ├── exception/
+│       │   │   └── config/          # SecurityConfig, CORS, beans globales
 │       │   └── resources/
-│       │       ├── application.properties
-│       │       └── application-local.properties  ← NO commitear
+│       │       ├── application.yml               ← configuración base
+│       │       └── application-local.yml         ← NO commitear
 │       └── test/
 └── frontend/
     ├── .env.local                               ← NO commitear
     └── src/
         ├── components/      # componentes reutilizables (Button, Card, Modal…)
         ├── pages/           # una carpeta por página/ruta
-        ├── store/           # slices de Redux
-        ├── services/        # todas las llamadas a la API
+        ├── store/           # slices de Redux — se crea en Entrega 6
+        ├── services/        # funciones de llamada a la API — se crea en Entrega 5
         ├── hooks/           # custom hooks
         └── routes/          # definición de rutas con React Router
 ```
 
-Dentro de cada módulo del backend, respetar siempre esta estructura de capas:
+### Estructura de capas del backend
+
+La arquitectura sigue el modelo de **3 capas** visto en la materia (UVA 1):
+
 ```
-<modulo>/
-├── <Entidad>.java
-├── <Entidad>Repository.java
-├── <Entidad>Service.java
-├── <Entidad>Controller.java
-├── <Entidad>RequestDTO.java
-└── <Entidad>ResponseDTO.java
+Controller  →  Service  →  Repository
 ```
+
+- **`controller/`** — recibe el request HTTP, delega al service, devuelve la respuesta.
+  Sin lógica de negocio.
+- **`service/`** — contiene toda la lógica de negocio. Es la única capa que puede llamar
+  al repository.
+- **`repository/`** — acceso a la base de datos mediante Spring Data JPA.
+- **`model/`** — entidades JPA. Nunca se exponen directamente en la API.
+- **`dto/`** — objetos de transferencia de datos, organizados en subcarpetas por entidad.
+  Cada entidad tiene su `<Entidad>RequestDTO` y `<Entidad>ResponseDTO`.
+- **`exception/`** — excepciones de dominio custom (ej: `PublicacionNotFoundException`)
+  y el `GlobalExceptionHandler` con `@ControllerAdvice`.
+- **`config/`** — configuración de Spring Security, CORS y otros beans globales.
+
+Los controllers **nunca** acceden al repository directamente. Todo pasa por el service.
 
 ---
 
@@ -101,21 +114,36 @@ cd backend
 # API disponible en http://localhost:8080
 ```
 
-Crear `backend/src/main/resources/application-local.properties` (ignorado por git):
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/thecollector
-spring.datasource.username=postgres
-spring.datasource.password=TU_PASSWORD
-jwt.secret=una_clave_secreta_de_al_menos_32_caracteres
-jwt.expiration-ms=86400000
+Crear `backend/src/main/resources/application-local.yml` (ignorado por git):
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/thecollector
+    username: postgres
+    password: TU_PASSWORD
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: una_clave_secreta_de_al_menos_32_caracteres
+  expiration-ms: 86400000
 ```
 
-En `application.properties` activar el perfil local:
-```properties
-spring.profiles.active=local
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+`application.yml` base (sí se commitea, sin secretos):
+```yaml
+spring:
+  profiles:
+    active: local
+  application:
+    name: thecollector
+
+server:
+  port: 8080
 ```
+
+Los valores de `jwt.secret` y credenciales de BD **nunca** van hardcodeados ni commiteados.
 
 ### Frontend
 
@@ -135,7 +163,19 @@ VITE_API_URL=http://localhost:8080/api
 
 ## Flujos de negocio clave
 
-### Flujo de compra (2 pasos)
+### Flujo de compra
+
+```
+COMPRADOR
+    │
+    ├─ Explora el catálogo
+    ├─ Agrega pieza al carrito
+    ├─ Realiza checkout
+    │  → se descuenta el stock
+    │  → si stock llega a 0, publicación pasa a VENDIDA
+```
+
+### Flujo de reserva (2 pasos)
 
 ```
 COMPRADOR                          VENDEDOR
@@ -213,6 +253,7 @@ Reserva         → Oferta        : OneToOne   (nullable — reserva puede venir
 - Al confirmar una `Reserva`, decrementar `producto.stock`. Si queda en 0, cambiar
   `publicacion.estado` a `VENDIDA`.
 - Al rechazar o cancelar una `Reserva` con estado `PENDIENTE`, liberar el stock bloqueado.
+- Al hacer checkout del carrito, verificar stock disponible antes de descontar.
 - Un comprador no puede reservar su propia publicación.
 - Un comprador no puede hacer oferta sobre una publicación propia.
 - Solo el vendedor dueño de la publicación puede confirmar/rechazar reservas y ofertas.
@@ -224,6 +265,33 @@ Reserva         → Oferta        : OneToOne   (nullable — reserva puede venir
 Todos los endpoints protegidos con 🔒 requieren header `Authorization: Bearer <token>`.
 Las respuestas siempre en JSON. Usar códigos HTTP semánticos.
 
+### Formato de respuesta de error
+
+Todas las respuestas de error siguen esta estructura, producida por el `GlobalExceptionHandler`:
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Publicacion con id 42 no encontrada",
+  "path": "/api/publicaciones/42",
+  "timestamp": "2025-04-01T12:00:00Z"
+}
+```
+
+Para errores de validación (422), se agrega el campo `details`:
+
+```json
+{
+  "status": 422,
+  "error": "Unprocessable Entity",
+  "message": "Error de validación",
+  "details": [
+    { "field": "precioOfertado", "message": "must be greater than 0" }
+  ]
+}
+```
+
 ### Auth
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
@@ -233,24 +301,43 @@ Las respuestas siempre en JSON. Usar códigos HTTP semánticos.
 ### Productos y Publicaciones
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
-| GET | `/api/publicaciones` | ❌ | Catálogo. Query params: `categoria`, `precioMin`, `precioMax`, `orden` (reciente/precio) |
+| GET | `/api/publicaciones` | ❌ | Catálogo. Query params: `categoria`, `precioMin`, `precioMax`, `orden` (reciente/precio), `page` (default 0), `size` (default 20) |
 | GET | `/api/publicaciones/{id}` | ❌ | Detalle con producto completo (incluye `historia`) |
-| POST | `/api/publicaciones` | 🔒 VENDEDOR | Crear publicación + producto en un solo request |
+| POST | `/api/publicaciones` | 🔒 VENDEDOR | Crear publicación + producto en un solo request. Devuelve 201. |
 | PUT | `/api/publicaciones/{id}` | 🔒 dueño | Editar publicación propia |
 | PATCH | `/api/publicaciones/{id}/estado` | 🔒 dueño | Cambiar estado: ACTIVA / PAUSADA |
-| DELETE | `/api/publicaciones/{id}` | 🔒 dueño | Solo si no tiene reservas PENDIENTES |
+| DELETE | `/api/publicaciones/{id}` | 🔒 dueño | Solo si no tiene reservas PENDIENTES. Devuelve 204. |
+
+El endpoint `GET /api/publicaciones` devuelve siempre paginado:
+```json
+{
+  "content": [ ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 100,
+  "totalPages": 5
+}
+```
+
+### Carrito
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| GET | `/api/carrito` | 🔒 COMPRADOR | Ver carrito activo |
+| POST | `/api/carrito/{publicacionId}` | 🔒 COMPRADOR | Agregar pieza al carrito. 409 si ya existe. |
+| DELETE | `/api/carrito/{publicacionId}` | 🔒 COMPRADOR | Quitar pieza del carrito |
+| POST | `/api/carrito/checkout` | 🔒 COMPRADOR | Confirmar compra → descuenta stock. Devuelve 200. |
 
 ### Favoritos (Lista de deseos)
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/api/favoritos` | 🔒 COMPRADOR | Mi lista de deseos |
-| POST | `/api/favoritos/{publicacionId}` | 🔒 COMPRADOR | Agregar a lista. 409 si ya existe. |
-| DELETE | `/api/favoritos/{publicacionId}` | 🔒 COMPRADOR | Quitar de lista |
+| POST | `/api/favoritos/{publicacionId}` | 🔒 COMPRADOR | Agregar a lista. 409 si ya existe. Devuelve 201. |
+| DELETE | `/api/favoritos/{publicacionId}` | 🔒 COMPRADOR | Quitar de lista. Devuelve 204. |
 
 ### Reservas
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
-| POST | `/api/reservas` | 🔒 COMPRADOR | Crear reserva. Body: `{ publicacionId }` |
+| POST | `/api/reservas` | 🔒 COMPRADOR | Crear reserva. Body: `{ publicacionId }`. Devuelve 201. |
 | GET | `/api/reservas/comprador` | 🔒 COMPRADOR | Mis reservas como comprador |
 | GET | `/api/reservas/vendedor` | 🔒 VENDEDOR | Reservas pendientes de mis publicaciones |
 | PATCH | `/api/reservas/{id}/confirmar` | 🔒 dueño pub. | Confirmar reserva → stock se descuenta |
@@ -260,7 +347,7 @@ Las respuestas siempre en JSON. Usar códigos HTTP semánticos.
 ### Ofertas
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
-| POST | `/api/ofertas` | 🔒 COMPRADOR | Hacer oferta. Body: `{ publicacionId, precioOfertado }` |
+| POST | `/api/ofertas` | 🔒 COMPRADOR | Hacer oferta. Body: `{ publicacionId, precioOfertado }`. Devuelve 201. |
 | GET | `/api/ofertas/comprador` | 🔒 COMPRADOR | Mis ofertas enviadas |
 | GET | `/api/ofertas/vendedor` | 🔒 VENDEDOR | Ofertas recibidas en mis publicaciones |
 | PATCH | `/api/ofertas/{id}/aceptar` | 🔒 dueño pub. | Acepta → crea Reserva automáticamente |
@@ -268,21 +355,6 @@ Las respuestas siempre en JSON. Usar códigos HTTP semánticos.
 | PATCH | `/api/ofertas/{id}/contraofertar` | 🔒 dueño pub. | Body: `{ precioContraoferta }` |
 | PATCH | `/api/ofertas/{id}/aceptar-contraoferta` | 🔒 comprador | Acepta → crea Reserva |
 | PATCH | `/api/ofertas/{id}/cancelar` | 🔒 comprador | Cancela oferta propia (si PENDIENTE) |
-
----
-
-## Redux — Slices
-
-| Slice | Estado | Notas |
-|---|---|---|
-| `authSlice` | `{ usuario, token, rol, isAuthenticated }` | Token persiste en `localStorage` |
-| `catalogoSlice` | `{ publicaciones[], filtros, loading, error }` | Filtros: categoría, precio, orden |
-| `favoritosSlice` | `{ items[], loading }` | Se carga al autenticarse como COMPRADOR |
-| `reservasSlice` | `{ reservas[], loading }` | Vistas de comprador y vendedor |
-| `ofertasSlice` | `{ ofertas[], loading }` | Vistas de comprador y vendedor |
-
-El token JWT se inyecta en cada request desde `services/api.js`. Ningún componente ni slice
-llama a `fetch` directamente; todo pasa por las funciones en `/services`.
 
 ---
 
@@ -294,6 +366,7 @@ llama a `fetch` directamente; todo pasa por las funciones en `/services`.
 | Detalle pieza | `/publicaciones/:id` | público | Historia, imágenes, precio, botones acción |
 | Login | `/login` | público | |
 | Registro | `/register` | público | Selección de rol al registrarse |
+| Carrito | `/carrito` | COMPRADOR | Piezas en el carrito + checkout |
 | Lista de deseos | `/favoritos` | COMPRADOR | Piezas guardadas + acción de reservar/ofertar |
 | Mis reservas | `/reservas` | COMPRADOR | Historial y estado de reservas |
 | Mis ofertas | `/ofertas` | COMPRADOR | Ofertas enviadas y contraofertas recibidas |
@@ -306,92 +379,266 @@ llama a `fetch` directamente; todo pasa por las funciones en `/services`.
 ## Code style
 
 ### Backend (Java)
-- Arquitectura en capas estricta: `Controller → Service → Repository`. Los controllers no
-  acceden directamente al repositorio nunca.
-- Usar DTOs para request y response. Las entidades JPA **nunca** se exponen directamente en la API.
-- Validar los request DTOs con `@Valid` + anotaciones de Bean Validation (`@NotNull`, `@Email`, etc.).
-- Excepciones manejadas globalmente en un `@ControllerAdvice`. No usar `try/catch` en controllers.
-- Control de acceso con `@PreAuthorize`. Validar además que el usuario sea dueño del recurso
-  en la capa de servicio.
-- Nombres de clases, métodos y variables en inglés. Comentarios en español si hacen falta.
 
-### Frontend (React)
-- Solo componentes funcionales. Sin class components.
-- Un componente por archivo. PascalCase para el nombre del archivo y del componente.
-- Toda lógica de fetch va en `/services`. Los slices llaman a funciones de services, nunca usan
-  `fetch` directamente.
-- Rutas protegidas con un componente `<PrivateRoute role="COMPRADOR">` que redirige a `/login`
-  si no hay sesión activa o si el rol no coincide.
-- Tailwind directo en JSX. Evitar archivos CSS salvo para animaciones o efectos imposibles con
-  utilidades de Tailwind.
+#### Arquitectura en capas
+- Flujo estricto: `Controller → Service → Repository`. Los controllers **nunca** acceden al
+  repository directamente.
+- Los controllers son delgados: solo reciben el request, delegan al service y devuelven la
+  respuesta. Cero lógica de negocio en el controller.
+- Toda lógica de negocio vive en `@Service`. Los servicios son stateless.
+
+#### Inyección de dependencias
+- Usar siempre **inyección por constructor**. Nunca `@Autowired` en campos.
+- Declarar las dependencias como `private final`.
+
+```java
+// ✅ Correcto
+@Service
+public class PublicacionService {
+    private final PublicacionRepository publicacionRepository;
+    private final ProductoRepository productoRepository;
+
+    public PublicacionService(PublicacionRepository publicacionRepository,
+                              ProductoRepository productoRepository) {
+        this.publicacionRepository = publicacionRepository;
+        this.productoRepository = productoRepository;
+    }
+}
+
+// ❌ Incorrecto
+@Service
+public class PublicacionService {
+    @Autowired
+    private PublicacionRepository publicacionRepository;
+}
+```
+
+#### DTOs
+- Usar DTOs para request y response. Las entidades JPA **nunca** se exponen en la API.
+- Cada entidad tiene su propio par en `dto/<entidad>/`:
+  - `<Entidad>RequestDTO.java` — lo que llega del cliente, con validaciones.
+  - `<Entidad>ResponseDTO.java` — lo que se devuelve al cliente.
+- Validar los request DTOs con `@Valid` + Bean Validation (`@NotNull`, `@Email`,
+  `@Positive`, `@Size`, etc.).
+- La conversión de entidad a ResponseDTO se hace en el service, no en el controller.
+
+```java
+// dto/oferta/OfertaRequestDTO.java
+public class OfertaRequestDTO {
+    @NotNull
+    private Long publicacionId;
+
+    @NotNull
+    @Positive(message = "El precio ofertado debe ser mayor a 0")
+    private BigDecimal precioOfertado;
+}
+```
+
+#### Transacciones
+- Anotar con `@Transactional` los métodos de servicio que escriben en la BD.
+- Para operaciones de solo lectura usar `@Transactional(readOnly = true)`.
+
+```java
+@Transactional
+public ReservaResponseDTO confirmarReserva(Long reservaId, Long vendedorId) { ... }
+
+@Transactional(readOnly = true)
+public List<ReservaResponseDTO> getReservasPorComprador(Long compradorId) { ... }
+```
+
+#### Manejo de excepciones
+- Definir excepciones de dominio custom en `exception/`
+  (ej: `PublicacionNotFoundException`, `StockInsuficienteException`).
+- Un único `GlobalExceptionHandler` con `@ControllerAdvice` maneja todas las excepciones.
+  Nunca usar `try/catch` en controllers.
+- Devolver siempre la estructura de error estandarizada definida en la sección de API REST.
+
+```java
+// exception/GlobalExceptionHandler.java
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PublicacionNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleNotFound(PublicacionNotFoundException ex,
+                                                           HttpServletRequest request) {
+        // construir ErrorResponseDTO con status 404
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex,
+                                                             HttpServletRequest request) {
+        // construir ErrorResponseDTO con status 422 y lista de campos inválidos
+    }
+}
+```
+
+#### Logging
+- Usar SLF4J. Declarar el logger como `private static final`.
+- Usar mensajes parametrizados, nunca concatenación de strings.
+
+```java
+private static final Logger logger = LoggerFactory.getLogger(CarritoService.class);
+
+// ✅ Correcto
+logger.info("Checkout realizado por usuario id={}", usuarioId);
+
+// ❌ Incorrecto
+logger.info("Checkout realizado por usuario id=" + usuarioId);
+```
+
+#### Repositorios
+- Extender `JpaRepository<Entidad, Long>` para operaciones CRUD estándar.
+- Para consultas que no cubre Spring Data por convención de nombres, usar `@Query` con JPQL.
+
+```java
+@Query("SELECT p FROM Publicacion p WHERE p.estado = 'ACTIVA' AND p.producto.categoria = :categoria")
+List<Publicacion> findActivasByCategoria(@Param("categoria") Categoria categoria);
+```
+
+#### Acceso y autorización
+- Usar `@PreAuthorize` en el controller para control de rol (COMPRADOR / VENDEDOR).
+- Validar en el **service** que el usuario autenticado sea el dueño del recurso antes de
+  cualquier mutación. El controller solo verifica el rol, el service verifica la propiedad.
+- Nombres de clases, métodos y variables en inglés. Comentarios en español si hacen falta.
 
 ---
 
-## Testing
+### Frontend (React)
 
-### Backend
-```bash
-cd backend
-./mvnw test                                    # toda la suite
-./mvnw test -Dtest=ReservaServiceTest          # test específico
-```
-- Tests unitarios para toda la capa de servicio con Mockito.
-- Tests de integración por controller con `@SpringBootTest` + `MockMvc`:
-  verificar código HTTP, estructura JSON y reglas de negocio (ej: no reservar pieza propia).
-- La suite completa debe estar en verde antes de cada entrega obligatoria.
+El frontend se construye en fases que siguen el cronograma de la materia. Cada fase tiene
+su propio enfoque; no adelantar implementaciones de fases posteriores.
 
-### Frontend
-```bash
-cd frontend
-npm run test          # Vitest modo watch
-npm run test -- --run # una sola pasada
+#### Fase 1 — Entregas 3 y 4: maquetado y routing (sin llamadas a la API)
+
+- Solo componentes funcionales. Un componente por archivo, PascalCase.
+- Tailwind directo en JSX desde el primer día. No crear archivos CSS salvo para animaciones
+  que Tailwind no pueda resolver.
+- Routing con `react-router-dom`. Todas las rutas definidas en `routes/`.
+- Rutas protegidas con un componente `<PrivateRoute role="COMPRADOR">` que redirige a
+  `/login` si no hay sesión activa o el rol no coincide.
+- El estado de sesión en esta fase puede ser local (useState) o hardcodeado para poder
+  navegar durante el desarrollo visual.
+- Props para pasar datos entre componentes padre e hijo. Sin fetch, sin Redux todavía.
+
+#### Fase 2 — Entrega 5: integración con el backend (fetch + useEffect)
+
+- Crear la carpeta `services/` con una función por recurso de la API. Los componentes
+  **nunca** llaman a `fetch` directamente.
+- Usar `useEffect` para disparar las llamadas al backend al montar el componente.
+- El token JWT se lee de `localStorage` y se adjunta en el header `Authorization` desde
+  cada función de `services/`.
+- Manejar los tres estados de cada llamada: cargando, éxito y error. Mostrar feedback
+  visual al usuario en cada caso.
+
+```jsx
+// services/publicacionService.js
+const API_URL = import.meta.env.VITE_API_URL;
+
+export async function getPublicaciones(filtros = {}) {
+  const params = new URLSearchParams(filtros).toString();
+  const res = await fetch(`${API_URL}/publicaciones?${params}`);
+  if (!res.ok) throw new Error('Error al obtener publicaciones');
+  return res.json();
+}
+
+// pages/Catalogo/Catalogo.jsx
+function Catalogo() {
+  const [publicaciones, setPublicaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getPublicaciones()
+      .then(setPublicaciones)
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>Error: {error}</p>;
+  return ( /* renderizar publicaciones */ );
+}
 ```
-- Testear reducers de Redux (son funciones puras, fácil).
-- Testear los formularios críticos: login, registro, nueva publicación, oferta.
+
+#### Fase 3 — Entrega 6: refactorización a Redux Toolkit
+
+- Crear la carpeta `store/` con un slice por recurso principal.
+- Migrar el estado y las llamadas a la API de los componentes a los slices usando
+  `createAsyncThunk`.
+- Las funciones de `services/` **no cambian**: los thunks las llaman igual que antes
+  lo hacían los componentes. Solo cambia dónde vive el estado y quién dispara el fetch.
+- Los componentes dejan de tener estado local para datos remotos: leen del store con
+  `useSelector` y despachan acciones con `useDispatch`.
+
+```jsx
+// store/catalogoSlice.js
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getPublicaciones } from '../services/publicacionService';
+
+export const fetchPublicaciones = createAsyncThunk(
+  'catalogo/fetchPublicaciones',
+  async (filtros) => getPublicaciones(filtros)
+);
+
+const catalogoSlice = createSlice({
+  name: 'catalogo',
+  initialState: { publicaciones: [], loading: false, error: null },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPublicaciones.pending, (state) => { state.loading = true; })
+      .addCase(fetchPublicaciones.fulfilled, (state, action) => {
+        state.loading = false;
+        state.publicaciones = action.payload;
+      })
+      .addCase(fetchPublicaciones.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  }
+});
+
+export default catalogoSlice.reducer;
+```
+
+#### Slices de Redux (Entrega 6)
+
+| Slice | Estado |
+|---|---|
+| `authSlice` | `{ usuario, token, rol, isAuthenticated }` — token persiste en `localStorage` |
+| `catalogoSlice` | `{ publicaciones[], filtros, loading, error }` |
+| `carritoSlice` | `{ items[], loading }` |
+| `favoritosSlice` | `{ items[], loading }` |
+| `reservasSlice` | `{ reservas[], loading }` |
+| `ofertasSlice` | `{ ofertas[], loading }` |
 
 ---
 
 ## Security considerations
 
-- **Nunca** commitear `application-local.properties` ni `.env.local`. Agregarlos al `.gitignore`
+- **Nunca** commitear `application-local.yml` ni `.env.local`. Están en `.gitignore`
   desde el primer commit.
 - JWT stateless con expiración de 24 hs. El backend no guarda sesión.
-- Validar en el **servicio** (no solo en el controller) que el usuario autenticado sea el dueño
+- Validar en el **service** (no solo en el controller) que el usuario autenticado sea el dueño
   del recurso antes de cualquier mutación.
 - CORS configurado explícitamente en `SecurityConfig` para aceptar solo `http://localhost:5173`
   en desarrollo.
 - Passwords hasheados con BCrypt. Nunca loguear ni devolver la password en ninguna respuesta.
-- Si se trabaja en ramas, nunca mergear a `main` sin que los tests pasen.
+- Usar JPQL o Spring Data para toda interacción con la BD. Nunca construir queries por
+  concatenación de strings (prevención de SQL injection).
+- Si se trabaja en ramas, nunca mergear a `main` con el backend que no levanta o el
+  frontend que no compila.
 
 ---
 
 ## Sugerencia de división de trabajo (4 integrantes)
 
-Una vez que lo definan, pueden organizarse así para evitar conflictos:
-
-| Integrante | Módulos sugeridos |
+| Integrante | Responsabilidad |
 |---|---|
 | Dev 1 | Backend: `auth` + `usuario` + `producto` + `publicacion` |
-| Dev 2 | Backend: `favorito` + `reserva` + `oferta` |
-| Dev 3 | Frontend: autenticación + catálogo + detalle de pieza |
+| Dev 2 | Backend: `carrito` + `reserva` + `oferta` + `favorito` |
+| Dev 3 | Frontend: autenticación + catálogo + detalle de pieza + carrito |
 | Dev 4 | Frontend: lista de deseos + reservas + ofertas + panel vendedor |
 
 Cada dev crea su rama desde `main` con el formato `feature/<modulo>` y hace PR al terminar.
 
 ---
-
-## Entregas obligatorias (TPO)
-
-| # | Contenido | Fecha límite |
-|---|---|---|
-| 1 | Modelo de datos y entidades JPA con relaciones | 07/04 |
-| 2 | Seguridad con JWT integrada a la capa de datos | 22/04 |
-| 3 | Maquetación visual del frontend (Tailwind) | 20/05 |
-| 4 | Componentes React y routing con React Router | 04/06 |
-| 5 | Integración frontend ↔ backend (Fetch + Promises) | 18/06 |
-| 6 | Refactorización e integración de Redux Toolkit | 02/07 |
-
-Cada entrega se defiende con **demo en vivo** (5–10 min por grupo).
-El código debe correr sin errores al momento de la presentación.
-
-**Parcial:** Sábado 13/06 &nbsp;|&nbsp; **Final regular:** Viernes 24/07

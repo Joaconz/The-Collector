@@ -1,34 +1,52 @@
 package com.uade.tpo.thecollector.backend.controller;
 
-import com.uade.tpo.thecollector.backend.service.PublicacionService;
+import jakarta.validation.Valid;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Map;
+
+import com.uade.tpo.thecollector.backend.dto.publicacion.PublicacionRequestDTO;
+import com.uade.tpo.thecollector.backend.dto.publicacion.PublicacionResponseDTO;
+import com.uade.tpo.thecollector.backend.dto.publicacion.UpdateEstadoRequestDTO;
+import com.uade.tpo.thecollector.backend.service.PublicacionService;
 
 @RestController
 @RequestMapping("/api/publicaciones")
 public class PublicacionController {
 
-    private final PublicacionService publicacionService;
+	private final PublicacionService publicacionService;
 
-    public PublicacionController(PublicacionService publicacionService) {
-        this.publicacionService = publicacionService;
-    }
+	public PublicacionController(PublicacionService publicacionService) {
+		this.publicacionService = publicacionService;
+	}
 
-    @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> getPublicaciones() {
-        return ResponseEntity.ok(publicacionService.getPublicaciones());
-    }
+	@GetMapping
+	public ResponseEntity<Page<PublicacionResponseDTO>> getPublicaciones(Pageable pageable) {
+		return ResponseEntity.ok(publicacionService.getPublicaciones(pageable));
+	}
 
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> createPublicacion(@RequestBody Map<String, Object> request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(publicacionService.createPublicacion(request));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<PublicacionResponseDTO> getPublicacionById(@PathVariable Long id) {
+		return ResponseEntity.ok(publicacionService.getPublicacionById(id));
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateEstadoPublicacion(@PathVariable Long id, @RequestBody Map<String, Object> request) {
-        return ResponseEntity.ok(publicacionService.updateEstadoPublicacion(id, request));
-    }
+	@PostMapping
+	public ResponseEntity<PublicacionResponseDTO> createPublicacion(@Valid @RequestBody PublicacionRequestDTO request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(publicacionService.createPublicacion(request));
+	}
+
+	@PatchMapping("/{id}/estado")
+	public ResponseEntity<PublicacionResponseDTO> updateEstado(@PathVariable Long id,
+			@Valid @RequestBody UpdateEstadoRequestDTO request) {
+		return ResponseEntity.ok(publicacionService.updateEstado(id, request));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePublicacion(@PathVariable Long id) {
+		publicacionService.deletePublicacion(id);
+		return ResponseEntity.noContent().build();
+	}
 }

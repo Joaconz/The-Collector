@@ -1,32 +1,66 @@
 package com.uade.tpo.thecollector.backend.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.uade.tpo.thecollector.backend.exception.ResourceNotFoundException;
+import com.uade.tpo.thecollector.backend.dto.producto.ProductoRequestDTO;
+import com.uade.tpo.thecollector.backend.dto.producto.ProductoResponseDTO;
+import com.uade.tpo.thecollector.backend.model.Producto;
+import com.uade.tpo.thecollector.backend.repository.ProductoRepository;
 
 @Service
 public class ProductoService {
 
-    public List<Map<String, Object>> getProductos() {
-        return List.of(
-                Map.of("id", 1, "nombre", "Reloj Vintage Rolex", "precio", 5000),
-                Map.of("id", 2, "nombre", "Cuadro Renacentista", "precio", 15000)
-        );
-    }
+	private final ProductoRepository productoRepository;
 
-    public Map<String, Object> getProductoById(Long id) {
-        return Map.of("id", id, "nombre", "Producto Test " + id, "precio", 999);
-    }
+	public ProductoService(ProductoRepository productoRepository) {
+		this.productoRepository = productoRepository;
+	}
 
-    public Map<String, Object> createProducto(Map<String, Object> producto) {
-        return Map.of("message", "Producto creado exitosamente", "producto", producto);
-    }
+	@Transactional(readOnly = true)
+	public Page<ProductoResponseDTO> getProductos(Pageable pageable) {
+		return productoRepository.findAll(pageable).map(ProductoResponseDTO::new);
+	}
 
-    public Map<String, Object> updateProducto(Long id, Map<String, Object> producto) {
-        return Map.of("message", "Producto modificado exitosamente", "id", id);
-    }
+	@Transactional(readOnly = true)
+	public ProductoResponseDTO getProductoById(Long id) {
+		Producto producto = productoRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el id: " + id));
+		return new ProductoResponseDTO(producto);
+	}
 
-    public Map<String, Object> deleteProducto(Long id) {
-        return Map.of("message", "Producto eliminado exitosamente", "id", id);
-    }
+	@Transactional
+	public ProductoResponseDTO createProducto(ProductoRequestDTO dto) {
+		Producto producto = new Producto(dto.getNombre(), dto.getDescripcion(), dto.getHistoria(), dto.getPrecio(),
+				dto.getStock(), dto.getCategoria(), dto.getImagenUrl());
+		producto = productoRepository.save(producto);
+		return new ProductoResponseDTO(producto);
+	}
+
+	@Transactional
+	public ProductoResponseDTO updateProducto(Long id, ProductoRequestDTO dto) {
+		Producto producto = productoRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el id: " + id));
+
+		producto.setNombre(dto.getNombre());
+		producto.setDescripcion(dto.getDescripcion());
+		producto.setHistoria(dto.getHistoria());
+		producto.setPrecio(dto.getPrecio());
+		producto.setStock(dto.getStock());
+		producto.setCategoria(dto.getCategoria());
+		producto.setImagenUrl(dto.getImagenUrl());
+
+		producto = productoRepository.save(producto);
+		return new ProductoResponseDTO(producto);
+	}
+
+	@Transactional
+	public void deleteProducto(Long id) {
+		Producto producto = productoRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el id: " + id));
+		productoRepository.delete(producto);
+	}
 }

@@ -1,34 +1,39 @@
 package com.uade.tpo.thecollector.backend.controller;
 
-import com.uade.tpo.thecollector.backend.service.OrdenService;
+import jakarta.validation.Valid;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Map;
+import com.uade.tpo.thecollector.backend.dto.orden.OrdenRequestDTO;
+import com.uade.tpo.thecollector.backend.dto.orden.OrdenResponseDTO;
+import com.uade.tpo.thecollector.backend.service.OrdenService;
+
 
 @RestController
 @RequestMapping("/api/ordenes")
 public class OrdenController {
 
-    private final OrdenService ordenService;
+	private final OrdenService ordenService;
 
-    public OrdenController(OrdenService ordenService) {
-        this.ordenService = ordenService;
-    }
+	public OrdenController(OrdenService ordenService) {
+		this.ordenService = ordenService;
+	}
 
-    @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> getOrdenes() {
-        return ResponseEntity.ok(ordenService.getOrdenes());
-    }
+	@GetMapping
+	public ResponseEntity<Page<OrdenResponseDTO>> getOrdenes(Pageable pageable) {
+		return ResponseEntity.ok(ordenService.getOrdenes(pageable));
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getOrdenById(@PathVariable Long id) {
-        return ResponseEntity.ok(ordenService.getOrdenById(id));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<OrdenResponseDTO> getOrdenById(@PathVariable Long id) {
+		return ResponseEntity.ok(ordenService.getOrdenById(id));
+	}
 
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> createOrden(@RequestBody Map<String, Object> request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ordenService.createOrden(request));
-    }
+	@PostMapping
+	public ResponseEntity<OrdenResponseDTO> createOrden(@Valid @RequestBody OrdenRequestDTO request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(ordenService.createOrden(request));
+	}
 }
