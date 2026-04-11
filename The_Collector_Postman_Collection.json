@@ -9,7 +9,7 @@
       "name": "Status",
       "request": {
         "method": "GET",
-        "url": {"raw": "http://localhost:8080/status", "host": ["localhost"], "port": "8080", "path": ["status"]}
+        "url": { "raw": "http://localhost:8080/status", "host": ["localhost"], "port": "8080", "path": ["status"] }
       }
     },
     {
@@ -19,18 +19,26 @@
           "name": "Register",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"email\": \"user@test.com\", \"password\": \"1234\", \"nombre\": \"Joaquin\"}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/auth/register", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "register"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Joaquin\",\n  \"email\": \"user@test.com\",\n  \"password\": \"1234\",\n  \"rol\": \"COMPRADOR\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/auth/register", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "register"] }
           }
         },
         {
           "name": "Login",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"email\": \"user@test.com\", \"password\": \"1234\"}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/auth/login", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "login"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@test.com\",\n  \"password\": \"1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/auth/login", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "login"] }
           }
         }
       ]
@@ -40,33 +48,41 @@
       "item": [
         {
           "name": "Listar",
-          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/productos", "host": ["localhost"], "port": "8080", "path": ["api", "productos"]}}
+          "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/productos", "host": ["localhost"], "port": "8080", "path": ["api", "productos"] } }
         },
         {
           "name": "Obtener por Id",
-          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"]}}
+          "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"] } }
         },
         {
           "name": "Crear",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"nombre\": \"Item Prueba\"}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/productos", "host": ["localhost"], "port": "8080", "path": ["api", "productos"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Item Prueba\",\n  \"descripcion\": \"Descripción del item\",\n  \"precio\": 1000.00,\n  \"stock\": 5,\n  \"categoria\": \"Coleccionables\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/productos", "host": ["localhost"], "port": "8080", "path": ["api", "productos"] }
           }
         },
         {
           "name": "Actualizar",
           "request": {
             "method": "PUT",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"precio\": 1000}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Item Prueba Modificado\",\n  \"descripcion\": \"Descripción actualizada\",\n  \"precio\": 1500.00,\n  \"stock\": 10,\n  \"categoria\": \"Coleccionables\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"] }
           }
         },
         {
           "name": "Eliminar",
-          "request": {"method": "DELETE", "url": {"raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"]}}
+          "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"] } }
         }
       ]
     },
@@ -75,19 +91,23 @@
       "item": [
         {
           "name": "Listar",
-          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/ordenes", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes"]}}
+          "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/ordenes", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes"] } }
         },
         {
           "name": "Obtener por Id",
-          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/ordenes/100", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes", "100"]}}
+          "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/ordenes/1", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes", "1"] } }
         },
         {
           "name": "Crear (Checkout)",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"items\": [1, 2]}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/ordenes", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"compradorId\": 1,\n  \"productoIds\": [1, 2]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/ordenes", "host": ["localhost"], "port": "8080", "path": ["api", "ordenes"] }
           }
         }
       ]
@@ -97,24 +117,32 @@
       "item": [
         {
           "name": "Listar",
-          "request": {"method": "GET", "url": {"raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"]}}
+          "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"] } }
         },
         {
           "name": "Crear",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"productoId\": 1}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendedorId\": 2,\n  \"producto\": {\n    \"nombre\": \"Cámara Leica M3 (1954)\",\n    \"descripcion\": \"Cámara telemétrica de 35mm\",\n    \"historia\": \"Usada por un fotógrafo en los 60\",\n    \"precio\": 3200.50,\n    \"stock\": 1,\n    \"categoria\": \"Cámaras\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"] }
           }
         },
         {
           "name": "Cambiar Estado",
           "request": {
             "method": "PUT",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\"estado\": \"PAUSADA\"}", "options": {"raw": {"language": "json"}}},
-            "url": {"raw": "http://localhost:8080/api/publicaciones/1", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1"]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"REACTIVADA\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:8080/api/publicaciones/1", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1"] }
           }
         }
       ]
