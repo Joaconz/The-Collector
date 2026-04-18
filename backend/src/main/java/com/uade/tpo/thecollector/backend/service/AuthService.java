@@ -1,8 +1,9 @@
 package com.uade.tpo.thecollector.backend.service;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +20,14 @@ public class AuthService {
 
 	private final UsuarioRepository usuarioRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtService jwtService;
+	private final AuthenticationManager authenticationManager;
 
-	public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+	public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
 		this.usuarioRepository = usuarioRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.jwtService = jwtService;
+		this.authenticationManager = authenticationManager;
 	}
 
 	@Transactional
@@ -36,24 +41,25 @@ public class AuthService {
 
 		usuario = usuarioRepository.save(usuario);
 
-		// JWT mock (To be replaced with stateless JWT token generation)
-		String mockToken = UUID.randomUUID().toString();
+		String token = jwtService.generateToken(usuario);
 
-		return new AuthResponseDTO(mockToken, usuario.getRol(), usuario.getNombre(), usuario.getId());
+		return new AuthResponseDTO(token, usuario.getRol(), usuario.getNombre(), usuario.getId());
 	}
 
 	@Transactional(readOnly = true)
 	public AuthResponseDTO login(LoginRequestDTO request) {
+		authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
+						request.getEmail(),
+						request.getPassword()
+				)
+		);
+
 		Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("Credenciales inválidas"));
 
-		if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
-			throw new IllegalArgumentException("Credenciales inválidas");
-		}
+		String token = jwtService.generateToken(usuario);
 
-		// JWT mock
-		String mockToken = UUID.randomUUID().toString();
-
-		return new AuthResponseDTO(mockToken, usuario.getRol(), usuario.getNombre(), usuario.getId());
+		return new AuthResponseDTO(token, usuario.getRol(), usuario.getNombre(), usuario.getId());
 	}
 }
