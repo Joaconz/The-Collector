@@ -39,6 +39,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponseDTO> handleGeneric(Exception ex, HttpServletRequest request) {
+		ex.printStackTrace(); // TODO: Remover para production
 		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error",
 				"Ocurrió un error inesperado", request.getRequestURI(), LocalDateTime.now());
 		return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
