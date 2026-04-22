@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
@@ -74,10 +73,6 @@ public class JwtService {
 	}
 
 	private Key getSignInKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-		// Assuming secretKey might not be base64 encoded by users for simple univ project,
-		// let's use the raw bytes if it fails. Spring Boot / JJWT can't decode plain string base64 easily without try/catch,
-		// actually Keys.hmacShaKeyFor(secretKey.getBytes()) is safer for unknown strings.
 		return Keys.hmacShaKeyFor(secretKey.getBytes());
 	}
 }
