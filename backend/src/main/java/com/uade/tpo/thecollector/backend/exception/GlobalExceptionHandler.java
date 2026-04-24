@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +37,21 @@ public class GlobalExceptionHandler {
 				request.getRequestURI(), LocalDateTime.now());
 		error.setDetails(details);
 		return ResponseEntity.status(422).body(error);
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.CONFLICT.value(), "Conflict", ex.getMessage(),
+				request.getRequestURI(), LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+	}
+
+	@ExceptionHandler({ BadCredentialsException.class, AuthenticationCredentialsNotFoundException.class })
+	public ResponseEntity<ErrorResponseDTO> handleAuthentication(Exception ex, HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "Unauthorized",
+				"Credenciales inválidas", request.getRequestURI(), LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 	}
 
 	@ExceptionHandler(Exception.class)
