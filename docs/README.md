@@ -1,4 +1,4 @@
-# VaultMarket
+# The Collector
 
 Marketplace de coleccionables premium donde piezas únicas encuentran a sus próximos dueños.
 Relojes vintage, joyería, arte, numismática: cada publicación es un objeto con historia,
@@ -9,7 +9,7 @@ no un producto genérico.
 ## Qué resuelve
 
 El e-commerce tradicional está diseñado para productos en serie: muchas unidades, precio fijo,
-compra inmediata. VaultMarket está diseñado para lo opuesto: piezas únicas o de edición muy
+compra inmediata. The Collector está diseñado para lo opuesto: piezas únicas o de edición muy
 limitada donde el valor es subjetivo, la historia importa, y el precio es frecuentemente
 negociable.
 
@@ -31,7 +31,7 @@ El sistema resuelve tres fricciones concretas del mercado de coleccionables:
 
 ## Roles de usuario
 
-VaultMarket tiene un modelo de roles flexible: **cualquier usuario puede actuar como comprador
+The Collector tiene un modelo de roles flexible: **cualquier usuario puede actuar como comprador
 o como vendedor**. El rol se define al registrarse, pero no es permanente ni excluyente.
 
 - Un **comprador** puede publicar piezas propias (actuando como vendedor).
@@ -126,7 +126,7 @@ compra directa a precio fijo, oferta privada aceptada, o cierre de subasta.
 ## Estructura del repositorio
 
 ```
-vaultmarket/
+The Collector/
 ├── README.md
 ├── AGENTS.md
 ├── docs/
@@ -134,7 +134,7 @@ vaultmarket/
 │   └── architecture.md     # Capas, comunicación frontend ↔ backend
 ├── backend/
 │   └── src/
-│       ├── main/java/com/vaultmarket/
+│       ├── main/java/com/The Collector/
 │       │   ├── auth/
 │       │   ├── usuario/
 │       │   ├── producto/

@@ -1,4 +1,4 @@
-# Business Logic — VaultMarket
+# Business Logic — The Collector
 
 Este documento describe en detalle los flujos de negocio, los estados de cada entidad,
 y las reglas que el backend debe hacer cumplir. Es la fuente de verdad para cualquier
@@ -10,7 +10,7 @@ decisión de implementación en la capa de servicio.
 
 ### Modelo de roles
 
-VaultMarket usa un modelo de roles flexible. El rol inicial se elige al registrarse,
+The Collector usa un modelo de roles flexible. El rol inicial se elige al registrarse,
 pero un usuario puede actuar en ambos contextos.
 
 | Acción | COMPRADOR | VENDEDOR |
