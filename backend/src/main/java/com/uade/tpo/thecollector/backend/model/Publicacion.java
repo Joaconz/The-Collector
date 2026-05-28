@@ -3,15 +3,20 @@ package com.uade.tpo.thecollector.backend.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "publicaciones")
+@SQLRestriction("activo = true")
 public class Publicacion {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Column(nullable = false)
+	private Boolean activo = true;
+
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "producto_id", referencedColumnName = "id")
@@ -68,5 +73,12 @@ public class Publicacion {
 	}
 	public void setFechaPublicacion(LocalDateTime fechaPublicacion) {
 		this.fechaPublicacion = fechaPublicacion;
+	}
+
+	public Boolean getActivo() {
+		return activo;
+	}
+	public void setActivo(Boolean activo) {
+		this.activo = activo;
 	}
 }

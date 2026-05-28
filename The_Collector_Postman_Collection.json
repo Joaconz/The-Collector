@@ -34,8 +34,8 @@
                 "exec": [
                   "if(pm.response.code === 201 || pm.response.code === 200) {",
                   "    let responseData = pm.response.json();",
-                  "    if (responseData.token) {",
-                  "        pm.collectionVariables.set(\"jwt_token\", responseData.token);",
+                  "    if (responseData.data && responseData.data.token) {",
+                  "        pm.collectionVariables.set(\"jwt_token\", responseData.data.token);",
                   "    }",
                   "}"
                 ],
@@ -63,8 +63,8 @@
                 "exec": [
                   "if(pm.response.code === 200) {",
                   "    let responseData = pm.response.json();",
-                  "    if (responseData.token) {",
-                  "        pm.collectionVariables.set(\"jwt_token\", responseData.token);",
+                  "    if (responseData.data && responseData.data.token) {",
+                  "        pm.collectionVariables.set(\"jwt_token\", responseData.data.token);",
                   "    }",
                   "}"
                 ],
@@ -123,8 +123,8 @@
           }
         },
         {
-          "name": "Eliminar",
-          "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/productos/1", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1"] } }
+          "name": "Inactivar",
+          "request": { "method": "PATCH", "url": { "raw": "http://localhost:8080/api/productos/1/inactivar", "host": ["localhost"], "port": "8080", "path": ["api", "productos", "1", "inactivar"] } }
         }
       ]
     },
@@ -162,6 +162,10 @@
           "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/publicaciones", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones"] } }
         },
         {
+          "name": "Obtener por Id",
+          "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/publicaciones/1", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1"] } }
+        },
+        {
           "name": "Crear",
           "request": {
             "method": "POST",
@@ -177,15 +181,19 @@
         {
           "name": "Cambiar Estado",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"estado\": \"REACTIVADA\"\n}",
+              "raw": "{\n  \"estado\": \"ACTIVA\"\n}",
               "options": { "raw": { "language": "json" } }
             },
-            "url": { "raw": "http://localhost:8080/api/publicaciones/1", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1"] }
+            "url": { "raw": "http://localhost:8080/api/publicaciones/1/estado", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1", "estado"] }
           }
+        },
+        {
+          "name": "Inactivar",
+          "request": { "method": "PATCH", "url": { "raw": "http://localhost:8080/api/publicaciones/1/inactivar", "host": ["localhost"], "port": "8080", "path": ["api", "publicaciones", "1", "inactivar"] } }
         }
       ]
     }

@@ -1,6 +1,4 @@
 # Local AI Agent configuration and instructions
-.agents/
-.claude/
 .vscode/
 instructions/
 contexto_proyecto_tpo.md

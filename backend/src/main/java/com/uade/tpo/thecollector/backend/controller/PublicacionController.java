@@ -53,10 +53,10 @@ public class PublicacionController {
 				publicacionService.updateEstado(id, request), LocalDateTime.now()));
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponseDTO<Map<String, Long>>> deletePublicacion(@PathVariable Long id) {
-		publicacionService.deletePublicacion(id);
-		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Publicación eliminada correctamente",
+	@PatchMapping("/{id}/inactivar")
+	public ResponseEntity<ApiResponseDTO<Map<String, Long>>> inactivarPublicacion(@PathVariable Long id) {
+		publicacionService.inactivarPublicacion(id);
+		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Publicación inactivada correctamente",
 				Map.of("id", id), LocalDateTime.now()));
 	}
 }

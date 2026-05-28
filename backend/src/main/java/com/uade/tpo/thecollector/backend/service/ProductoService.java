@@ -58,9 +58,11 @@ public class ProductoService {
 	}
 
 	@Transactional
-	public void deleteProducto(Long id) {
+	public void inactivarProducto(Long id) {
 		Producto producto = productoRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el id: " + id));
-		productoRepository.delete(producto);
+
+		producto.setActivo(false);
+		productoRepository.save(producto);
 	}
 }

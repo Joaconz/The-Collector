@@ -3,15 +3,20 @@ package com.uade.tpo.thecollector.backend.model;
 import java.math.BigDecimal;
 
 import jakarta.persistence.*;
-
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "productos")
+@SQLRestriction("activo = true")
 public class Producto {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Column(nullable = false)
+	private Boolean activo = true;
+
 
 	@Column(nullable = false)
 	private String nombre;
@@ -100,5 +105,12 @@ public class Producto {
 	}
 	public void setImagenUrl(String imagenUrl) {
 		this.imagenUrl = imagenUrl;
+	}
+
+	public Boolean getActivo() {
+		return activo;
+	}
+	public void setActivo(Boolean activo) {
+		this.activo = activo;
 	}
 }

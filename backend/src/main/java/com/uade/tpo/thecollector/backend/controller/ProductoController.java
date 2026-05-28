@@ -52,10 +52,10 @@ public class ProductoController {
 				productoService.updateProducto(id, request), LocalDateTime.now()));
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponseDTO<Map<String, Long>>> deleteProducto(@PathVariable Long id) {
-		productoService.deleteProducto(id);
-		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Producto eliminado correctamente",
+	@PatchMapping("/{id}/inactivar")
+	public ResponseEntity<ApiResponseDTO<Map<String, Long>>> inactivarProducto(@PathVariable Long id) {
+		productoService.inactivarProducto(id);
+		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Producto inactivado correctamente",
 				Map.of("id", id), LocalDateTime.now()));
 	}
 }

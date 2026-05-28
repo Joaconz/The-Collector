@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.uade.tpo.thecollector.backend.dto.publicacion.PublicacionRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.publicacion.PublicacionResponseDTO;
@@ -62,6 +64,8 @@ public class PublicacionService {
 		Publicacion publicacion = publicacionRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Publicación no encontrada"));
 
+		verificarPropiedad(publicacion);
+
 		publicacion.setEstado(request.getEstado());
 		publicacion = publicacionRepository.save(publicacion);
 
@@ -69,9 +73,20 @@ public class PublicacionService {
 	}
 
 	@Transactional
-	public void deletePublicacion(Long id) {
+	public void inactivarPublicacion(Long id) {
 		Publicacion publicacion = publicacionRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Publicación no encontrada"));
-		publicacionRepository.delete(publicacion);
+
+		verificarPropiedad(publicacion);
+
+		publicacion.setActivo(false);
+		publicacionRepository.save(publicacion);
+	}
+
+	private void verificarPropiedad(Publicacion publicacion) {
+		String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		if (!publicacion.getVendedor().getEmail().equals(currentUserEmail)) {
+			throw new AccessDeniedException("No tienes permiso para modificar esta publicación");
+		}
 	}
 }
