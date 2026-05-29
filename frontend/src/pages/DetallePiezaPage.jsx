@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import OfertaModal from '../components/forms/OfertaModal';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import { getPublicacionById, MODO_VENTA, ESTADO_PUBLICACION } from '../data/mockData';
 
 const DetallePiezaPage = ({
@@ -20,6 +21,20 @@ const DetallePiezaPage = ({
   const [imagenActiva, setImagenActiva] = useState(0);
   const [ofertaModalOpen, setOfertaModalOpen] = useState(false);
   
+  // Estado del modal de confirmación (unificado para reserva y puja)
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    description: '',
+    details: [],
+    confirmText: 'CONFIRMAR',
+    icon: 'verified',
+    variant: 'success',
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+
   // Estados para subasta
   const [pujaMonto, setPujaMonto] = useState('');
   const [pujaError, setPujaError] = useState('');
@@ -62,18 +77,33 @@ const DetallePiezaPage = ({
     }).format(val);
   };
 
-  // Manejo de Reserva Directa
+  // Manejo de Reserva Directa — abre confirmación antes de ejecutar
   const handleReservaDirecta = () => {
     if (!currentUser) {
       alert('Debe iniciar sesión para realizar transacciones.');
       navigate('/login');
       return;
     }
-    
-    // Crear reserva
-    onAddReserva(pub.id, pub.precio, pub.vendedor);
-    alert(`¡Solicitud de Reserva iniciada con éxito para: ${pub.nombre}! Se lo ha redirigido a su panel de control.`);
-    navigate('/reservas');
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirmar Solicitud de Reserva',
+      description: 'Está por iniciar una reserva directa sobre esta pieza. El curador recibirá su solicitud y deberá confirmarla para completar la adquisición.',
+      details: [
+        { label: 'PIEZA', value: pub.nombre },
+        { label: 'VENDEDOR', value: pub.vendedor },
+        { label: 'VALOR DE ADQUISICIÓN', value: `${formatCurrency(pub.precio)} USD` },
+        { label: 'TIPO', value: 'Reserva Directa' },
+      ],
+      confirmText: 'SOLICITAR RESERVA',
+      cancelText: 'CANCELAR',
+      icon: 'bookmark_added',
+      variant: 'success',
+      onConfirm: () => {
+        onAddReserva(pub.id, pub.precio, pub.vendedor);
+        closeConfirmModal();
+        navigate('/reservas');
+      },
+    });
   };
 
   // Manejo de Oferta
@@ -90,7 +120,7 @@ const DetallePiezaPage = ({
     navigate('/ofertas');
   };
 
-  // Manejo de Puja (Subasta)
+  // Manejo de Puja (Subasta) — valida primero, luego abre confirmación
   const handleRegistrarPuja = (e) => {
     e.preventDefault();
     setPujaError('');
@@ -110,12 +140,27 @@ const DetallePiezaPage = ({
       return;
     }
 
-    // Registrar puja
-    onAddPuja(monto);
-    alert(`¡Puja registrada con éxito por ${formatCurrency(monto)} USD! Usted es ahora el postor líder.`);
-    
-    // Actualizar sugerencia
-    setPujaMonto(monto + pub.incrementoMinimo);
+    // Abrir modal de confirmación antes de registrar
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirmar Puja en Vivo',
+      description: '¿Confirma el registro de esta puja? Si es aceptada, quedará como el postor líder de la subasta.',
+      details: [
+        { label: 'PIEZA', value: pub.nombre },
+        { label: 'PUJA ACTUAL LÍDER', value: `${formatCurrency(precioReferencia)} USD` },
+        { label: 'SU PUJA', value: `${formatCurrency(monto)} USD` },
+        { label: 'INCREMENTO', value: `+${formatCurrency(monto - precioReferencia)} USD` },
+      ],
+      confirmText: 'REGISTRAR PUJA',
+      cancelText: 'REVISAR',
+      icon: 'gavel',
+      variant: 'success',
+      onConfirm: () => {
+        onAddPuja(monto);
+        closeConfirmModal();
+        setPujaMonto(monto + pub.incrementoMinimo);
+      },
+    });
   };
 
   return (
@@ -360,6 +405,20 @@ const DetallePiezaPage = ({
         onClose={() => setOfertaModalOpen(false)}
         publicacion={pub}
         onConfirm={handleOfertaSubmit}
+      />
+
+      {/* Modal de Confirmación Transaccional */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        description={confirmModal.description}
+        details={confirmModal.details}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        icon={confirmModal.icon}
+        variant={confirmModal.variant}
       />
     </div>
   );

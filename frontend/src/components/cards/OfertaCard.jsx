@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import ConfirmModal from '../ui/ConfirmModal';
 import { getPublicacionById } from '../../data/mockData';
 
 const OfertaCard = ({ oferta, onUpdateEstado }) => {
@@ -30,17 +31,63 @@ const OfertaCard = ({ oferta, onUpdateEstado }) => {
     }).format(val);
   };
 
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    description: '',
+    details: [],
+    confirmText: 'CONFIRMAR',
+    cancelText: 'CANCELAR',
+    icon: 'verified',
+    variant: 'success',
+    onConfirm: null,
+  });
+  const closeConfirmModal = () => setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+
   const handleAceptar = () => {
-    onUpdateEstado(id, 'ACEPTADA');
-    alert(`¡Contraoferta aceptada con éxito! Su adquisición ha sido consolidada. Puede revisarla ahora en 'Mis Reservas'.`);
+    setConfirmModal({
+      isOpen: true,
+      title: 'Aceptar Contraoferta del Curador',
+      description: 'Al aceptar, se creará automáticamente una reserva con el precio acordado. Podrá seguirla desde "Mis Reservas".',
+      details: [
+        { label: 'PIEZA', value: pieza.nombre },
+        { label: 'VENDEDOR', value: vendedor },
+        { label: 'SU OFERTA INICIAL', value: `${formatCurrency(precioOfertado)} USD` },
+        { label: 'PRECIO ACORDADO', value: `${formatCurrency(precioContraoferta)} USD` },
+      ],
+      confirmText: 'ACEPTAR PROPUESTA',
+      cancelText: 'REVISAR',
+      icon: 'handshake',
+      variant: 'success',
+      onConfirm: () => {
+        onUpdateEstado(id, 'ACEPTADA');
+        closeConfirmModal();
+      },
+    });
   };
 
   const handleRechazar = () => {
-    onUpdateEstado(id, 'RECHAZADA');
-    alert(`Oferta rechazada y cerrada formalmente.`);
+    setConfirmModal({
+      isOpen: true,
+      title: 'Rechazar Contraoferta',
+      description: 'Al rechazar, la propuesta de negociación será cerrada formalmente. Podrá iniciar una nueva oferta desde el catálogo.',
+      details: [
+        { label: 'PIEZA', value: pieza.nombre },
+        { label: 'CONTRAOFERTA A RECHAZAR', value: `${formatCurrency(precioContraoferta)} USD` },
+      ],
+      confirmText: 'RECHAZAR',
+      cancelText: 'CANCELAR',
+      icon: 'block',
+      variant: 'danger',
+      onConfirm: () => {
+        onUpdateEstado(id, 'RECHAZADA');
+        closeConfirmModal();
+      },
+    });
   };
 
   return (
+    <>
     <div className={`
       bg-surface-container border text-left flex flex-col md:flex-row transition-all duration-300
       ${estado === 'CONTRAOFERTA_RECIBIDA' ? 'border-[#dec2a3]' : 'border-outline-variant/40 hover:border-outline'}
@@ -176,6 +223,21 @@ const OfertaCard = ({ oferta, onUpdateEstado }) => {
       </div>
 
     </div>
+
+    {/* Modal de Confirmación */}
+    <ConfirmModal
+      isOpen={confirmModal.isOpen}
+      onClose={closeConfirmModal}
+      onConfirm={confirmModal.onConfirm}
+      title={confirmModal.title}
+      description={confirmModal.description}
+      details={confirmModal.details}
+      confirmText={confirmModal.confirmText}
+      cancelText={confirmModal.cancelText}
+      icon={confirmModal.icon}
+      variant={confirmModal.variant}
+    />
+    </>
   );
 };
 

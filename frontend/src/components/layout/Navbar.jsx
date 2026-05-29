@@ -122,13 +122,22 @@ const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
                   </div>
 
                   {currentUser.rol === 'VENDEDOR' ? (
-                    <Link
-                      to="/vendedor"
-                      onClick={() => setUserDropdownOpen(false)}
-                      className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
-                    >
-                      Panel de Control
-                    </Link>
+                    <>
+                      <Link
+                        to="/vendedor"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
+                      >
+                        Panel de Control
+                      </Link>
+                      <Link
+                        to="/vendedor/historial"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
+                      >
+                        Historial de Ventas
+                      </Link>
+                    </>
                   ) : (
                     <>
                       <Link
@@ -204,13 +213,22 @@ const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
             {currentUser && (
               <div className="pt-4 border-t border-outline-variant/40 flex flex-col space-y-4 text-left">
                 {currentUser.rol === 'VENDEDOR' ? (
-                  <Link
-                    to="/vendedor"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
-                  >
-                    PANEL DE CONTROL
-                  </Link>
+                  <>
+                    <Link
+                      to="/vendedor"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
+                    >
+                      PANEL DE CONTROL
+                    </Link>
+                    <Link
+                      to="/vendedor/historial"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
+                    >
+                      HISTORIAL DE VENTAS
+                    </Link>
+                  </>
                 ) : (
                   <>
                     <Link

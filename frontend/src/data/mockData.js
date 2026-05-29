@@ -346,6 +346,56 @@ export const mockPujas = [
   { id: 5, usuario: "Joaquín González", monto: 145000, fecha: "Hace 5 min" } // El usuario actual tiene la mejor puja
 ];
 
+// Historial de Ventas Completadas (Vendedor: "Aura Dolce Galería")
+export const TIPO_OPERACION = {
+  VENTA_DIRECTA: "VENTA_DIRECTA",
+  OFERTA_ACEPTADA: "OFERTA_ACEPTADA",
+  SUBASTA_ADJUDICADA: "SUBASTA_ADJUDICADA"
+};
+
+export const mockVentas = [
+  {
+    id: 301,
+    piezaId: 8, // AP Royal Oak — VENDIDA
+    ref: "VTA-2026-001",
+    comprador: "Joaquín González",
+    precioFinal: 42000,
+    tipoOperacion: TIPO_OPERACION.VENTA_DIRECTA,
+    fechaVenta: "2026-04-10",
+    comision: 2100 // 5% sobre el precio final
+  },
+  {
+    id: 302,
+    piezaId: 1, // Rolex Daytona — reserva confirmada
+    ref: "VTA-2026-002",
+    comprador: "Coleccionista_GVA",
+    precioFinal: 32500,
+    tipoOperacion: TIPO_OPERACION.VENTA_DIRECTA,
+    fechaVenta: "2026-05-15",
+    comision: 1625
+  },
+  {
+    id: 303,
+    piezaId: 5, // Joan Miró — subasta anterior adjudicada
+    ref: "VTA-2025-014",
+    comprador: "PrestigeArt",
+    precioFinal: 102000,
+    tipoOperacion: TIPO_OPERACION.SUBASTA_ADJUDICADA,
+    fechaVenta: "2025-11-20",
+    comision: 5100
+  },
+  {
+    id: 304,
+    piezaId: 4, // Anillo Tiffany — oferta aceptada anterior
+    ref: "VTA-2025-009",
+    comprador: "Elena Martínez",
+    precioFinal: 17200,
+    tipoOperacion: TIPO_OPERACION.OFERTA_ACEPTADA,
+    fechaVenta: "2025-08-05",
+    comision: 860
+  }
+];
+
 // Base de datos reactiva simulada con almacenamiento local
 // para permitir manipulación básica de estado en la sesión actual
 let publicaciones = [...mockPublicaciones];
@@ -457,3 +507,7 @@ export const updatePublicacion = (id, updatedPub) => {
   }
   return null;
 };
+
+// Funciones de Ventas (read-only, el historial no muta en el mock)
+export const getVentas = () => [...mockVentas];
+export const getVentasByVendedor = () => [...mockVentas]; // Todas son de Aura Dolce en el mock

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import {
   getVendedorPublicaciones,
   ESTADO_PUBLICACION,
@@ -14,6 +15,20 @@ const PanelVendedorPage = () => {
   const [misPublicaciones, setMisPublicaciones] = useState([]);
   const [solicitudesReserva, setSolicitudesReserva] = useState([]);
   const [ofertasRecibidas, setOfertasRecibidas] = useState([]);
+
+  // Estado del modal de confirmación
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    description: '',
+    details: [],
+    confirmText: 'CONFIRMAR',
+    cancelText: 'CANCELAR',
+    icon: 'verified',
+    variant: 'success',
+    onConfirm: null,
+  });
+  const closeConfirmModal = () => setConfirmModal((prev) => ({ ...prev, isOpen: false }));
 
   useEffect(() => {
     // Sincronizar mis publicaciones de "Aura Dolce Galería"
@@ -45,14 +60,45 @@ const PanelVendedorPage = () => {
     }).format(val);
   };
 
-  const handleConfirmarReserva = (resId, piezaNombre) => {
-    alert(`Reserva #${resId} de la pieza '${piezaNombre}' CONFIRMADA con éxito. Se ha generado la orden de custodia.`);
-    setSolicitudesReserva(solicitudesReserva.filter(r => r.id !== resId));
+  const handleConfirmarReserva = (resId, piezaNombre, precio) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirmar Reserva',
+      description: 'Al confirmar, se descontará el stock de la pieza y se notificará al comprador.',
+      details: [
+        { label: 'PIEZA', value: piezaNombre },
+        { label: 'PRECIO ACORDADO', value: `${formatCurrency(precio)} USD` },
+        { label: 'ACCIÓN', value: 'Confirmar adquisición' },
+      ],
+      confirmText: 'CONFIRMAR RESERVA',
+      cancelText: 'CANCELAR',
+      icon: 'check_circle',
+      variant: 'success',
+      onConfirm: () => {
+        setSolicitudesReserva((prev) => prev.filter((r) => r.id !== resId));
+        closeConfirmModal();
+      },
+    });
   };
 
   const handleRechazarReserva = (resId, piezaNombre) => {
-    alert(`Reserva #${resId} de la pieza '${piezaNombre}' RECHAZADA. Se ha liberado la pieza en el catálogo.`);
-    setSolicitudesReserva(solicitudesReserva.filter(r => r.id !== resId));
+    setConfirmModal({
+      isOpen: true,
+      title: 'Rechazar Reserva',
+      description: 'Al rechazar, la pieza volverá a estar disponible en el catálogo y se notificará al comprador.',
+      details: [
+        { label: 'PIEZA', value: piezaNombre },
+        { label: 'ACCIÓN', value: 'Rechazar y liberar stock' },
+      ],
+      confirmText: 'RECHAZAR RESERVA',
+      cancelText: 'CANCELAR',
+      icon: 'cancel',
+      variant: 'danger',
+      onConfirm: () => {
+        setSolicitudesReserva((prev) => prev.filter((r) => r.id !== resId));
+        closeConfirmModal();
+      },
+    });
   };
 
   const handleResponderOferta = (ofId, piezaNombre) => {
@@ -60,6 +106,7 @@ const PanelVendedorPage = () => {
   };
 
   return (
+    <>
     <div className="w-full bg-background min-h-screen py-16 px-6 md:px-16 flex flex-col items-center">
       <div className="max-w-7xl w-full flex flex-col space-y-12">
         
@@ -77,11 +124,19 @@ const PanelVendedorPage = () => {
             </p>
           </div>
           
-          <Link to="/vendedor/nueva" className="self-start md:self-auto">
-            <Button variant="primary" className="py-3.5 px-6">
-              + NUEVA PUBLICACIÓN
-            </Button>
-          </Link>
+          <div className="flex items-center space-x-3 self-start md:self-auto">
+            <Link to="/vendedor/historial">
+              <Button variant="outline" className="py-3.5 px-5 flex items-center space-x-2">
+                <span className="material-symbols-outlined text-sm font-light">bar_chart_4_bars</span>
+                <span>HISTORIAL</span>
+              </Button>
+            </Link>
+            <Link to="/vendedor/nueva">
+              <Button variant="primary" className="py-3.5 px-6">
+                + NUEVA PUBLICACIÓN
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Notificaciones de Acción (Reservas y Ofertas Pendientes) */}
@@ -107,14 +162,14 @@ const PanelVendedorPage = () => {
                         </div>
                         <div className="flex space-x-2 flex-shrink-0">
                           <button
-                            onClick={() => handleRechazarReserva(res.id, pieza?.nombre)}
+                         onClick={() => handleRechazarReserva(res.id, pieza?.nombre)}
                             className="w-8 h-8 border border-error/40 hover:border-error text-error flex items-center justify-center transition-colors cursor-pointer"
                             title="Rechazar Reserva"
                           >
                             <span className="material-symbols-outlined text-lg font-light">close</span>
                           </button>
                           <button
-                            onClick={() => handleConfirmarReserva(res.id, pieza?.nombre)}
+                           onClick={() => handleConfirmarReserva(res.id, pieza?.nombre, res.precioAcordado)}
                             className="w-8 h-8 bg-primary hover:bg-[#ebd5be] text-on-primary flex items-center justify-center transition-colors cursor-pointer"
                             title="Confirmar Reserva"
                           >
@@ -239,6 +294,21 @@ const PanelVendedorPage = () => {
 
       </div>
     </div>
+
+      {/* Modal de Confirmación Transaccional */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        description={confirmModal.description}
+        details={confirmModal.details}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        icon={confirmModal.icon}
+        variant={confirmModal.variant}
+      />
+    </>
   );
 };
 

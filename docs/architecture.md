@@ -78,7 +78,8 @@ Estados de `Oferta`: `PENDIENTE` → `ACEPTADA` | `RECHAZADA` | `CONTRAOFERTA` |
 ## Páginas del frontend
 
 | Página | Ruta | Acceso | Descripción |
-|---|---|---|---|
+|---|---|---|
+|---|
 | Home / Catálogo | `/` | público | Grilla de publicaciones con filtros |
 | Detalle pieza | `/publicaciones/:id` | público | Historia, imágenes, precio, botones acción |
 | Login | `/login` | público | |
@@ -88,5 +89,33 @@ Estados de `Oferta`: `PENDIENTE` → `ACEPTADA` | `RECHAZADA` | `CONTRAOFERTA` |
 | Mis reservas | `/reservas` | COMPRADOR | Historial y estado de reservas |
 | Mis ofertas | `/ofertas` | COMPRADOR | Ofertas enviadas y contraofertas recibidas |
 | Panel vendedor | `/vendedor` | VENDEDOR | Mis publicaciones, reservas y ofertas pendientes |
+| Historial de ventas | `/vendedor/historial` | VENDEDOR | Piezas vendidas, estadísticas y comisiones por tipo de operación |
 | Nueva publicación | `/vendedor/nueva` | VENDEDOR | Formulario crear producto + publicación |
 | Editar publicación | `/vendedor/:id/editar` | VENDEDOR | |
+
+---
+
+## Flujo de confirmación transaccional
+
+Toda acción que implique una modificación de estado (reserva, oferta, puja, confirmar/rechazar)
+pasa por un modal de confirmación (`ConfirmModal`) **antes** de ejecutarse.
+El modal muestra el desglose de la transacción y requiere confirmación explícita del usuario.
+
+```
+Usuario pulsa acción
+    │
+    ├─ Se abre ConfirmModal con:
+    │    • título e icono descriptivos
+    │    • descripción del impacto de la acción
+    │    • desglose: pieza, precio, tipo, vendedor
+    │    • variante visual: success (verde/dorado) | danger (rojo)
+    │
+    ├─ Usuario cancela → modal se cierra, nada cambia
+    │
+    └─ Usuario confirma → se ejecuta la mutación y el modal se cierra
+```
+
+Puntos de integración actuales:
+- `DetallePiezaPage`: Solicitar Reserva Directa, Registrar Puja
+- `PanelVendedorPage`: Confirmar Reserva (success), Rechazar Reserva (danger)
+- `OfertaCard`: Aceptar Contraoferta (success), Rechazar Contraoferta (danger)

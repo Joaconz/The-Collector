@@ -1,7 +1,7 @@
 # Local AI Agent configuration and instructions
 .vscode/
 instructions/
-contexto_proyecto_tpo.md
+node_modules/
 
 # OS files
 .DS_Store

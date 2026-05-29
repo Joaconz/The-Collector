@@ -11,6 +11,7 @@ import FavoritosPage from '../pages/FavoritosPage';
 import ReservasPage from '../pages/ReservasPage';
 import OfertasPage from '../pages/OfertasPage';
 import PanelVendedorPage from '../pages/PanelVendedorPage';
+import HistorialVentasPage from '../pages/HistorialVentasPage';
 import NuevaPublicacionPage from '../pages/NuevaPublicacionPage';
 import EditarPublicacionPage from '../pages/EditarPublicacionPage';
 import GestionSubastaPage from '../pages/GestionSubastaPage';
@@ -96,6 +97,16 @@ const AppRouter = ({
               reservas={reservas}
               ofertas={ofertas}
             />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/vendedor/historial"
+        element={
+          currentUser && currentUser.rol === 'VENDEDOR' ? (
+            <HistorialVentasPage />
           ) : (
             <Navigate to="/login" replace />
           )
