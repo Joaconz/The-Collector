@@ -30,10 +30,7 @@ public class JsonAccessDeniedHandler implements AccessDeniedHandler {
 				  "path": "%s",
 				  "timestamp": "%s"
 				}
-				""".formatted(
-				HttpStatus.FORBIDDEN.value(),
-				request.getRequestURI(),
-				LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-		));
+				""".formatted(HttpStatus.FORBIDDEN.value(), request.getRequestURI(),
+				LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
 	}
 }

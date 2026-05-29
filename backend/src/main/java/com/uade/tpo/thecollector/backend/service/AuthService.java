@@ -1,6 +1,7 @@
 package com.uade.tpo.thecollector.backend.service;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,10 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uade.tpo.thecollector.backend.exception.ResourceNotFoundException;
 import com.uade.tpo.thecollector.backend.dto.usuario.AuthResponseDTO;
 import com.uade.tpo.thecollector.backend.dto.usuario.LoginRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.usuario.RegisterRequestDTO;
+import com.uade.tpo.thecollector.backend.exception.ResourceNotFoundException;
 import com.uade.tpo.thecollector.backend.model.Usuario;
 import com.uade.tpo.thecollector.backend.repository.UsuarioRepository;
 
@@ -23,7 +24,8 @@ public class AuthService {
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 
-	public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+	public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
+			AuthenticationManager authenticationManager) {
 		this.usuarioRepository = usuarioRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
@@ -41,25 +43,19 @@ public class AuthService {
 
 		usuario = usuarioRepository.save(usuario);
 
-		String token = jwtService.generateToken(usuario);
-
+		String token = jwtService.generateToken(Map.of("rol", usuario.getRol().name()), usuario);
 		return new AuthResponseDTO(token, usuario.getRol(), usuario.getNombre(), usuario.getId());
 	}
 
 	@Transactional(readOnly = true)
 	public AuthResponseDTO login(LoginRequestDTO request) {
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-						request.getEmail(),
-						request.getPassword()
-				)
-		);
+		authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
 		Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("Credenciales inválidas"));
 
-		String token = jwtService.generateToken(usuario);
-
+		String token = jwtService.generateToken(Map.of("rol", usuario.getRol().name()), usuario);
 		return new AuthResponseDTO(token, usuario.getRol(), usuario.getNombre(), usuario.getId());
 	}
 }

@@ -27,15 +27,14 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> register(@Valid @RequestBody RegisterRequestDTO request) {
 		AuthResponseDTO response = authService.register(request);
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(new ApiResponseDTO<>(HttpStatus.CREATED.value(), "Usuario registrado correctamente", response,
-						LocalDateTime.now()));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponseDTO<>(HttpStatus.CREATED.value(),
+				"Usuario registrado correctamente", response, LocalDateTime.now()));
 	}
 
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> login(@Valid @RequestBody LoginRequestDTO request) {
 		AuthResponseDTO response = authService.login(request);
-		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Login exitoso", response,
-				LocalDateTime.now()));
+		return ResponseEntity
+				.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Login exitoso", response, LocalDateTime.now()));
 	}
 }

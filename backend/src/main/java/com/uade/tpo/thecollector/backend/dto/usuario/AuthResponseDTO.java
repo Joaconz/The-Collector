@@ -1,7 +1,6 @@
 package com.uade.tpo.thecollector.backend.dto.usuario;
 import com.uade.tpo.thecollector.backend.model.Rol;
 
-
 public class AuthResponseDTO {
 	private String token;
 	private Rol rol;

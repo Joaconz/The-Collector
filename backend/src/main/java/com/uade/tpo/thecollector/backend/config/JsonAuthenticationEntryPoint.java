@@ -30,10 +30,7 @@ public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
 				  "path": "%s",
 				  "timestamp": "%s"
 				}
-				""".formatted(
-				HttpStatus.UNAUTHORIZED.value(),
-				request.getRequestURI(),
-				LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-		));
+				""".formatted(HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(),
+				LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
 	}
 }

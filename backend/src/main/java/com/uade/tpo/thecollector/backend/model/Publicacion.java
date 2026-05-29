@@ -1,8 +1,10 @@
 package com.uade.tpo.thecollector.backend.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
+
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -17,7 +19,6 @@ public class Publicacion {
 	@Column(nullable = false)
 	private Boolean activo = true;
 
-
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "producto_id", referencedColumnName = "id")
 	private Producto producto;
@@ -30,16 +31,32 @@ public class Publicacion {
 	@Column(nullable = false)
 	private EstadoPublicacion estado;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private ModoPublicacion modo;
+
+	@Column(name = "precio_base")
+	private BigDecimal precioBase;
+
+	@Column(name = "fecha_limite_subasta")
+	private LocalDateTime fechaLimiteSubasta;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "estado_subasta")
+	private EstadoSubasta estadoSubasta;
+
 	@Column(name = "fecha_publicacion", nullable = false)
 	private LocalDateTime fechaPublicacion;
 
 	public Publicacion() {
 	}
 
-	public Publicacion(Producto producto, Usuario vendedor, EstadoPublicacion estado, LocalDateTime fechaPublicacion) {
+	public Publicacion(Producto producto, Usuario vendedor, EstadoPublicacion estado, ModoPublicacion modo,
+			LocalDateTime fechaPublicacion) {
 		this.producto = producto;
 		this.vendedor = vendedor;
 		this.estado = estado;
+		this.modo = modo;
 		this.fechaPublicacion = fechaPublicacion;
 	}
 
@@ -50,6 +67,7 @@ public class Publicacion {
 	public Producto getProducto() {
 		return producto;
 	}
+
 	public void setProducto(Producto producto) {
 		this.producto = producto;
 	}
@@ -57,6 +75,7 @@ public class Publicacion {
 	public Usuario getVendedor() {
 		return vendedor;
 	}
+
 	public void setVendedor(Usuario vendedor) {
 		this.vendedor = vendedor;
 	}
@@ -64,13 +83,47 @@ public class Publicacion {
 	public EstadoPublicacion getEstado() {
 		return estado;
 	}
+
 	public void setEstado(EstadoPublicacion estado) {
 		this.estado = estado;
+	}
+
+	public ModoPublicacion getModo() {
+		return modo;
+	}
+
+	public void setModo(ModoPublicacion modo) {
+		this.modo = modo;
+	}
+
+	public BigDecimal getPrecioBase() {
+		return precioBase;
+	}
+
+	public void setPrecioBase(BigDecimal precioBase) {
+		this.precioBase = precioBase;
+	}
+
+	public LocalDateTime getFechaLimiteSubasta() {
+		return fechaLimiteSubasta;
+	}
+
+	public void setFechaLimiteSubasta(LocalDateTime fechaLimiteSubasta) {
+		this.fechaLimiteSubasta = fechaLimiteSubasta;
+	}
+
+	public EstadoSubasta getEstadoSubasta() {
+		return estadoSubasta;
+	}
+
+	public void setEstadoSubasta(EstadoSubasta estadoSubasta) {
+		this.estadoSubasta = estadoSubasta;
 	}
 
 	public LocalDateTime getFechaPublicacion() {
 		return fechaPublicacion;
 	}
+
 	public void setFechaPublicacion(LocalDateTime fechaPublicacion) {
 		this.fechaPublicacion = fechaPublicacion;
 	}
@@ -78,6 +131,7 @@ public class Publicacion {
 	public Boolean getActivo() {
 		return activo;
 	}
+
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
 	}

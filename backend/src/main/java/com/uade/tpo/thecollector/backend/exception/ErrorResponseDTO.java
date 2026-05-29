@@ -2,7 +2,6 @@ package com.uade.tpo.thecollector.backend.exception;
 
 import java.time.LocalDateTime;
 
-
 public class ErrorResponseDTO {
 	private int status;
 	private String error;

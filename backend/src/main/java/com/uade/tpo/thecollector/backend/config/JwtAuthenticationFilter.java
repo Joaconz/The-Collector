@@ -2,6 +2,11 @@ package com.uade.tpo.thecollector.backend.config;
 
 import java.io.IOException;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,11 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.uade.tpo.thecollector.backend.service.JwtService;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,12 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	@Override
-	protected void doFilterInternal(
-			@NonNull HttpServletRequest request,
-			@NonNull HttpServletResponse response,
-			@NonNull FilterChain filterChain
-	) throws ServletException, IOException {
-		
+	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+			@NonNull FilterChain filterChain) throws ServletException, IOException {
+
 		final String authHeader = request.getHeader("Authorization");
 		final String jwt;
 		final String userEmail;
@@ -46,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		jwt = authHeader.substring(7);
-		
+
 		try {
 			userEmail = jwtService.extractUsername(jwt);
 
@@ -54,24 +51,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
 				if (jwtService.isTokenValid(jwt, userDetails)) {
-					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-							userDetails,
-							null,
-							userDetails.getAuthorities()
-					);
-					authToken.setDetails(
-							new WebAuthenticationDetailsSource().buildDetails(request)
-					);
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+							null, userDetails.getAuthorities());
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}
 			}
 		} catch (Exception e) {
-			// Si el token es inválido, está expirado, o mal formado (ej: "Bearer Bearer ..."),
+			// Si el token es inválido, está expirado, o mal formado (ej: "Bearer Bearer
+			// ..."),
 			// atrapamos la excepción para evitar un 500 Internal Server Error.
-			// SecurityContextHolder permanece limpio, por lo que el EntryPoint devolverá un 401.
+			// SecurityContextHolder permanece limpio, por lo que el EntryPoint devolverá un
+			// 401.
 			SecurityContextHolder.clearContext();
 		}
-		
+
 		filterChain.doFilter(request, response);
 	}
 }

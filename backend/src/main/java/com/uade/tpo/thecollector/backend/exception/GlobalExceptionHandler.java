@@ -9,12 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -47,7 +47,21 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
 	}
 
-	@ExceptionHandler({ BadCredentialsException.class, AuthenticationCredentialsNotFoundException.class })
+	@ExceptionHandler(IllegalStateException.class)
+	public ResponseEntity<ErrorResponseDTO> handleIllegalState(IllegalStateException ex, HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.CONFLICT.value(), "Conflict", ex.getMessage(),
+				request.getRequestURI(), LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+	}
+
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ErrorResponseDTO> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getMessage(),
+				request.getRequestURI(), LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+	}
+
+	@ExceptionHandler({BadCredentialsException.class, AuthenticationCredentialsNotFoundException.class})
 	public ResponseEntity<ErrorResponseDTO> handleAuthentication(Exception ex, HttpServletRequest request) {
 		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(), "Unauthorized",
 				"Credenciales inválidas", request.getRequestURI(), LocalDateTime.now());
@@ -56,7 +70,6 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponseDTO> handleGeneric(Exception ex, HttpServletRequest request) {
-		ex.printStackTrace(); // TODO: Remover para production
 		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error",
 				"Ocurrió un error inesperado", request.getRequestURI(), LocalDateTime.now());
 		return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

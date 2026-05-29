@@ -3,6 +3,7 @@ package com.uade.tpo.thecollector.backend.model;
 import java.math.BigDecimal;
 
 import jakarta.persistence.*;
+
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -16,7 +17,6 @@ public class Producto {
 
 	@Column(nullable = false)
 	private Boolean activo = true;
-
 
 	@Column(nullable = false)
 	private String nombre;
@@ -33,8 +33,9 @@ public class Producto {
 	@Column(nullable = false)
 	private Integer stock;
 
-	@Column
-	private String categoria;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private Categoria categoria;
 
 	@Column(name = "imagen_url")
 	private String imagenUrl;
@@ -43,7 +44,7 @@ public class Producto {
 	}
 
 	public Producto(String nombre, String descripcion, String historia, BigDecimal precio, Integer stock,
-			String categoria, String imagenUrl) {
+			Categoria categoria, String imagenUrl) {
 		this.nombre = nombre;
 		this.descripcion = descripcion;
 		this.historia = historia;
@@ -53,7 +54,6 @@ public class Producto {
 		this.imagenUrl = imagenUrl;
 	}
 
-	// Getters y Setters
 	public Long getId() {
 		return id;
 	}
@@ -61,6 +61,7 @@ public class Producto {
 	public String getNombre() {
 		return nombre;
 	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
@@ -68,6 +69,7 @@ public class Producto {
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
@@ -75,6 +77,7 @@ public class Producto {
 	public String getHistoria() {
 		return historia;
 	}
+
 	public void setHistoria(String historia) {
 		this.historia = historia;
 	}
@@ -82,6 +85,7 @@ public class Producto {
 	public BigDecimal getPrecio() {
 		return precio;
 	}
+
 	public void setPrecio(BigDecimal precio) {
 		this.precio = precio;
 	}
@@ -89,20 +93,23 @@ public class Producto {
 	public Integer getStock() {
 		return stock;
 	}
+
 	public void setStock(Integer stock) {
 		this.stock = stock;
 	}
 
-	public String getCategoria() {
+	public Categoria getCategoria() {
 		return categoria;
 	}
-	public void setCategoria(String categoria) {
+
+	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
 	}
 
 	public String getImagenUrl() {
 		return imagenUrl;
 	}
+
 	public void setImagenUrl(String imagenUrl) {
 		this.imagenUrl = imagenUrl;
 	}
@@ -110,6 +117,7 @@ public class Producto {
 	public Boolean getActivo() {
 		return activo;
 	}
+
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
 	}

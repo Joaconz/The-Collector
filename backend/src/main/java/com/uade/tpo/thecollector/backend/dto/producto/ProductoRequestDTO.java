@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import com.uade.tpo.thecollector.backend.model.Categoria;
 
 public class ProductoRequestDTO {
 
@@ -24,12 +25,15 @@ public class ProductoRequestDTO {
 	@Min(value = 0, message = "El stock no puede ser negativo")
 	private Integer stock;
 
-	private String categoria;
+	@NotNull(message = "La categoría es obligatoria")
+	private Categoria categoria;
+
 	private String imagenUrl;
 
 	public String getNombre() {
 		return nombre;
 	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
@@ -37,6 +41,7 @@ public class ProductoRequestDTO {
 	public String getDescripcion() {
 		return descripcion;
 	}
+
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
@@ -44,6 +49,7 @@ public class ProductoRequestDTO {
 	public String getHistoria() {
 		return historia;
 	}
+
 	public void setHistoria(String historia) {
 		this.historia = historia;
 	}
@@ -51,6 +57,7 @@ public class ProductoRequestDTO {
 	public BigDecimal getPrecio() {
 		return precio;
 	}
+
 	public void setPrecio(BigDecimal precio) {
 		this.precio = precio;
 	}
@@ -58,20 +65,23 @@ public class ProductoRequestDTO {
 	public Integer getStock() {
 		return stock;
 	}
+
 	public void setStock(Integer stock) {
 		this.stock = stock;
 	}
 
-	public String getCategoria() {
+	public Categoria getCategoria() {
 		return categoria;
 	}
-	public void setCategoria(String categoria) {
+
+	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
 	}
 
 	public String getImagenUrl() {
 		return imagenUrl;
 	}
+
 	public void setImagenUrl(String imagenUrl) {
 		this.imagenUrl = imagenUrl;
 	}

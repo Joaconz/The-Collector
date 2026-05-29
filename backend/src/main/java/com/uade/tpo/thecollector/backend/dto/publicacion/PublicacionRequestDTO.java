@@ -1,30 +1,61 @@
 package com.uade.tpo.thecollector.backend.dto.publicacion;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import com.uade.tpo.thecollector.backend.dto.producto.ProductoRequestDTO;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+import com.uade.tpo.thecollector.backend.dto.producto.ProductoRequestDTO;
+import com.uade.tpo.thecollector.backend.model.ModoPublicacion;
 
 public class PublicacionRequestDTO {
 
-	@NotNull(message = "El vendedor es obligatorio")
-	private Long vendedorId;
+	@NotNull(message = "El modo de publicación es obligatorio")
+	private ModoPublicacion modo;
 
 	@Valid
 	@NotNull(message = "Los datos del producto son obligatorios")
 	private ProductoRequestDTO producto;
 
-	public Long getVendedorId() {
-		return vendedorId;
+	// Solo para modo SUBASTA
+	@Positive(message = "El precio base debe ser mayor a 0")
+	private BigDecimal precioBase;
+
+	@Future(message = "La fecha límite debe ser en el futuro")
+	private LocalDateTime fechaLimiteSubasta;
+
+	public ModoPublicacion getModo() {
+		return modo;
 	}
-	public void setVendedorId(Long vendedorId) {
-		this.vendedorId = vendedorId;
+
+	public void setModo(ModoPublicacion modo) {
+		this.modo = modo;
 	}
 
 	public ProductoRequestDTO getProducto() {
 		return producto;
 	}
+
 	public void setProducto(ProductoRequestDTO producto) {
 		this.producto = producto;
+	}
+
+	public BigDecimal getPrecioBase() {
+		return precioBase;
+	}
+
+	public void setPrecioBase(BigDecimal precioBase) {
+		this.precioBase = precioBase;
+	}
+
+	public LocalDateTime getFechaLimiteSubasta() {
+		return fechaLimiteSubasta;
+	}
+
+	public void setFechaLimiteSubasta(LocalDateTime fechaLimiteSubasta) {
+		this.fechaLimiteSubasta = fechaLimiteSubasta;
 	}
 }

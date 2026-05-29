@@ -1,8 +1,8 @@
 package com.uade.tpo.thecollector.backend.dto.publicacion;
 
 import jakarta.validation.constraints.NotNull;
-import com.uade.tpo.thecollector.backend.model.EstadoPublicacion;
 
+import com.uade.tpo.thecollector.backend.model.EstadoPublicacion;
 
 public class UpdateEstadoRequestDTO {
 

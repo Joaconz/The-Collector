@@ -3,8 +3,8 @@ package com.uade.tpo.thecollector.backend.dto.usuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import com.uade.tpo.thecollector.backend.model.Rol;
 
+import com.uade.tpo.thecollector.backend.model.Rol;
 
 public class RegisterRequestDTO {
 
