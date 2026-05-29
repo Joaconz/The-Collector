@@ -1,0 +1,175 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>THE COLLECTOR - Register</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#e8e1dd",
+                        "on-secondary": "#30312f",
+                        "outline-variant": "#4e453d",
+                        "on-tertiary-fixed": "#0f1d29",
+                        "on-background": "#e8e1dd",
+                        "surface-container": "#221f1d",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1e1b19",
+                        "tertiary": "#d6e4f6",
+                        "primary-container": "#dec2a3",
+                        "on-error": "#690005",
+                        "primary-fixed": "#fbdebd",
+                        "surface-tint": "#dec2a3",
+                        "on-tertiary-container": "#465462",
+                        "secondary-container": "#464746",
+                        "on-secondary-container": "#b6b5b3",
+                        "on-tertiary-fixed-variant": "#3b4856",
+                        "surface-variant": "#373432",
+                        "surface-container-lowest": "#100e0c",
+                        "on-primary-container": "#634f36",
+                        "tertiary-fixed-dim": "#bac8d9",
+                        "surface": "#151311",
+                        "surface-container-high": "#2c2927",
+                        "inverse-primary": "#705b41",
+                        "surface-bright": "#3c3936",
+                        "on-primary": "#3e2d17",
+                        "primary": "#fbdebe",
+                        "inverse-on-surface": "#33302d",
+                        "on-primary-fixed": "#271905",
+                        "on-tertiary": "#24323f",
+                        "secondary-fixed": "#e4e2e0",
+                        "on-surface-variant": "#d1c4b9",
+                        "primary-fixed-dim": "#dec2a3",
+                        "surface-container-highest": "#373432",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#d6e4f5",
+                        "on-surface": "#e8e1dd",
+                        "outline": "#9a8f85",
+                        "on-primary-fixed-variant": "#57432c",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed-variant": "#464746",
+                        "surface-dim": "#151311",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "tertiary-container": "#bac8d9",
+                        "background": "#151311",
+                        "secondary": "#c7c6c4",
+                        "secondary-fixed-dim": "#c7c6c4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Playfair Display"],
+                        "label-caps": ["DM Sans"],
+                        "display-lg": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "metadata": ["DM Sans"],
+                        "headline-sm": ["Playfair Display"],
+                        "body-md": ["DM Sans"],
+                        "body-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "700" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "metadata": ["14px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Left Side: Editorial Image -->
+<div class="hidden md:block md:w-1/2 relative bg-surface-container-highest">
+<img alt="Luxury watch detail" class="absolute inset-0 w-full h-full object-cover object-center mix-blend-luminosity opacity-80" data-alt="A striking macro editorial photograph of a vintage luxury mechanical watch dial. The lighting is highly dramatic, with deep shadows emphasizing the intricate metallic textures, guilloche patterns, and sharp hands. The mood is exclusive, archival, and museum-grade, leaning into high-contrast minimalism. The palette consists of deep blacks, brushed steel grays, and subtle glints of bronze and gold, perfectly matching a high-end collectibles aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLo5wETpKpYDUNKyoQUhY0ZbC7K896pOIOAwhdHx8j3nxZutHjJnvhby-ys3MxGPyFh66vuM17yGdLlxymz7zIr54XWl9vHMSPGv8Pbc6wOrv0-irZhN6meaeqZOSi7cOXrdqkj43ZTR-sPNmLGUeI_6CNUwum12szIeh-XZ7y0Pdw9Y3fYjWPIQNzij99h6ScKABkzMUrklP2SQdz36yG_iijbSZ1G9ATo_TRRayeRp5NXSWz37vjUwCPA994_BOPeBSDf6FM6LQ">
+<div class="absolute inset-0 bg-gradient-to-r from-background/40 to-background"></div>
+<div class="absolute bottom-margin-desktop left-margin-desktop">
+<h1 class="font-display-lg text-display-lg text-primary tracking-[0.15em] mb-unit*4">THE COLLECTOR</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Access the world's most exclusive marketplace for vetted artifacts, fine art, and rare horology.</p>
+</div>
+</div>
+<!-- Right Side: Registration Form -->
+<div class="w-full md:w-1/2 flex items-center justify-center p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<div class="w-full max-w-md">
+<div class="mb-12 md:hidden">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-[0.15em] mb-unit*2">THE COLLECTOR</h1>
+</div>
+<div class="mb-8">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Join the Registry</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Select your primary intent to customize your experience.</p>
+</div>
+<form action="#" class="space-y-8" method="POST">
+<!-- Role Selector -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Comprador Card -->
+<label class="relative cursor-pointer group">
+<input checked="" class="peer sr-only" name="role" type="radio" value="comprador">
+<div class="h-full bg-surface-container border border-outline-variant rounded-none p-6 text-center transition-colors duration-200 peer-checked:border-primary-container peer-checked:bg-surface-container-high group-hover:border-primary-container/50">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-4 peer-checked:text-primary-container group-hover:text-primary-container/80 transition-colors" data-icon="shopping_bag">shopping_bag</span>
+<h3 class="font-label-caps text-label-caps text-on-surface peer-checked:text-primary-container">COMPRADOR</h3>
+</div>
+</label>
+<!-- Vendedor Card -->
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="role" type="radio" value="vendedor">
+<div class="h-full bg-surface-container border border-outline-variant rounded-none p-6 text-center transition-colors duration-200 peer-checked:border-primary-container peer-checked:bg-surface-container-high group-hover:border-primary-container/50">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-4 peer-checked:text-primary-container group-hover:text-primary-container/80 transition-colors" data-icon="storefront">storefront</span>
+<h3 class="font-label-caps text-label-caps text-on-surface peer-checked:text-primary-container">VENDEDOR</h3>
+</div>
+</label>
+</div>
+<!-- Input Fields -->
+<div class="space-y-6">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2" for="name">FULL NAME</label>
+<input class="w-full bg-background border border-outline-variant text-on-surface font-body-md text-body-md px-4 py-3 rounded-none focus:outline-none focus:border-primary-container focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" id="name" name="name" placeholder="Enter your legal name" required="" type="text">
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2" for="email">EMAIL ADDRESS</label>
+<input class="w-full bg-background border border-outline-variant text-on-surface font-body-md text-body-md px-4 py-3 rounded-none focus:outline-none focus:border-primary-container focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" id="email" name="email" placeholder="Enter your email" required="" type="email">
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2" for="password">PASSWORD</label>
+<input class="w-full bg-background border border-outline-variant text-on-surface font-body-md text-body-md px-4 py-3 rounded-none focus:outline-none focus:border-primary-container focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" id="password" name="password" placeholder="Create a secure password" required="" type="password">
+</div>
+</div>
+<!-- Submit Action -->
+<div class="pt-4">
+<button class="w-full bg-primary-container text-on-primary font-label-caps text-label-caps py-4 rounded-none hover:bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary-container focus:ring-offset-2 focus:ring-offset-background" type="submit">
+                        SOLICITAR ACCESO
+                    </button>
+<p class="mt-6 text-center font-metadata text-metadata text-on-surface-variant">
+                        Already registered? <a class="text-primary-container hover:underline underline-offset-4" href="#">Sign in to your vault</a>.
+                    </p>
+</div>
+</form>
+</div>
+</div>
+</body></html>

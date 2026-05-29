@@ -1,113 +1,171 @@
 @import "tailwindcss";
 
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@theme {
+  /* Paleta de Colores de Lujo (Stitch Config) */
+  --color-background: #131313;
+  --color-surface: #131313;
+  --color-surface-container: #20201f;
+  --color-surface-container-low: #1b1c1b;
+  --color-surface-container-high: #2a2a29;
+  --color-surface-container-highest: #353534;
+  --color-surface-container-lowest: #0e0e0d;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --color-primary: #dec2a3;
+  --color-primary-container: #a58d70;
+  --color-on-primary: #3e2d17;
+  --color-surface-tint: #dec2a3;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-secondary: #cfc5ba;
+  --color-on-surface: #e5e2e0;
+  --color-on-surface-variant: #d1c4b9;
+  --color-outline: #9a8f85;
+  --color-outline-variant: #4d453d;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+
+  /* Tipografía */
+  --font-display: "Playfair Display", serif;
+  --font-sans: "DM Sans", sans-serif;
+
+  /* Custom Spacing / Border Radius (0px everywhere for angular luxury look) */
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+}
+
+/* Estilos Globales Base */
+@layer base {
+  html, body {
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  /* Reset simple de inputs y botones para mantener el diseño angular */
+  input, select, textarea, button {
+    border-radius: 0px !important;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* Clases Utilitarias Custom para la Tipografía según el Design System */
+.font-display-lg {
+  font-family: var(--font-display);
+  font-size: 3rem; /* 48px */
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+@media (max-width: 768px) {
+  .font-display-lg {
+    font-size: 2.25rem; /* 36px */
+    line-height: 1.2;
   }
 }
 
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
+.font-headline-md {
+  font-family: var(--font-display);
+  font-size: 2rem; /* 32px */
+  line-height: 1.2;
   font-weight: 500;
-  color: var(--text-h);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+.font-headline-sm {
+  font-family: var(--font-display);
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.3;
+  font-weight: 500;
 }
-h2 {
+
+.font-body-lg {
+  font-family: var(--font-sans);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.font-body-md {
+  font-family: var(--font-sans);
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.font-body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.font-label-caps {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Material Icon base styling */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
   font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* true liquid glassmorphism panel for premium dark layouts */
+.liquid-glass {
+  background: rgba(32, 32, 31, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 30px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* Custom premium cubic-bezier transition timings */
+.transition-luxury {
+  transition-property: transform, opacity, background-color, border-color, color;
+  transition-duration: 350ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* easeOutExpo */
+}
+

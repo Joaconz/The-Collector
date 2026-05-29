@@ -1,0 +1,296 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>The Collector - Lista de Deseos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#e8e1dd",
+                        "on-secondary": "#30312f",
+                        "outline-variant": "#4e453d",
+                        "on-tertiary-fixed": "#0f1d29",
+                        "on-background": "#e8e1dd",
+                        "surface-container": "#221f1d",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1e1b19",
+                        "tertiary": "#d6e4f6",
+                        "primary-container": "#dec2a3",
+                        "on-error": "#690005",
+                        "primary-fixed": "#fbdebd",
+                        "surface-tint": "#dec2a3",
+                        "on-tertiary-container": "#465462",
+                        "secondary-container": "#464746",
+                        "on-secondary-container": "#b6b5b3",
+                        "on-tertiary-fixed-variant": "#3b4856",
+                        "surface-variant": "#373432",
+                        "surface-container-lowest": "#100e0c",
+                        "on-primary-container": "#634f36",
+                        "tertiary-fixed-dim": "#bac8d9",
+                        "surface": "#151311",
+                        "surface-container-high": "#2c2927",
+                        "inverse-primary": "#705b41",
+                        "surface-bright": "#3c3936",
+                        "on-primary": "#3e2d17",
+                        "primary": "#fbdebe",
+                        "inverse-on-surface": "#33302d",
+                        "on-primary-fixed": "#271905",
+                        "on-tertiary": "#24323f",
+                        "secondary-fixed": "#e4e2e0",
+                        "on-surface-variant": "#d1c4b9",
+                        "primary-fixed-dim": "#dec2a3",
+                        "surface-container-highest": "#373432",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#d6e4f5",
+                        "on-surface": "#e8e1dd",
+                        "outline": "#9a8f85",
+                        "on-primary-fixed-variant": "#57432c",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed-variant": "#464746",
+                        "surface-dim": "#151311",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "tertiary-container": "#bac8d9",
+                        "background": "#151311",
+                        "secondary": "#c7c6c4",
+                        "secondary-fixed-dim": "#c7c6c4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Playfair Display"],
+                        "label-caps": ["DM Sans"],
+                        "display-lg": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "metadata": ["DM Sans"],
+                        "headline-sm": ["Playfair Display"],
+                        "body-md": ["DM Sans"],
+                        "body-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "700" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "metadata": ["14px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface h-[56px] w-full sticky top-0 z-50 border-b border-outline-variant flat no shadows">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="flex-shrink-0">
+<a class="text-label-caps font-label-caps text-primary tracking-[0.15em]" href="#">THE COLLECTOR</a>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">RELOJES</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">JOYERÍA</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">ARTE</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">NUMISMÁTICA</a>
+</nav>
+<div class="flex items-center gap-6">
+<!-- Highlighted Favorite Icon as we are on Wishlist -->
+<button aria-label="favorite" class="text-primary hover:text-primary transition-colors duration-200 flex items-center justify-center opacity-80 border-b border-primary pb-1 pt-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<button aria-label="search" class="text-primary dark:text-primary hover:text-primary transition-colors duration-200 flex items-center justify-center">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 md:py-24">
+<!-- Header -->
+<header class="mb-16 md:mb-24 flex flex-col items-start gap-4">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg-mobile md:font-display-lg text-on-surface">
+                Lista de Deseos
+            </h1>
+<div class="flex items-center gap-4">
+<span class="text-label-caps font-label-caps text-on-surface-variant tracking-[0.15em]">4 ARTÍCULOS GUARDADOS</span>
+<div class="h-px w-16 bg-outline-variant"></div>
+</div>
+</header>
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter md:gap-12">
+<!-- Item 1: Auction Mode -->
+<article class="group relative flex flex-col bg-[#1b1c1b] border border-outline-variant transition-colors hover:border-primary-container">
+<!-- Image Container -->
+<div class="relative w-full aspect-[4/5] bg-surface-container-high border-b border-outline-variant overflow-hidden">
+<img alt="Contemporary abstract painting" class="w-full h-full object-cover grayscale opacity-80 mix-blend-luminosity group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="A striking abstract oil painting featuring heavy impasto textures and deep, moody tones of charcoal and crimson, displayed in a high-end minimalist gallery. The lighting is focused and dramatic, casting stark shadows that highlight the physical depth of the paint. The aesthetic is museum-grade, authoritative, and exclusive, utilizing a high-contrast dark mode palette. The piece commands attention in a silent, spacious archival environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALr0VWGtGXhbz2NvdQYikkTkp3VbrbdyQ3EWm70uFZyKnxOVV9HvVJSyPAlby8Rc_BigYAq3FPtDlwe6mI6IlpJ1fwJ7Eje-FIqxdk7qP3FRbhUJU-LasjmRuAi657qJrpRFkMCKlPxp6llgOEo90eUNEWrK43woGBxUv06SeR-S6b7pgcheWHr4v8m2wpMwvUN3X4ffUBIDERLIHVzE44SIG_VXi-fGT_JPVRylsKJxvZRlERxDFp6P8HAEOfBz-lv53L0uxHaDk">
+<!-- Remove from wishlist action -->
+<button aria-label="Remove from wishlist" class="absolute top-4 right-4 text-primary-container hover:text-surface-bright transition-colors bg-[#1b1c1b] border border-outline-variant w-10 h-10 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<!-- Category Badge -->
+<div class="absolute bottom-4 left-4 bg-[#1b1c1b] border border-outline-variant px-3 py-2">
+<span class="text-label-caps font-label-caps text-on-surface tracking-[0.15em]">ARTE</span>
+</div>
+</div>
+<!-- Content -->
+<div class="p-6 flex flex-col flex-grow justify-between gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="text-headline-sm font-headline-sm text-on-surface line-clamp-2">Nocturne in Black and Gold</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">J.A. Whistler · 1875</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end border-t border-outline-variant pt-4">
+<span class="text-metadata font-metadata text-on-surface-variant uppercase tracking-widest">Puja Actual</span>
+<span class="text-body-lg font-body-lg text-primary-container tracking-tight">$ 245,000 USD</span>
+</div>
+<button class="w-full bg-primary-container text-[#1b1c1b] text-label-caps font-label-caps py-4 tracking-[0.15em] hover:bg-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background">
+                            HACER OFERTA
+                        </button>
+</div>
+</div>
+</article>
+<!-- Item 2: Fixed Price Mode -->
+<article class="group relative flex flex-col bg-[#1b1c1b] border border-outline-variant transition-colors hover:border-primary-container">
+<div class="relative w-full aspect-[4/5] bg-surface-container-high border-b border-outline-variant overflow-hidden">
+<img alt="Vintage mechanical watch" class="w-full h-full object-cover grayscale opacity-80 mix-blend-luminosity group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="A macro photograph of an ultra-rare vintage mechanical chronograph watch, resting on a textured dark slate surface. The metallic elements gleam with a warm bronze hue under precise, high-contrast studio lighting. The aesthetic is modern-traditionalist, conveying extreme exclusivity and mechanical precision. The visual style is rooted in deep blacks and subtle metallic tones, emphasizing the watch's intricate dial and provenance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFjbXLPZwuZgwrhdHz9Vt-InR2rrPbG-NORGIp0dCAvUfO4Yxllxy2_ZOhOdyOP9gZ4FxpUBJYoIq6DwAdI4IfMW9gW4TFXJ7qerbDIn5fI9HUXJCJMirgx3JGjSnoW1uwdLAJ6om8r0rf5u-eGMCs-HxUDC_zdAIsb4hz5_1NIHUfiCMPge1UJPwNqrRxhMGtpnNDKpalv3z8xoEHh0VjNQu2tyfuNEjURp27wJRt-QaHPuQhlgdjcjzxXaurmiFb1IHaKiHZtTE">
+<button aria-label="Remove from wishlist" class="absolute top-4 right-4 text-primary-container hover:text-surface-bright transition-colors bg-[#1b1c1b] border border-outline-variant w-10 h-10 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="absolute bottom-4 left-4 bg-[#1b1c1b] border border-outline-variant px-3 py-2">
+<span class="text-label-caps font-label-caps text-on-surface tracking-[0.15em]">RELOJES</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow justify-between gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="text-headline-sm font-headline-sm text-on-surface line-clamp-2">Oyster Perpetual Cosmograph</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Rolex · Circa 1968</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end border-t border-outline-variant pt-4">
+<span class="text-metadata font-metadata text-on-surface-variant uppercase tracking-widest">Precio Fijo</span>
+<span class="text-body-lg font-body-lg text-on-surface tracking-tight">$ 85,000 USD</span>
+</div>
+<button class="w-full bg-transparent border border-outline-variant text-on-surface text-label-caps font-label-caps py-4 tracking-[0.15em] hover:border-primary-container hover:text-primary-container transition-colors focus:outline-none focus:ring-1 focus:ring-primary-container focus:ring-offset-1 focus:ring-offset-background">
+                            COMPRAR AHORA
+                        </button>
+</div>
+</div>
+</article>
+<!-- Item 3: Auction Mode -->
+<article class="group relative flex flex-col bg-[#1b1c1b] border border-outline-variant transition-colors hover:border-primary-container">
+<div class="relative w-full aspect-[4/5] bg-surface-container-high border-b border-outline-variant overflow-hidden">
+<img alt="Antique gold coin" class="w-full h-full object-cover grayscale opacity-80 mix-blend-luminosity group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="A striking close-up of a rare, ancient gold Roman coin resting on a sheer, black velvet pedestal. The gallery lighting creates a sharp, single-source highlight that reveals the intricate, centuries-old engravings and patina of the metal. The scene is utterly silent and archival, rendered in a strict dark mode palette of deep charcoal and glowing bronze. It conveys an atmosphere of extreme historical weight and investment-grade value." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFRNO6izvtZ_wSgxJPOAUTFWiazPOSvuKyYJpsup77X-3K27zz6ajqvnO26pSP90odAkv5CX0pIwNYMr6xSaei02cfG_LrDVXTa71OaC7cLtU7sAuhK2BjEm6J9gYzBm-__g-FliyzrHd7NrxDQ7uVU95UDF4ZoGBrSKhU4kZhPmgDCG4veR2qmFAuENrNAYOO8G_4m2BPYbbvlSwMLbQ9LQBSmdeFhSLsKPFZwjNoy47w_PrdRRJZ7SGKuKZE3ztpRcHCl0SB04E">
+<button aria-label="Remove from wishlist" class="absolute top-4 right-4 text-primary-container hover:text-surface-bright transition-colors bg-[#1b1c1b] border border-outline-variant w-10 h-10 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="absolute bottom-4 left-4 bg-[#1b1c1b] border border-outline-variant px-3 py-2">
+<span class="text-label-caps font-label-caps text-on-surface tracking-[0.15em]">NUMISMÁTICA</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow justify-between gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="text-headline-sm font-headline-sm text-on-surface line-clamp-2">Aureus of Augustus</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Roman Empire · 2 BC</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end border-t border-outline-variant pt-4">
+<span class="text-metadata font-metadata text-on-surface-variant uppercase tracking-widest">Puja Actual</span>
+<span class="text-body-lg font-body-lg text-primary-container tracking-tight">$ 12,500 USD</span>
+</div>
+<button class="w-full bg-primary-container text-[#1b1c1b] text-label-caps font-label-caps py-4 tracking-[0.15em] hover:bg-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background">
+                            HACER OFERTA
+                        </button>
+</div>
+</div>
+</article>
+<!-- Item 4: Fixed Price Mode (Demonstrating 4th item wrapping) -->
+<article class="group relative flex flex-col bg-[#1b1c1b] border border-outline-variant transition-colors hover:border-primary-container">
+<div class="relative w-full aspect-[4/5] bg-surface-container-high border-b border-outline-variant overflow-hidden">
+<img alt="Diamond necklace" class="w-full h-full object-cover grayscale opacity-80 mix-blend-luminosity group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="An exquisite high-jewelry diamond and sapphire necklace draped elegantly over an angular, matte black structural display bust. The lighting is intensely focused, creating starburst reflections on the gemstones against the enveloping pitch-black museum backdrop. The visual aesthetic is fiercely minimalist and high-contrast, employing a strict palette of void-black, stark white, and piercing sapphire blue. The mood is one of untouchable luxury and archival stillness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApHi01nKZEc_wZ6K5f_x6j2ugxnYq00EqzvS7OzTeMTSpsefkBTxTNNtYTQlJm6PV0KVrYy5AfYe-z7wulVrU4UPJ4RV1GVUEcc-5j9BzwImy91Xep2Yz_nfejHFqoPtt3yV4EGTOtx-mi4J35aQZ1bFOJBrv_B5FpdSFBlccjhPXheQkg0dQmfBZWF2Zo8vdp7bqVuEWtCDprO6jfrImDPJQVQo5jmaqr4qPJsk3iQ4jsqG7y8dssLRlMy2cXepCbEhoTQS1zBV0">
+<button aria-label="Remove from wishlist" class="absolute top-4 right-4 text-primary-container hover:text-surface-bright transition-colors bg-[#1b1c1b] border border-outline-variant w-10 h-10 flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="absolute bottom-4 left-4 bg-[#1b1c1b] border border-outline-variant px-3 py-2">
+<span class="text-label-caps font-label-caps text-on-surface tracking-[0.15em]">JOYERÍA</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow justify-between gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="text-headline-sm font-headline-sm text-on-surface line-clamp-2">Sapphire &amp; Diamond Rivière</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Cartier · 1920s</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end border-t border-outline-variant pt-4">
+<span class="text-metadata font-metadata text-on-surface-variant uppercase tracking-widest">Precio Fijo</span>
+<span class="text-body-lg font-body-lg text-on-surface tracking-tight">$ 450,000 USD</span>
+</div>
+<button class="w-full bg-transparent border border-outline-variant text-on-surface text-label-caps font-label-caps py-4 tracking-[0.15em] hover:border-primary-container hover:text-primary-container transition-colors focus:outline-none focus:ring-1 focus:ring-primary-container focus:ring-offset-1 focus:ring-offset-background">
+                            COMPRAR AHORA
+                        </button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface dark:bg-surface w-full py-unit*4 border-t border-outline-variant flat no shadows mt-auto">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-4">
+<p class="text-label-caps font-label-caps text-on-surface-variant">© 2024 THE COLLECTOR. ALL RIGHTS RESERVED.</p>
+<nav class="hidden md:flex gap-6">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">PRIVACY</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">TERMS</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">CONTACT</a>
+</nav>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for removing items visually
+        document.querySelectorAll('button[aria-label="Remove from wishlist"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const card = this.closest('article');
+                card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.remove();
+                }, 400);
+            });
+        });
+    </script>
+</body></html>

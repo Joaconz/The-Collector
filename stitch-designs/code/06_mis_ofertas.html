@@ -1,0 +1,263 @@
+<!DOCTYPE html><html class="dark" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>THE COLLECTOR - Mis Ofertas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/thin/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/light/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/thin/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/light/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#e8e1dd",
+                      "on-secondary": "#30312f",
+                      "outline-variant": "#4e453d",
+                      "on-tertiary-fixed": "#0f1d29",
+                      "on-background": "#e8e1dd",
+                      "surface-container": "#221f1d",
+                      "error-container": "#93000a",
+                      "surface-container-low": "#1e1b19",
+                      "tertiary": "#d6e4f6",
+                      "primary-container": "#dec2a3",
+                      "on-error": "#690005",
+                      "primary-fixed": "#fbdebd",
+                      "surface-tint": "#dec2a3",
+                      "on-tertiary-container": "#465462",
+                      "secondary-container": "#464746",
+                      "on-secondary-container": "#b6b5b3",
+                      "on-tertiary-fixed-variant": "#3b4856",
+                      "surface-variant": "#373432",
+                      "surface-container-lowest": "#100e0c",
+                      "on-primary-container": "#634f36",
+                      "tertiary-fixed-dim": "#bac8d9",
+                      "surface": "#151311",
+                      "surface-container-high": "#2c2927",
+                      "inverse-primary": "#705b41",
+                      "surface-bright": "#3c3936",
+                      "on-primary": "#3e2d17",
+                      "primary": "#fbdebe",
+                      "inverse-on-surface": "#33302d",
+                      "on-primary-fixed": "#271905",
+                      "on-tertiary": "#24323f",
+                      "secondary-fixed": "#e4e2e0",
+                      "on-surface-variant": "#d1c4b9",
+                      "primary-fixed-dim": "#dec2a3",
+                      "surface-container-highest": "#373432",
+                      "on-error-container": "#ffdad6",
+                      "tertiary-fixed": "#d6e4f5",
+                      "on-surface": "#e8e1dd",
+                      "outline": "#9a8f85",
+                      "on-primary-fixed-variant": "#57432c",
+                      "error": "#ffb4ab",
+                      "on-secondary-fixed-variant": "#464746",
+                      "surface-dim": "#151311",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "tertiary-container": "#bac8d9",
+                      "background": "#151311",
+                      "secondary": "#c7c6c4",
+                      "secondary-fixed-dim": "#c7c6c4"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-mobile": "20px",
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                      "sans": ["DM Sans", "sans-serif"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        @keyframes pulse-bronze {
+            0% { box-shadow: 0 0 0 0 rgba(222, 194, 163, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(222, 194, 163, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(222, 194, 163, 0); }
+        }
+        .animate-pulse-bronze {
+            animation: pulse-bronze 2s infinite;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .stagger-enter-1 { animation: fadeInUp 300ms cubic-bezier(0.23, 1, 0.32, 1) 50ms both; }
+            .stagger-enter-2 { animation: fadeInUp 300ms cubic-bezier(0.23, 1, 0.32, 1) 100ms both; }
+            
+            .btn-active:active {
+                transform: scale(0.97);
+                transition: transform 100ms ease-out;
+            }
+        }
+
+        .focus-ring:focus-visible {
+            outline: 2px solid #dec2a3;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-[100dvh] flex flex-col font-sans">
+<!-- TopNavBar -->
+<nav class="h-[56px] w-full sticky top-0 z-50 bg-surface border-b border-outline-variant flat no shadows">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-6">
+<a class="text-[12px] font-bold text-primary tracking-[0.15em] uppercase focus-ring" href="#">THE COLLECTOR</a>
+<div class="hidden md:flex gap-6 h-full items-center">
+<a class="text-[12px] font-bold text-on-surface-variant hover:text-primary transition-colors duration-200 h-full flex items-center uppercase focus-ring" href="#">RELOJES</a>
+<a class="text-[12px] font-bold text-on-surface-variant hover:text-primary transition-colors duration-200 h-full flex items-center uppercase focus-ring" href="#">JOYERÍA</a>
+<a class="text-[12px] font-bold text-on-surface-variant hover:text-primary transition-colors duration-200 h-full flex items-center uppercase focus-ring" href="#">ARTE</a>
+<a class="text-[12px] font-bold text-on-surface-variant hover:text-primary transition-colors duration-200 h-full flex items-center uppercase focus-ring" href="#">NUMISMÁTICA</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary dark:text-primary hover:text-primary transition-colors duration-200 focus-ring rounded">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="text-primary dark:text-primary hover:text-primary transition-colors duration-200 focus-ring rounded">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant focus-ring">
+<img alt="User avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiXN-y9R6qVQUnN1b1dYOzGWF-eY-Ir6uaAwFR8GonA4K7okK_gWYvda0TQDTu2aGH4nQAQLMnl4kklvXcbIVWPyi5RYzBgeftmC10_pmnE77NKZBCNRunITrXdyZc2ITbqsh6iuXjECI5aSTSTRzt9afqMnc1WP6jGLxLNyAFbaQbj2luXJVX2k54APyOAXtFyW1qyN7CX6Y_KLMijM8yjZT3dnJvxPvZzey8Hu7Zppq-N-Z6LwlP-RzC3eTslrw3Mokuz4m7qvk">
+</button>
+</div>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-grow w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-12 md:py-20 flex flex-col gap-12 md:gap-16">
+<!-- Header -->
+<header class="flex flex-col gap-2">
+<h1 class="text-3xl font-semibold">Mis Ofertas</h1>
+<p class="text-sm font-light text-on-surface-variant max-w-[65ch]">Administre las negociaciones activas. El mercado es dinámico; las contraofertas requieren su atención para asegurar la pieza.</p>
+</header>
+<!-- Section 1: Contraoferta Recibida -->
+<section class="flex flex-col gap-4">
+<h2 class="text-base font-semibold">Contraoferta recibida</h2>
+<div class="w-full border border-outline-variant bg-surface relative flex flex-col p-4 md:p-6">
+  <!-- Badge Row -->
+  <div class="flex items-center gap-2 mb-4 md:mb-6">
+    <div class="w-2 h-2 rounded-full bg-[#dec2a3] animate-pulse-bronze"></div>
+    <span class="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-sm">ACCIÓN REQUERIDA</span>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] items-center gap-6 lg:gap-12">
+    <!-- Item Info -->
+    <div class="flex gap-4 items-center min-w-0">
+      <div class="w-[72px] h-[72px] flex-shrink-0 border border-outline-variant bg-surface overflow-hidden">
+        <img alt="Rolex Submariner Ref. 5513 'Meters First'" class="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPphWc5PzOGzPOkYcKtsy5kD01Ld8FF5Cxxa_BPfBndwKBEyDGO_xubnETG50ICVB0iGzMZdyjvt9hCOdGUW5oBBKFFeOFEwdWhrC3Qc2H9exD0GxwatN2ruQJx765CCHIQWyPAJvur3L1OnrP__4x8Fx1vDrX2kShDUKWrkFD4tn62T3dND2uCbRCZmCq4400aKvxhCGuQIP9id_II6984WyRu-RfhfH2fqUWmrdbsQugFslpKzj9ZuDQdZfoyrnBII0GaK6THso">
+      </div>
+      <div class="flex flex-col gap-0.5 min-w-0">
+        <span class="text-[10px] md:text-[12px] font-bold tracking-widest uppercase text-on-surface-variant truncate">RELOJES • LOTE 402</span>
+        <h3 class="text-base font-medium truncate">Rolex Submariner Ref. 5513 'Meters First'</h3>
+        <span class="text-[10px] md:text-[12px] font-bold tracking-widest uppercase text-[#dec2a3] mt-1">12H RESTANTES</span>
+      </div>
+    </div>
+
+    <!-- Price Comparison -->
+    <div class="flex items-center gap-3 md:gap-6">
+      <span class="text-sm line-through text-on-surface-variant whitespace-nowrap">Tu oferta €18,500</span>
+      <span class="material-symbols-outlined text-outline-variant text-sm">arrow_forward</span>
+      <div class="flex flex-col">
+        <span class="text-base font-semibold text-on-surface whitespace-nowrap">Contraoferta €19,200</span>
+        <span class="text-sm font-medium text-[#dec2a3]">+€700 (+3.7%)</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 w-full sm:w-auto">
+      <button class="flex-1 sm:flex-none bg-primary-container text-[#151311] text-[12px] font-bold tracking-widest uppercase px-6 py-3 btn-active focus-ring rounded-sm hover:bg-primary transition-colors whitespace-nowrap">ACEPTAR</button>
+      <button class="flex-1 sm:flex-none bg-transparent border border-outline-variant text-on-surface text-[12px] font-bold tracking-widest uppercase px-6 py-3 btn-active focus-ring rounded-sm hover:border-on-surface transition-colors whitespace-nowrap">CONTRAOFERTAR</button>
+    </div>
+  </div>
+</div>
+</section>
+<!-- Section 2: Esperando respuesta -->
+<section class="flex flex-col gap-4">
+<h2 class="text-base font-semibold">Esperando respuesta</h2>
+<div class="flex flex-col border-t border-outline-variant">
+<!-- Row 1 -->
+<div class="stagger-enter-1 flex flex-col md:flex-row gap-4 md:items-center justify-between py-4 border-b border-outline-variant min-h-[44px]">
+<div class="flex gap-4 items-center">
+<div class="w-[56px] h-[56px] flex-shrink-0 border border-outline-variant bg-surface overflow-hidden">
+<img alt="Aureus de Augusto, Ceca de Lugdunum" class="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCJ0B8dpw-x6lenyQ5VfLQUJfSdQEFx6bVjIqojXhDEc96y5C385koytJyEBaDLqinJOc1nyHiTwu9ySVfWQkh1JW4d9ET59qxdUt-GATF-83RqyS7XdO4Xw--OR9OnQkWd-wh_8rmtqyDefW6ElSrjtkVcMMA_ERyAhNX4MWns-mdBbA0tDDmgjIbTwZjI3sMfqTbuLtzT0J5R-OH9bsQ1NNMoIR3u7w-tRHUAReBK44oc18FLMFDcwBe-xJBE3qb9hKOJYEIz-U">
+</div>
+<div class="flex flex-col">
+<span class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">NUMISMÁTICA</span>
+<h3 class="text-base font-medium">Aureus de Augusto, Ceca de Lugdunum</h3>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 justify-between w-full md:w-auto">
+<div class="flex flex-col">
+<span class="text-base">Oferta enviada: €4,200</span>
+<div class="flex items-center gap-1.5 text-on-surface-variant mt-0.5">
+<i class="ph-light ph-clock text-[14px]"></i>
+<span class="text-[12px]">Esperando respuesta del vendedor</span>
+</div>
+</div>
+<button class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant hover:text-error transition-colors btn-active focus-ring rounded-sm px-2 py-1 -ml-2 md:ml-0 md:text-right">RETIRAR OFERTA</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="stagger-enter-2 flex flex-col md:flex-row gap-4 md:items-center justify-between py-4 border-b border-outline-variant min-h-[44px]">
+<div class="flex gap-4 items-center">
+<div class="w-[56px] h-[56px] flex-shrink-0 border border-outline-variant bg-surface overflow-hidden">
+<img alt="Estudio en Carbón No. 4" class="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4T9QMGLNrzFfvAMi5C2vMyjvmoJIjoJl1q6VorS-gLRHTlvBQXvykIgZP5ZQiAsKha2R9oaygf5KZrSpPuOZyCEiaH3b7IbzViZ3LtUQIEOStqIpSrdbSPvzIhlRFB4sPNdmlITWmx37IBeo8Z9Md7qNIeNrbFwdaApPF7mAE_qVeteIfaNuOfvC_jOZZfgxX1zPyhO-8dgEvmFHj94CdEk9iJlQxk_0u7Jb9AaPrJrDTJh2HBB2P19TEKPeCE9t0u_hjgHtTXHI">
+</div>
+<div class="flex flex-col">
+<span class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">ARTE CONTEMPORÁNEO</span>
+<h3 class="text-base font-medium">Estudio en Carbón No. 4</h3>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 justify-between w-full md:w-auto">
+<div class="flex flex-col">
+<span class="text-base">Oferta enviada: €12,000</span>
+<div class="flex items-center gap-1.5 text-on-surface-variant mt-0.5">
+<i class="ph-light ph-clock text-[14px]"></i>
+<span class="text-[12px]">Esperando respuesta del vendedor</span>
+</div>
+</div>
+<button class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant hover:text-error transition-colors btn-active focus-ring rounded-sm px-2 py-1 -ml-2 md:ml-0 md:text-right">RETIRAR OFERTA</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface dark:bg-surface border-t border-outline-variant mt-auto">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-full py-8 flex-col md:flex-row gap-6">
+<span class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">© 2024 THE COLLECTOR. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-6">
+<a class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant hover:text-primary transition-colors duration-200 focus-ring rounded-sm px-1" href="#">PRIVACY</a>
+<a class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant hover:text-primary transition-colors duration-200 focus-ring rounded-sm px-1" href="#">TERMS</a>
+<a class="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant hover:text-primary transition-colors duration-200 focus-ring rounded-sm px-1" href="#">CONTACT</a>
+</div>
+</div>
+</footer>
+
+
+
+
+</body></html>

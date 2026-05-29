@@ -1,0 +1,316 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>CURATOR | The Pinnacle of Provenance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=DM+Sans:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#d6e4f6",
+                    "secondary": "#cfc5ba",
+                    "on-background": "#e5e2e0",
+                    "background": "#131313",
+                    "secondary-container": "#4c463d",
+                    "error": "#ffb4ab",
+                    "tertiary": "#bac8d9",
+                    "surface-tint": "#dec2a3",
+                    "on-surface": "#e5e2e0",
+                    "inverse-primary": "#705b41",
+                    "on-primary-container": "#372711",
+                    "surface-container": "#20201f",
+                    "on-primary": "#3e2d17",
+                    "inverse-on-surface": "#31302f",
+                    "surface": "#131313",
+                    "surface-variant": "#353534",
+                    "surface-container-low": "#1b1c1b",
+                    "on-tertiary-fixed-variant": "#3b4856",
+                    "surface-container-high": "#2a2a29",
+                    "on-tertiary-container": "#1e2b38",
+                    "surface-dim": "#131313",
+                    "secondary-fixed": "#ebe1d5",
+                    "primary-fixed-dim": "#dec2a3",
+                    "primary": "#dec2a3",
+                    "on-primary-fixed-variant": "#56432c",
+                    "outline": "#9a8f85",
+                    "on-surface-variant": "#d1c4b9",
+                    "on-tertiary-fixed": "#101d2a",
+                    "on-error-container": "#ffdad6",
+                    "on-error": "#690005",
+                    "on-secondary": "#353028",
+                    "on-secondary-fixed": "#1f1b14",
+                    "on-tertiary": "#25313f",
+                    "tertiary-fixed-dim": "#bac8d9",
+                    "primary-container": "#a58d70",
+                    "tertiary-container": "#8592a2",
+                    "surface-container-highest": "#353534",
+                    "on-secondary-container": "#bdb4a9",
+                    "surface-container-lowest": "#0e0e0d",
+                    "on-secondary-fixed-variant": "#4c463d",
+                    "primary-fixed": "#fbdebd",
+                    "on-primary-fixed": "#271905",
+                    "outline-variant": "#4d453d",
+                    "error-container": "#93000a",
+                    "secondary-fixed-dim": "#cfc5ba",
+                    "surface-bright": "#393938",
+                    "inverse-surface": "#e5e2e0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "container-max": "1280px",
+                    "base": "8px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "label-caps": ["DM Sans"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "body-sm": ["DM Sans"],
+                    "body-lg": ["DM Sans"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "headline-sm": ["Playfair Display"],
+                    "body-md": ["DM Sans"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "300"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #131313; color: #e5e2e0; }
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .scroll-indicator::after {
+            content: '';
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, #dec2a3, transparent);
+            position: absolute;
+            left: 50%;
+            bottom: -70px;
+        }
+    </style>
+</head>
+<body class="font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background border-b border-outline-variant h-14">
+<nav class="flex justify-between items-center w-full px-margin-desktop h-full max-w-container-max mx-auto">
+<div class="text-body-sm font-label-caps font-bold tracking-[0.25em] text-primary whitespace-nowrap">THE COLLECTOR</div>
+<div class="hidden md:flex items-center gap-10 h-full">
+<a class="relative h-full flex items-center text-primary text-[11px] font-label-caps tracking-widest group" href="#">
+        RELOJES
+        <span class="absolute bottom-0 left-0 w-full h-[1px] bg-primary"></span>
+</a>
+<a class="relative h-full flex items-center text-on-surface-variant text-[11px] font-label-caps tracking-widest hover:text-primary transition-colors group" href="#">
+        JOYERÍA
+        <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+<a class="relative h-full flex items-center text-on-surface-variant text-[11px] font-label-caps tracking-widest hover:text-primary transition-colors group" href="#">
+        ARTE
+        <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+<a class="relative h-full flex items-center text-on-surface-variant text-[11px] font-label-caps tracking-widest hover:text-primary transition-colors group" href="#">
+        MONEDAS
+        <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-primary cursor-pointer transition-colors">search</span>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-primary cursor-pointer transition-colors">favorite</span>
+<span class="absolute -top-1 -right-1 flex items-center justify-center bg-primary text-on-primary text-[9px] font-bold rounded-full w-3.5 h-3.5">2</span>
+</div>
+<div class="w-7 h-7 rounded-full overflow-hidden border border-outline-variant hover:border-primary transition-colors cursor-pointer">
+<img alt="Collector Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1G-YoaWKHapZQbjt0UY2eSW1JteBOGNUZIdX-NP1PqNp36PIb3YX63sao2lT0yOvJYI52SZE5A7hUonZroVPryr7WSLEhAatjdPdtBn4f6sxrKGuAg-0OSdy1NqMrCaIH6v_dtwm1Ojdb2vToz8eHeHR10OeeQr25TofmzugJeUaKBoki_fWj9UjDg8mhdsqyFsEp4Zdk1EpC3haJuifCb7MWK34h72MEcaSaPQcSWVF7zQpTEyLI_rWujvc9RRisK4irJEkLFv8">
+</div>
+</div>
+</nav>
+</header>
+<!-- Full-Bleed Hero Section -->
+<section class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="High-end vintage watch, Patek Philippe Calatrava style, macro photography." class="w-full h-full object-cover scale-105" data-alt="A macro cinematic shot of a rare Patek Philippe style vintage watch, focusing on the intricate mechanical gears and gold hands. The lighting is low-key with golden highlights, set against a dark charcoal background. The mood is highly exclusive, archival, and luxurious, emphasizing the watch's craftsmanship and historical value." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpPgmczLb4G0icEKZm1ymO13kCL-1Li05zWofzWEQ2ks2jDuITMNNnjteSWwejcJyVQhUXoyDTnNsGAvzou5sFxTKpuPUegVA7fgpVmb_WngfG8mBWLxUXYAGp9-bBcL5W2CmNoQIV9hQiDu5ohewM5xeiJ9MZFNCzPKE1WK9qFu-Gh7IMb-jg1rBJLtkscxKG5JtpTjNsdxvQvXJTk0VlgTcjdKgdQdPj7RjAUqCobFsDiKVa6BJ_O4WdnIB7qR_yK_7neG3amReQ">
+<div class="absolute inset-0 bg-black/40 bg-gradient-to-t from-background via-transparent to-black/20 opacity-90"></div>
+</div>
+<div class="relative z-10 text-center px-margin-mobile reveal-on-scroll visible">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-on-surface tracking-tight mb-4">THE PINNACLE OF PROVENANCE</h1>
+<p class="text-body-lg font-body-lg text-secondary uppercase tracking-[0.3em] max-w-2xl mx-auto">Archival Masterpieces for the Discerning Collector</p>
+<div class="mt-12 relative flex justify-center">
+<div class="scroll-indicator"></div>
+</div>
+</div>
+</section>
+<!-- Category Navigation -->
+<section class="py-20 bg-background border-b border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="flex justify-center gap-12 md:gap-24 overflow-x-auto pb-4 scrollbar-hide">
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border border-outline p-1 mb-4 group-hover:border-primary transition-colors duration-500">
+<img class="w-full h-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Close up of a luxury watch face with Roman numerals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANzqztJ1YXR9ZnsLak7PYkPHrQn0K4q4sr62qdTbF0axniYGG6n9H87-IwVt4L8W5YBypwKWPccgORrIRwFFvgCeK1oowHt6husCwgGkD5KP1yMgHWpA6MIv0uKWKVV7E09-4ZecJONvnTc94Q2uqMiFHUDMbhpkcBznzosi0oZE5wHX2q-PjWU9Tz6YOoMhpjTroNUFRIXlu5zkLfttyXYa7PLCCE6-0oZ5UOd03J1FUlMcQu2VjfJ4XMm1wtcfgIP4KXLmjilIQ">
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary transition-colors">WATCHES</span>
+</div>
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border border-outline p-1 mb-4 group-hover:border-primary transition-colors duration-500">
+<img class="w-full h-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Close up of a sparkling diamond ring in a luxury setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSqSJD5yC_qVsWX9LTEsNY039TnRrXaPzDptz7WKmPWvDTL-1SMjT1eB-TYKtkOTgWsxwaSkkVtRMLvGX3EJ4tAp1qTIaR8PjcaeSq8PFa9E3j1RE662byKwnLjVJxd_9apdWADaq8Qq6PIFXm68MAsVioTiB6YvS_7fDCydtqnpfxbOWIsFO7evM6ss59w7mv7jK3ptFhDaGOLy7QM3w-ngCFJvNEBK3Jp7B7VybPf8a4PUoEBhc8vOYgnSR5ErQd1vqDUBjYmU0">
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary transition-colors">JEWELRY</span>
+</div>
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border border-outline p-1 mb-4 group-hover:border-primary transition-colors duration-500">
+<img class="w-full h-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A detailed view of an oil painting with visible brushstrokes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPozxInnObrW9dd1fOjIydWdy14ntmsS97M5M5iby7QnFlfAMzUIV-E5wro3WBqMrCd2vwJleCYsfMNMi1CpyK4kldFjJX4L8rtF87xr4P32qV-eDj1XRQbDkakQIUAETgeYdzmU-qI_RMTAB3BWWJzCEbDxmr2rjvXlASNvqhUMVTxK5_pMJPAg-o_AU09QbEcQbLNFyVQOWe9FJ6BQUE_XTKPQgFuV2oQTRentzMNqcPA84beZuPViKXk5NsX8dB1-9inFDx2xY">
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary transition-colors">FINE ART</span>
+</div>
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border border-outline p-1 mb-4 group-hover:border-primary transition-colors duration-500">
+<img class="w-full h-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Macro photo of a rare gold coin." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1f8Qai87SJ-BaFNvkXXQxNR8f55unzqXCoNnPlXSbCo3Y0teH6wKmkckQUOQ-DkTeOt0ytOmtdR769vGR2Zsd7u9ct5KCd5uij3RYL8z673Hc8ZMYU240lDwVVQTxUdeFgNwp-dIQWP_TO4988IJmJwwGBKAMHLmPr0PdJvNueFBGKq3Mg7YOlGnsq1p7OtBV4h9sIL-UqYxDHtEVTlwN2jdYx6guhxLUM8nLiXUcqgj8rTpBoeqMOQYmmEmN8fJrYgnW2OgTjT4">
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary transition-colors">COINS</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Focus Section: Art -->
+<section class="py-32 md:py-48 bg-surface-container-low overflow-hidden">
+<div class="max-w-container-max mx-auto px-margin-desktop grid md:grid-cols-2 items-center gap-24">
+<div class="reveal-on-scroll order-2 md:order-1 visible">
+<div class="relative group">
+<div class="absolute -inset-4 border border-outline-variant transition-all duration-700 group-hover:inset-0"></div>
+<img class="relative z-10 w-full aspect-[4/5] object-cover desaturate-[20%]" data-alt="A breathtaking oil painting portrait of a noble figure, characterized by dramatic chiaroscuro lighting and deep umber tones. The painting is displayed in a minimalist gallery with soft spotlighting, creating a moody, archival atmosphere that celebrates the timeless elegance and provenance of classical art. The colors are muted golds and rich blacks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhLrPd8_BWkcmhxfm8oZdELrxUrURE5MuyMOKmp84EVp_13mQnH0aCuoA6dUgxrfLNr0P4ly_0nTzwUPHd0fmMLaf6edB_b5-8_izr-4F7SG2Cf2LApcW0XX1GKltLYivO191tlMJm4NiQMFARCyN7wrZM7k2OSiNwGQWj-r8-tZ3iizRugdKESlizLW2NqYcZxmMG3KNKUMlwvqUhpdR9yAmL3NKVEoUKQOGG9PLaQaX2qX5PNVxGDAka_atC-o_GuCvTag_maRo">
+</div>
+</div>
+<div class="reveal-on-scroll order-1 md:order-2 space-y-8 visible">
+<h2 class="text-label-caps font-label-caps text-primary">THE GALLERY SELECTION</h2>
+<h3 class="text-display-lg-mobile md:text-headline-md font-headline-md text-on-surface leading-tight">Masterpieces That Transcend Time</h3>
+<p class="text-body-lg font-body-lg text-secondary max-w-md">
+                    Every stroke tells a story of centuries past. Our curated art collection focuses on works with impeccable lineage and profound cultural significance.
+                </p>
+<div class="pt-8">
+<button class="px-10 py-4 bg-primary text-on-primary text-label-caps font-label-caps hover:bg-surface-tint transition-all active:opacity-80">EXPLORE PROVENANCE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Focus Section: Jewelry -->
+<section class="py-32 md:py-48 bg-background overflow-hidden border-t border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin-desktop grid md:grid-cols-2 items-center gap-24">
+<div class="reveal-on-scroll space-y-8 visible">
+<h2 class="text-label-caps font-label-caps text-primary">THE HAUTE JOAILLERIE</h2>
+<h3 class="text-display-lg-mobile md:text-headline-md font-headline-md text-on-surface leading-tight">Brilliance Beyond the Bezel</h3>
+<p class="text-body-lg font-body-lg text-secondary max-w-md">
+                    From rare colored diamonds to Victorian-era heirlooms, our jewelry section is a testament to the enduring allure of rare stones and expert craftsmanship.
+                </p>
+<div class="pt-8">
+<button class="px-10 py-4 border border-outline text-on-surface text-label-caps font-label-caps hover:bg-on-surface hover:text-background transition-all active:opacity-80">VIEW COLLECTION</button>
+</div>
+</div>
+<div class="reveal-on-scroll visible">
+<div class="relative group">
+<div class="absolute -inset-4 border border-outline-variant transition-all duration-700 group-hover:inset-0"></div>
+<img class="relative z-10 w-full aspect-[4/5] object-cover" data-alt="A high-fidelity shot of an emerald-cut diamond ring set in platinum, resting on a slab of dark, polished marble. The lighting is crisp and cold, making the facets of the diamond sparkle against the desaturated, dark environment. The overall aesthetic is one of quiet luxury, discipline, and archival perfection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_gV0AY7e_qwxTeIAEBN0qYWxD3RmP3DAZZBGBUzr3dOm6boR3MLQg5onda929TFv1hLmH4vgUF9aFGTaE0oGAA76BFGjGmumrmpTziCc1NN2ovWlxyCYsV29T6JNT-8-sTbPX1bSHcQJOIKzcaq_DEQnJql9ycRg_EHb1yjpwjlnmtHCgNISI9MZxaYaP8lLJcJ4s20FGegVDaut_ptpduRIIl93rVTHY0mO-RG2jj7J6P7Kt_UiM5UGeNwAwC1m6K62_gvSID74">
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter/Concierge Callout -->
+<section class="py-32 bg-surface-container-lowest border-y border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin-desktop text-center">
+<div class="reveal-on-scroll max-w-2xl mx-auto space-y-6 visible">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="lock">lock</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">The Concierge Experience</h2>
+<p class="text-body-md font-body-md text-secondary">Join an exclusive circle of global collectors. Receive early access to archival acquisitions and private viewing invitations.</p>
+<div class="mt-10 flex flex-col md:flex-row gap-0">
+<input class="flex-grow bg-transparent border-b md:border-b-0 md:border-l border-outline-variant px-6 py-4 text-label-caps font-label-caps focus:border-primary outline-none transition-colors" placeholder="ENTER YOUR EMAIL" type="email">
+<button class="bg-primary text-on-primary px-12 py-4 text-label-caps font-label-caps hover:bg-surface-tint transition-all">REQUEST ACCESS</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="text-secondary bg-surface">
+<div class="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-base max-w-container-max mx-auto">
+<div class="text-label-caps font-label-caps text-primary tracking-[0.15em] mb-8 md:mb-0" style="opacity: 0;">THE COLLECTOR</div>
+<div class="flex flex-wrap justify-center gap-8 mb-8 md:mb-0"><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors uppercase" href="#">Privacy</a><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors uppercase" href="#">Terms</a><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors uppercase" href="#">Contact</a></div>
+<div class="text-label-caps font-label-caps opacity-60 text-center md:text-right">© 2024 THE COLLECTOR. ALL RIGHTS RESERVED.</div>
+</div>
+</footer>
+<script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Simple Parallax Effect for Hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroImg = document.querySelector('section img');
+            if (heroImg) {
+                heroImg.style.transform = `translateY(${scrolled * 0.3}px) scale(1.05)`;
+            }
+        });
+
+        // Header transparency on scroll
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('bg-background/95');
+                header.classList.remove('bg-background/80');
+            } else {
+                header.classList.add('bg-background/80');
+                header.classList.remove('bg-background/95');
+            }
+        });
+    </script>
+
+
+
+
+</body></html>

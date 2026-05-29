@@ -1,122 +1,110 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import PageLayout from './components/layout/PageLayout';
+import AppRouter from './routes/AppRouter';
+import {
+  mockUsuarios,
+  getFavoritos,
+  toggleFavorito,
+  getReservas,
+  addReserva,
+  getOfertas,
+  addOferta,
+  updateOfertaEstado,
+  getPujas,
+  addPuja
+} from './data/mockData';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Inicializamos el usuario actual con el Comprador Joaquín para simplificar el flujo inicial
+  const [currentUser, setCurrentUser] = useState(mockUsuarios[0]);
+  
+  // Estados para simular la persistencia reactiva durante la sesión de navegación
+  const [favoritos, setFavoritos] = useState([1, 3, 5]); // IDs correspondientes a mockFavoritos
+  const [reservas, setReservas] = useState(getReservas());
+  const [ofertas, setOfertas] = useState(getOfertas());
+  const [pujas, setPujas] = useState(getPujas());
+
+  // Manejador de Login
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+  };
+
+  // Manejador de Logout
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+
+  // Manejador de Favoritos (Deseos/Carrito)
+  const handleToggleFavorito = (id) => {
+    const pId = parseInt(id);
+    let updated;
+    if (favoritos.includes(pId)) {
+      updated = favoritos.filter(f => f !== pId);
+    } else {
+      updated = [...favoritos, pId];
+    }
+    setFavoritos(updated);
+  };
+
+  // Manejador de Reservas
+  const handleAddReserva = (piezaId, precioAcordado, vendedor) => {
+    const newRes = addReserva({
+      piezaId,
+      precioAcordado,
+      vendedor,
+      tipo: "Adquisición Directa"
+    });
+    setReservas([...getReservas()]);
+    return newRes;
+  };
+
+  // Manejador de Ofertas
+  const handleAddOferta = (piezaId, precioOriginal, precioOfertado, vendedor) => {
+    const newOf = addOferta({
+      piezaId,
+      precioOriginal,
+      precioOfertado,
+      vendedor
+    });
+    setOfertas([...getOfertas()]);
+    return newOf;
+  };
+
+  // Actualizar estado de una Oferta (aceptar/contraofertar)
+  const handleUpdateOfertaEstado = (id, nuevoEstado) => {
+    updateOfertaEstado(id, nuevoEstado);
+    setOfertas([...getOfertas()]);
+    setReservas([...getReservas()]); // Si fue aceptada, se crea una reserva
+  };
+
+  // Registrar puja en subasta
+  const handleAddPuja = (monto) => {
+    addPuja(monto);
+    setPujas([...getPujas()]);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <PageLayout
+      currentUser={currentUser}
+      onLogout={handleLogout}
+      favoritosCount={favoritos.length}
+    >
+      <AppRouter
+        currentUser={currentUser}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+        favoritos={favoritos}
+        onToggleFavorito={handleToggleFavorito}
+        reservas={reservas}
+        onAddReserva={handleAddReserva}
+        ofertas={ofertas}
+        onAddOferta={handleAddOferta}
+        onUpdateOfertaEstado={handleUpdateOfertaEstado}
+        pujas={pujas}
+        onAddPuja={handleAddPuja}
+      />
+    </PageLayout>
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Active Auction Panel - The Collector</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#1e1b19",
+                      "on-primary-fixed-variant": "#57432c",
+                      "tertiary-container": "#bac8d9",
+                      "tertiary-fixed": "#d6e4f5",
+                      "secondary-fixed": "#e4e2e0",
+                      "secondary-container": "#464746",
+                      "on-tertiary-fixed-variant": "#3b4856",
+                      "outline": "#9a8f85",
+                      "surface-container": "#221f1d",
+                      "error-container": "#93000a",
+                      "primary": "#fbdebe",
+                      "on-primary-fixed": "#271905",
+                      "secondary": "#c7c6c4",
+                      "on-error": "#690005",
+                      "on-secondary-container": "#b6b5b3",
+                      "on-tertiary-container": "#465462",
+                      "on-tertiary": "#24323f",
+                      "on-secondary": "#30312f",
+                      "on-error-container": "#ffdad6",
+                      "surface-dim": "#151311",
+                      "on-background": "#e8e1dd",
+                      "primary-fixed-dim": "#dec2a3",
+                      "primary-container": "#dec2a3",
+                      "surface": "#151311",
+                      "on-tertiary-fixed": "#0f1d29",
+                      "surface-tint": "#dec2a3",
+                      "primary-fixed": "#fbdebd",
+                      "on-surface-variant": "#d1c4b9",
+                      "surface-container-lowest": "#100e0c",
+                      "inverse-on-surface": "#33302d",
+                      "surface-bright": "#3c3936",
+                      "surface-variant": "#373432",
+                      "on-surface": "#e8e1dd",
+                      "tertiary-fixed-dim": "#bac8d9",
+                      "surface-container-high": "#2c2927",
+                      "inverse-primary": "#705b41",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "tertiary": "#d6e4f6",
+                      "surface-container-highest": "#373432",
+                      "secondary-fixed-dim": "#c7c6c4",
+                      "error": "#ffb4ab",
+                      "inverse-surface": "#e8e1dd",
+                      "on-primary-container": "#634f36",
+                      "on-primary": "#3e2d17",
+                      "background": "#151311",
+                      "outline-variant": "#4e453d",
+                      "on-secondary-fixed-variant": "#464746"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "margin-desktop": "64px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "label-caps": [
+                              "DM Sans"
+                      ],
+                      "headline-md": [
+                              "Playfair Display"
+                      ],
+                      "body-lg": [
+                              "DM Sans"
+                      ],
+                      "body-md": [
+                              "DM Sans"
+                      ],
+                      "metadata": [
+                              "DM Sans"
+                      ],
+                      "display-lg-mobile": [
+                              "Playfair Display"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "display-lg": [
+                              "Playfair Display"
+                      ]
+              },
+              "fontSize": {
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.15em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "metadata": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-sm": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for museum aesthetic */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #151311;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4e453d;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+<!-- Task-Focused Header: Minimalist return path -->
+<header class="w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 border-b border-outline-variant bg-surface shrink-0">
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="font-label-caps text-label-caps uppercase">Catálogo</span>
+</a>
+<div class="font-label-caps text-label-caps tracking-widest text-primary">
+            SALA DE SUBASTAS EN VIVO
+        </div>
+</header>
+<!-- Main Content Canvas: 60/40 Split -->
+<main class="flex flex-col md:flex-row flex-1 w-full overflow-hidden">
+<!-- Left Side: Asset Presentation (60%) -->
+<section class="w-full md:w-[60%] flex flex-col bg-surface-container-lowest border-b md:border-b-0 md:border-r border-outline-variant overflow-y-auto relative h-[50vh] md:h-auto">
+<div class="p-margin-mobile md:p-margin-desktop max-w-4xl mx-auto w-full">
+<!-- Provenance Badge -->
+<div class="mb-6 flex items-center gap-2">
+<div class="border border-outline-variant px-3 py-1 bg-surface inline-flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Lote Autenticado 042</span>
+</div>
+</div>
+<!-- Main Asset Image -->
+<div class="relative w-full aspect-square border border-outline-variant bg-surface flex items-center justify-center p-8 mb-12">
+<img alt="Patek Philippe Calatrava Ref. 96" class="w-full h-full object-contain filter drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida/ADBb0uj6MWLwA9xi2wxrYWp3UPGnagR0upyJLwbW4GhvGx2w1SvWDmpTfc8-qCNWq-6_p7Av0QfDG_vBeDzErBXjLkPQeaT2Vs-LVNDzZLpLemr_3ToAaxZ2uuIt-rXzCKVctyn-vStqcFQqyBzQeEAHb1sh4AfxKXz4CpDsVMn_A7oIg_qmzZmkNTzWAogZyfCCVrZQB38Ve417iq4zlpaO3oImsZq6qvTa792sLF3FvU-TUJThP2_G-zmlNwU"/>
+<!-- Subtle corner brackets for architectural feel -->
+<div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary-fixed-dim m-2"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary-fixed-dim m-2"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary-fixed-dim m-2"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-primary-fixed-dim m-2"></div>
+</div>
+<!-- Asset Details -->
+<article class="space-y-6 pb-12">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Patek Philippe Calatrava Ref. 96</h1>
+<div class="h-px w-24 bg-primary-fixed-dim"></div>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-2xl">
+                        Una obra maestra de la horología de 1934. Este modelo pionero introdujo la estética Bauhaus en Patek Philippe. Presenta una caja de oro amarillo excepcionalmente preservada y un dial sectorial intrincado con marcadores negros. Su movimiento mecánico de cuerda manual representa el pináculo de la artesanía suiza de la época dorada.
+                    </p>
+<!-- Metadata Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-outline-variant mt-8">
+<div>
+<span class="block font-label-caps text-label-caps text-outline mb-2">AÑO</span>
+<span class="font-body-md text-body-md text-on-surface">1934</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline mb-2">MATERIAL</span>
+<span class="font-body-md text-body-md text-on-surface">Oro Amarillo 18k</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline mb-2">ESTADO</span>
+<span class="font-body-md text-body-md text-on-surface">Excelente</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline mb-2">PROCEDENCIA</span>
+<span class="font-body-md text-body-md text-on-surface">Ginebra, Suiza</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Right Side: Action & History Panel (40%) -->
+<section class="w-full md:w-[40%] bg-surface flex flex-col h-[50vh] md:h-auto">
+<!-- Sticky Top Header: Current State -->
+<div class="p-gutter md:p-margin-mobile lg:p-gutter border-b border-outline-variant bg-surface-container-low shrink-0 relative">
+<!-- Status Indicator -->
+<div class="absolute top-gutter right-gutter flex items-center gap-2">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+</span>
+<span class="font-label-caps text-label-caps text-error">EN VIVO</span>
+</div>
+<div class="mb-4">
+<h2 class="font-label-caps text-label-caps text-outline tracking-[0.2em] mb-2">PUJA ACTUAL</h2>
+<div class="font-headline-md text-headline-md md:text-[48px] leading-none text-primary-fixed-dim">
+                        $145,000 USD
+                    </div>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<span class="block font-metadata text-metadata text-on-surface-variant mb-1">Mejor Postor:</span>
+<span class="font-body-md text-body-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">account_circle</span>
+                            A. Dupont (Suiza)
+                        </span>
+</div>
+<div class="text-right">
+<span class="block font-metadata text-metadata text-on-surface-variant mb-1">Termina en:</span>
+<span class="font-body-md text-body-md text-error flex items-center gap-1 justify-end">
+<span class="material-symbols-outlined text-[16px]">timer</span>
+                            04d 12h 30m
+                        </span>
+</div>
+</div>
+</div>
+<!-- Scrollable Middle: Bid History -->
+<div class="flex-1 overflow-y-auto p-gutter bg-surface">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-6 border-b border-outline-variant pb-2">HISTORIAL DE PUJAS</h3>
+<ul class="flex flex-col">
+<!-- Newest Bid -->
+<li class="flex justify-between items-center py-4 border-b border-outline-variant bg-surface-container-high px-3 -mx-3 border-l-2 border-l-primary-fixed-dim">
+<div class="flex flex-col gap-1">
+<span class="font-body-md text-body-md text-primary-fixed-dim">$145,000 USD</span>
+<span class="font-metadata text-metadata text-on-surface-variant">A. Dupont</span>
+</div>
+<span class="font-metadata text-metadata text-outline">Hace 2 min</span>
+</li>
+<li class="flex justify-between items-center py-4 border-b border-outline-variant hover:bg-surface-container transition-colors">
+<div class="flex flex-col gap-1">
+<span class="font-body-md text-body-md text-on-surface">$140,000 USD</span>
+<span class="font-metadata text-metadata text-on-surface-variant">L. Chen</span>
+</div>
+<span class="font-metadata text-metadata text-outline">Hace 15 min</span>
+</li>
+<li class="flex justify-between items-center py-4 border-b border-outline-variant hover:bg-surface-container transition-colors">
+<div class="flex flex-col gap-1">
+<span class="font-body-md text-body-md text-on-surface">$135,000 USD</span>
+<span class="font-metadata text-metadata text-on-surface-variant">J. Smith</span>
+</div>
+<span class="font-metadata text-metadata text-outline">Hace 1 hora</span>
+</li>
+<li class="flex justify-between items-center py-4 border-b border-outline-variant hover:bg-surface-container transition-colors">
+<div class="flex flex-col gap-1">
+<span class="font-body-md text-body-md text-on-surface">$120,000 USD</span>
+<span class="font-metadata text-metadata text-on-surface-variant">M. Rossi</span>
+</div>
+<span class="font-metadata text-metadata text-outline">Hace 3 horas</span>
+</li>
+<li class="flex justify-between items-center py-4 border-b border-outline-variant hover:bg-surface-container transition-colors">
+<div class="flex flex-col gap-1">
+<span class="font-body-md text-body-md text-on-surface">$100,000 USD</span>
+<span class="font-metadata text-metadata text-outline">Puja Inicial</span>
+</div>
+<span class="font-metadata text-metadata text-outline">01 Oct, 09:00</span>
+</li>
+</ul>
+</div>
+<!-- Sticky Bottom: Action Area -->
+<div class="p-gutter border-t border-outline-variant bg-surface-container-low shrink-0">
+<button class="w-full flex items-center justify-center gap-3 py-4 px-6 border border-error bg-transparent text-error hover:bg-error hover:text-on-error transition-all duration-300 group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">gavel</span>
+<span class="font-label-caps text-label-caps uppercase tracking-[0.15em]">CERRAR SUBASTA</span>
+</button>
+</div>
+</section>
+</main>
+</body></html>

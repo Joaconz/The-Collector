@@ -1,0 +1,222 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Reservas - THE COLLECTOR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#e8e1dd",
+                        "on-secondary": "#30312f",
+                        "outline-variant": "#4e453d",
+                        "on-tertiary-fixed": "#0f1d29",
+                        "on-background": "#e8e1dd",
+                        "surface-container": "#221f1d",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1e1b19",
+                        "tertiary": "#d6e4f6",
+                        "primary-container": "#dec2a3",
+                        "on-error": "#690005",
+                        "primary-fixed": "#fbdebd",
+                        "surface-tint": "#dec2a3",
+                        "on-tertiary-container": "#465462",
+                        "secondary-container": "#464746",
+                        "on-secondary-container": "#b6b5b3",
+                        "on-tertiary-fixed-variant": "#3b4856",
+                        "surface-variant": "#373432",
+                        "surface-container-lowest": "#100e0c",
+                        "on-primary-container": "#634f36",
+                        "tertiary-fixed-dim": "#bac8d9",
+                        "surface": "#151311",
+                        "surface-container-high": "#2c2927",
+                        "inverse-primary": "#705b41",
+                        "surface-bright": "#3c3936",
+                        "on-primary": "#3e2d17",
+                        "primary": "#fbdebe",
+                        "inverse-on-surface": "#33302d",
+                        "on-primary-fixed": "#271905",
+                        "on-tertiary": "#24323f",
+                        "secondary-fixed": "#e4e2e0",
+                        "on-surface-variant": "#d1c4b9",
+                        "primary-fixed-dim": "#dec2a3",
+                        "surface-container-highest": "#373432",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#d6e4f5",
+                        "on-surface": "#e8e1dd",
+                        "outline": "#9a8f85",
+                        "on-primary-fixed-variant": "#57432c",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed-variant": "#464746",
+                        "surface-dim": "#151311",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "tertiary-container": "#bac8d9",
+                        "background": "#151311",
+                        "secondary": "#c7c6c4",
+                        "secondary-fixed-dim": "#c7c6c4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "container-max": "1440px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Playfair Display"],
+                        "label-caps": ["DM Sans"],
+                        "display-lg": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "metadata": ["DM Sans"],
+                        "headline-sm": ["Playfair Display"],
+                        "body-md": ["DM Sans"],
+                        "body-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "700" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "metadata": ["14px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface dark:bg-surface h-[56px] w-full sticky top-0 z-50 border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-8">
+<a class="text-label-caps font-label-caps text-primary tracking-[0.15em] hover:opacity-80 transition-opacity" href="#">THE COLLECTOR</a>
+<ul class="hidden md:flex items-center gap-6">
+<li><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">RELOJES</a></li>
+<li><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">JOYERÍA</a></li>
+<li><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">ARTE</a></li>
+<li><a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">NUMISMÁTICA</a></li>
+</ul>
+</div>
+<div class="flex items-center gap-4 text-primary dark:text-primary">
+<button aria-label="favorite" class="hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined text-headline-sm" data-icon="favorite">favorite</span>
+</button>
+<button aria-label="search" class="hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined text-headline-sm" data-icon="search">search</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-[80px] md:py-[120px]">
+<header class="mb-[64px]">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Mis Reservas</h1>
+<p class="font-metadata text-metadata text-on-surface-variant uppercase tracking-[0.05em]">Historial de Adquisiciones y Ofertas</p>
+</header>
+<!-- Reservations List -->
+<div class="flex flex-col border-t border-outline-variant">
+<!-- List Item 1 -->
+<article class="flex flex-col sm:flex-row gap-6 py-8 border-b border-outline-variant group">
+<div class="flex-shrink-0 w-[80px] h-[100px] border border-outline-variant bg-surface overflow-hidden">
+<img alt="Vintage Patek Philippe" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300" data-alt="A macro shot of a vintage gold luxury watch resting on dark textured velvet in a museum-like display. The lighting is low-key, dramatic, and focused on the intricate dial details, casting deep shadows around the edges. The color palette emphasizes rich bronze, deep black, and subtle gold tones, reflecting a high-end, exclusive archival aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8sUS_i2l6WG0HxOElgiszloONr9A4dCWE5Y5o3ExE3jOPs6V86n_1PrPqfXDACYTk9UN0fsnFQ7lgDg2nhzxiA1j0AcZonhzZ6gb4lu_oEo9WmrZupeTVNWHl3aNGWi3mxoFi-C_txbdfRgIvdFluIAGLenyQuq5VI6ghXd84BkuDGL_6clg_3DionQpVrqXNuFevz8U7EqGkeuXoDIWf2afQ6AJIlHce_j_kX4dc3-QE-XNn4qAY3DtxPP7MER3l_9zIWIFghes">
+</div>
+<div class="flex flex-col sm:flex-row justify-between w-full gap-4">
+<div class="flex flex-col justify-center gap-2">
+<div class="flex items-center gap-3">
+<span class="inline-block border border-outline-variant px-2 py-[2px] font-label-caps text-label-caps text-primary-container">CONFIRMADO</span>
+<span class="font-metadata text-metadata text-on-surface-variant">REF: 894-AB</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Patek Philippe Calatrava</h2>
+<p class="font-metadata text-metadata text-on-surface-variant">Acero Inoxidable, 1954</p>
+</div>
+<div class="flex flex-col sm:items-end justify-center gap-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Precio Acordado</span>
+<span class="font-body-lg text-body-lg text-on-surface">$24,500 USD</span>
+<span class="font-metadata text-metadata text-outline mt-1">Liquidado: 12 Nov, 2023</span>
+</div>
+</div>
+</article>
+<!-- List Item 2 -->
+<article class="flex flex-col sm:flex-row gap-6 py-8 border-b border-outline-variant group">
+<div class="flex-shrink-0 w-[80px] h-[100px] border border-outline-variant bg-surface overflow-hidden">
+<img alt="Abstract Art Piece" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300" data-alt="A close-up view of a highly textured abstract oil painting displayed against a stark black background. The artwork features aggressive, thick brushstrokes in muted ochre, deep charcoal, and off-white. The lighting is harsh and directional, highlighting the impasto technique and casting micro-shadows that emphasize the painting's physical depth and rawness. The overall mood is solemn and authoritative." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHYlZ1d4EM5hX9o5hgnilqPa86H9fIy6pwAoFqeKHOt5hd_tBk_7xo1Pij-0AJot-ig1r-RXSx3N8LBAurvEIghdKa0cBCsYPHPBRBgn28L6WZijEJllwgVKZ6jkDUPUN0UHkLvxl6ByCohFnPNK0YE83wzRN9heiNuBs7gy0dP4Vgk7cr-6WJOGBowR5KJdyQFvMtOKeHv5na60-EK3MQFy5QPmLyDMQb_UnqjXjLN5MnQEwtaKEdRK9DjfN4kCThRiiE0dfCk4A">
+</div>
+<div class="flex flex-col sm:flex-row justify-between w-full gap-4">
+<div class="flex flex-col justify-center gap-2">
+<div class="flex items-center gap-3">
+<span class="inline-block border border-outline-variant px-2 py-[2px] font-label-caps text-label-caps text-on-surface-variant">EN PROCESO</span>
+<span class="font-metadata text-metadata text-on-surface-variant">REF: 102-XZ</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Estudio N° 4, Tàpies</h2>
+<p class="font-metadata text-metadata text-on-surface-variant">Técnica Mixta, 1972</p>
+</div>
+<div class="flex flex-col sm:items-end justify-center gap-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Oferta Actual</span>
+<span class="font-body-lg text-body-lg text-on-surface">$18,200 USD</span>
+<span class="font-metadata text-metadata text-outline mt-1">Cierre: 24 Nov, 2023</span>
+</div>
+</div>
+</article>
+<!-- List Item 3 -->
+<article class="flex flex-col sm:flex-row gap-6 py-8 border-b border-outline-variant group opacity-75">
+<div class="flex-shrink-0 w-[80px] h-[100px] border border-outline-variant bg-surface overflow-hidden">
+<img alt="Ancient Coin" class="w-full h-full object-cover grayscale opacity-80" data-alt="A highly detailed close-up of a weathered silver ancient Roman coin resting on a dark slate surface. The lighting is minimal and precise, carving out the eroded facial profile and worn inscriptions on the coin's surface. The color palette is strictly monochromatic, utilizing deep greys and harsh whites to create a stark, archival, and historical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF3JqefmvjeTLg3iPJc_c_L3o1WN5D0b2m42mzzgmNk2nmoC_Le8ac7fduQmUREaOkx6KujMWmxEOQpMHXAeNoqTFALcFJ58j8pvVWuKeLhZO6IbqQoDu0ujrqNINEHevei_YnWinf9F4pLOu4U74jTekvH-mGAJZ-2PdaR3l1Q0dOchXVhu0aeGICJMFnka7AJp_rln7RnB6ILHMs1omGJMvxRy7663gdTgbZnPTDCZTzPOmHDqtRsz5rb16YoHU7hgXfkmW-0oc">
+</div>
+<div class="flex flex-col sm:flex-row justify-between w-full gap-4">
+<div class="flex flex-col justify-center gap-2">
+<div class="flex items-center gap-3">
+<span class="inline-block border border-outline-variant px-2 py-[2px] font-label-caps text-label-caps text-outline">COMPLETADO</span>
+<span class="font-metadata text-metadata text-on-surface-variant">REF: 441-CQ</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Tetradracma de Atenas</h2>
+<p class="font-metadata text-metadata text-on-surface-variant">Plata, Siglo V a.C.</p>
+</div>
+<div class="flex flex-col sm:items-end justify-center gap-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Adjudicado por</span>
+<span class="font-body-lg text-body-lg text-on-surface">$4,100 USD</span>
+<span class="font-metadata text-metadata text-outline mt-1">Entregado: 02 Sep, 2023</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Action Button -->
+<div class="mt-16 flex justify-center w-full">
+<button class="bg-transparent border border-outline-variant text-on-surface font-label-caps text-label-caps px-8 py-4 tracking-[0.15em] hover:border-primary-container hover:text-primary-container transition-colors duration-300">
+                CARGAR HISTORIAL
+            </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface dark:bg-surface w-full py-[16px] border-t border-outline-variant mt-auto">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto flex-col md:flex-row gap-4 md:gap-0">
+<span class="text-label-caps font-label-caps text-on-surface-variant">© 2024 THE COLLECTOR. ALL RIGHTS RESERVED.</span>
+<div class="flex items-center gap-6">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">PRIVACY</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">TERMS</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">CONTACT</a>
+</div>
+<span class="text-label-caps font-label-caps text-primary hidden md:block">THE COLLECTOR</span>
+</div>
+</footer>
+</body></html>

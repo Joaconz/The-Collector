@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Panel de Vendedor - THE COLLECTOR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#151311",
+                      "on-background": "#e5e2e0",
+                      "surface": "#151311",
+                      "on-surface": "#e5e2e0",
+                      "surface-variant": "#353534",
+                      "on-surface-variant": "#d1c4b9",
+                      "primary": "#dec2a3",
+                      "on-primary": "#3e2d17",
+                      "primary-container": "#a58d70",
+                      "on-primary-container": "#372711",
+                      "secondary": "#cfc5ba",
+                      "on-secondary": "#353028",
+                      "secondary-container": "#4c463d",
+                      "on-secondary-container": "#bdb4a9",
+                      "tertiary": "#bac8d9",
+                      "on-tertiary": "#25313f",
+                      "tertiary-container": "#8592a2",
+                      "on-tertiary-container": "#1e2b38",
+                      "outline": "#9a8f85",
+                      "outline-variant": "#4d453d",
+                      "surface-container-lowest": "#100e0c",
+                      "surface-container-low": "#1e1b19",
+                      "surface-container": "#20201f",
+                      "surface-container-high": "#2a2a29",
+                      "surface-container-highest": "#353534"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0",
+                      "lg": "0",
+                      "xl": "0",
+                      "full": "0"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "base": "8px",
+                      "margin-mobile": "20px",
+                      "container-max": "1280px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "body-sm": [
+                              "DM Sans"
+                      ],
+                      "display-lg": [
+                              "Playfair Display"
+                      ],
+                      "headline-md": [
+                              "Playfair Display"
+                      ],
+                      "body-lg": [
+                              "DM Sans"
+                      ],
+                      "display-lg-mobile": [
+                              "Playfair Display"
+                      ],
+                      "body-md": [
+                              "DM Sans"
+                      ],
+                      "label-caps": [
+                              "DM Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "300"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #151311;
+            color: #e5e2e0;
+        }
+        .dashboard-card {
+            background-color: #151311;
+            border: 1px solid #4d453d;
+            border-radius: 0;
+        }
+        .btn-primary {
+            background-color: #dec2a3;
+            color: #151311;
+            border-radius: 0;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .btn-ghost {
+            background-color: transparent;
+            color: #e5e2e0;
+            border: 1px solid #4d453d;
+            border-radius: 0;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-ghost:hover {
+            border-color: #dec2a3;
+            color: #dec2a3;
+        }
+        .list-item-border {
+            border-bottom: 1px solid #4d453d;
+        }
+        .list-item-border:last-child {
+            border-bottom: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #151311;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4d453d;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col bg-background text-on-background">
+<!-- TopNavBar -->
+<nav class="bg-surface w-full h-[56px] border-b border-outline-variant flex items-center justify-between px-margin-mobile md:px-margin-desktop sticky top-0 z-50">
+<!-- Left: Wordmark -->
+<div class="flex items-center">
+<span class="text-primary font-sans text-[14px] uppercase tracking-[0.2em] font-bold">THE COLLECTOR</span>
+</div>
+<!-- Center: Links (Desktop Only) -->
+<div class="hidden md:flex items-center gap-8 h-full">
+<a class="relative text-on-surface hover:text-primary transition-colors text-[11px] font-bold uppercase tracking-widest h-full flex items-center group" href="#">
+      RELOJES
+      <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+<a class="relative text-on-surface hover:text-primary transition-colors text-[11px] font-bold uppercase tracking-widest h-full flex items-center group" href="#">
+      JOYERÍA
+      <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+<a class="relative text-on-surface hover:text-primary transition-colors text-[11px] font-bold uppercase tracking-widest h-full flex items-center group" href="#">
+      ARTE
+      <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+<a class="relative text-on-surface hover:text-primary transition-colors text-[11px] font-bold uppercase tracking-widest h-full flex items-center group" href="#">
+      MONEDAS
+      <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+</a>
+</div>
+<!-- Right: Icons -->
+<div class="flex items-center gap-4">
+<button aria-label="search" class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<div class="hidden md:flex items-center relative">
+<button aria-label="favorites" class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+<span class="absolute -top-1.5 -right-1.5 bg-primary text-background text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">2</span>
+</div>
+<div class="w-[28px] h-[28px] border border-outline-variant">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgtLJXsuhCaH-2Zvh9OT7Tk98wm5ze8OfjBO0XW9yTYdeMOC5F0dwDxw73G9Bz30q5Qdt1rAk5y57Qon5Kfv-O8NChbhzmeEnoI6RXr1ymfsl6kVCWSBPXpa65sDMxdi7O17BPU2BQA9Vrcx5HvP41gfYp1cQz4H0_9iNFYKwLyF2UA7qpUdNW8YzgH57DC5MdPqP9miAKQdlIWk6CB0YikOVWj1V1FwKLvIqkECDilOqQbi4tXPgcI6Q8SAvEAxUM47yE6akYYF0"/>
+</div>
+<!-- Mobile Hamburger -->
+<button aria-label="menu" class="md:hidden text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<!-- Main Dashboard Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-16"><header class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<div>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Panel de Control</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Gestionando su colección privada y adquisiciones.</p>
+</div>
+<button class="btn-primary font-label-caps text-label-caps flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+        NUEVA PUBLICACIÓN
+    </button>
+</header>
+<div class="flex flex-col gap-gutter">
+<!-- Top Row: Summary Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Card 1: Reservas Pendientes -->
+<div class="dashboard-card flex flex-col">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-label-caps text-label-caps tracking-widest text-on-surface">RESERVAS PENDIENTES</h2>
+<span class="bg-primary text-background px-2 py-0.5 text-[10px] font-bold">1</span>
+</div>
+<div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
+<div class="flex flex-col md:flex-row gap-6 items-center">
+<div class="w-full md:w-1/2 aspect-[4/3] overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover grayscale sepia-[.1] contrast-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUTd2sCUNvDmeInBAIJZxLA6pRMMLQ6QiVzrsCtX-T1LQvI4rxeYQxvRVVd3GkwN0KyKB0FPgrWfNzV5sLevALA8FvrUK83FPHxBQQroycTQFU3EtaGawAnSf4ecE_uKkuytIaOTMtoXa_THjn7_9xYCXxb12e3qkLyxhlB2VcLpLtNY7moVmLwZpmtRoC_Qy5YfGK3l8e1c_VawMvCi7bpb-HA1HbDiAcbvaBgvEJsPKJZJYOAEmYa2qmi0dw_Za7J8rOSwEJaGs"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col space-y-4">
+<div>
+<h4 class="font-headline-sm text-[24px] text-on-surface mb-2">Art Deco Sapphire Ring</h4>
+<p class="text-body-sm text-on-surface-variant font-bold">Fecha límite: 24 Nov, 2024</p>
+</div>
+<div class="flex gap-4 pt-2">
+<button class="btn-primary flex-grow text-[10px] font-label-caps tracking-widest">CONFIRMAR</button>
+<button class="btn-ghost flex-grow text-[10px] font-label-caps tracking-widest">RECHAZAR</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Ofertas Privadas -->
+<div class="dashboard-card flex flex-col">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-label-caps text-label-caps tracking-widest text-on-surface">OFERTAS PRIVADAS</h2>
+<span class="bg-primary text-background px-2 py-0.5 text-[10px] font-bold">2</span>
+</div>
+<div class="p-6 space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-6 overflow-y-auto custom-scrollbar flex-grow">
+<div class="space-y-4 md:border-r md:border-outline-variant md:pr-6">
+<h4 class="font-headline-sm text-[20px] text-on-surface">Patek Philippe Calatrava</h4>
+<div class="flex justify-between items-center bg-surface-container-low p-3 border border-outline-variant">
+<div>
+<p class="text-[10px] font-label-caps text-on-surface-variant mb-1">PRECIO DE LISTA</p>
+<p class="font-body-md text-on-surface">$19,000</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-label-caps text-primary mb-1">OFERTA RECIBIDA</p>
+<p class="font-body-md text-primary font-bold">$18,500</p>
+</div>
+</div>
+<button class="btn-ghost w-full text-[10px] font-label-caps tracking-widest">REVISAR</button>
+</div>
+<div class="space-y-4 md:pl-6">
+<h4 class="font-headline-sm text-[20px] text-on-surface">1968 Rolex Submariner</h4>
+<div class="flex justify-between items-center bg-surface-container-low p-3 border border-outline-variant">
+<div>
+<p class="text-[10px] font-label-caps text-on-surface-variant mb-1">PRECIO DE LISTA</p>
+<p class="font-body-md text-on-surface">$24,500</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-label-caps text-primary mb-1">OFERTA RECIBIDA</p>
+<p class="font-body-md text-primary font-bold">$22,000</p>
+</div>
+</div>
+<button class="btn-ghost w-full text-[10px] font-label-caps tracking-widest">REVISAR</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Technical Table -->
+<div class="dashboard-card flex flex-col">
+<div class="p-6 border-b border-outline-variant">
+<h2 class="font-label-caps text-label-caps tracking-widest text-on-surface">MIS PUBLICACIONES</h2>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-low">
+<th class="p-4 pl-6 font-label-caps text-[10px] text-on-surface-variant tracking-widest">PIEZA</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant tracking-widest">ESTADO</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant tracking-widest">VALOR ACTUAL</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant tracking-widest">FECHA DE LISTADO</th>
+<th class="p-4 pr-6 font-label-caps text-[10px] text-on-surface-variant tracking-widest text-right">ACCIONES</th>
+</tr>
+</thead>
+<tbody>
+<!-- Table Row 1 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors group">
+<td class="p-4 pl-6 flex items-center gap-4">
+<div class="w-12 h-12 shrink-0 border border-outline-variant">
+<img class="w-full h-full object-cover grayscale sepia-[.1] contrast-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ9PtRIvIB3L1j2Kc8xQ0u0pgmVSILkgaYArtQgoEpkVdnO816goPfrc6VacO_tA6Pdw-H8V_uzkwOHHW3ofdd6MDIIAL85HhLe0RaTNmgFdepbXKeK__NPDiKYEBIaLxsZhknJmu4NKSWM_zIWlxjsK7C-sw-BK8VUJn-Ad7k1eLfrNe_8gjUWIxeeuy8PAyudS3dGMfD3j6i4Iqqd4aJcKBx5K-X8UGGbAhkUwNGPSLVfYhvxbKEquy26z0TDsI1N5yi0amdJ9U"/>
+</div>
+<div>
+<h4 class="font-headline-sm text-[16px] text-on-surface leading-tight mb-1">1968 Rolex Submariner</h4>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Ref. 5512</p>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-block border border-primary text-primary px-2 py-0.5 text-[9px] font-label-caps">ACTIVA</span>
+</td>
+<td class="p-4 font-body-md text-primary font-bold">$24,500</td>
+<td class="p-4 font-body-sm text-on-surface">12 Oct, 2024</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors group">
+<td class="p-4 pl-6 flex items-center gap-4">
+<div class="w-12 h-12 shrink-0 border border-outline-variant">
+<img class="w-full h-full object-cover grayscale sepia-[.1] contrast-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdF3p00zj0H5FCzjeZ7OuHZ6sAVXYf90tCr8DmUwEQfH_U08MhjLhCTKMJhIRyJIGoGwD7CYNEqTT_d6iX_2UKGN45pu8x3pKdMxizVVS-0i-rtrslMgRtzmMF-wPhO2Wa-IOPCyrukqkSNTQCO06pAP0vxr3Q0wMhdEyswkH3_O33n2jl5TU5cBp1Ogfr6_vgduOTpswK_eFsUyLZf8ZkVzxFRWVVZ8vb-kay0MnYI_4W-yZwXPOPws7BTW2ymnqbOIXOKFrdA4U"/>
+</div>
+<div>
+<h4 class="font-headline-sm text-[16px] text-on-surface leading-tight mb-1">Denarius of Augustus</h4>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Silver | 19 BC</p>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-block border border-tertiary text-tertiary px-2 py-0.5 text-[9px] font-label-caps">VENDIDA</span>
+</td>
+<td class="p-4 font-body-md text-primary font-bold">$3,100</td>
+<td class="p-4 font-body-sm text-on-surface">05 Sep, 2024</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Table Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="p-4 pl-6 flex items-center gap-4">
+<div class="w-12 h-12 shrink-0 border border-outline-variant">
+<img class="w-full h-full object-cover grayscale sepia-[.1] contrast-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0EpsdrCWwExuCZeB5PVI4lI6HYf64TEI7k0FR4_7YLfyV5-hzKqaKq1UucGFb6MZ_zTW0km6T08h4av4trs_EnzIQ8pvoqtUbadyu57OmYdfWkVw27FxY6wK0lg759Sn6RkwRrI-mAagH8LCP7z3llg7oWBdD2SsxXY_T9GYOe1JX0fVpx6ky_H5x8yAriipY1pm0BWqi9Fms78V2EucBV5IdoX1mNY_tjXQCzcoridTrTbE88jkeap4exVGxiLZbAXDkb0a_efc"/>
+</div>
+<div>
+<h4 class="font-headline-sm text-[16px] text-on-surface leading-tight mb-1">Study in Ochre, 2019</h4>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Oil on Canvas</p>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-block border border-outline text-outline px-2 py-0.5 text-[9px] font-label-caps">PAUSADA</span>
+</td>
+<td class="p-4 font-body-md text-primary font-bold">$8,200</td>
+<td class="p-4 font-body-sm text-on-surface">28 Ago, 2024</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div></main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-base mt-auto">
+<div class="text-headline-sm font-headline-sm text-primary mb-4 md:mb-0">
+            THE COLLECTOR
+        </div>
+<div class="flex gap-6 flex-wrap justify-center md:justify-end mb-4 md:mb-0">
+<a class="text-body-sm font-body-sm text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Procedencia</a>
+<a class="text-body-sm font-body-sm text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Términos</a>
+<a class="text-body-sm font-body-sm text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Privacidad</a>
+<a class="text-body-sm font-body-sm text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Conserje</a>
+</div>
+<div class="text-secondary text-body-sm font-body-sm text-label-caps font-label-caps">
+            © 2024 THE COLLECTOR. TODOS LOS DERECHOS RESERVADOS.
+        </div>
+</footer>
+</body></html>

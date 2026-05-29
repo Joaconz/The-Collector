@@ -1,0 +1,213 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>THE COLLECTOR - Masterworks</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&amp;family=Playfair+Display:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#b6b5b3",
+                        "inverse-on-surface": "#33302d",
+                        "on-surface-variant": "#d1c4b9",
+                        "on-primary-container": "#634f36",
+                        "surface-container-low": "#1e1b19",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-tertiary-fixed": "#0f1d29",
+                        "tertiary": "#d6e4f6",
+                        "surface-container-highest": "#373432",
+                        "secondary-fixed": "#e4e2e0",
+                        "primary-fixed": "#fbdebd",
+                        "on-tertiary-fixed-variant": "#3b4856",
+                        "background": "#151311",
+                        "surface-container-high": "#2c2927",
+                        "surface": "#151311",
+                        "on-primary": "#3e2d17",
+                        "on-secondary": "#30312f",
+                        "on-primary-fixed": "#271905",
+                        "on-tertiary-container": "#465462",
+                        "secondary-container": "#464746",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "secondary": "#c7c6c4",
+                        "on-surface": "#e8e1dd",
+                        "tertiary-container": "#bac8d9",
+                        "surface-bright": "#3c3936",
+                        "on-primary-fixed-variant": "#57432c",
+                        "primary-fixed-dim": "#dec2a3",
+                        "primary-container": "#dec2a3",
+                        "tertiary-fixed-dim": "#bac8d9",
+                        "on-tertiary": "#24323f",
+                        "on-background": "#e8e1dd",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#4e453d",
+                        "tertiary-fixed": "#d6e4f5",
+                        "error": "#ffb4ab",
+                        "outline": "#9a8f85",
+                        "on-error": "#690005",
+                        "surface-container": "#221f1d",
+                        "surface-variant": "#373432",
+                        "inverse-surface": "#e8e1dd",
+                        "secondary-fixed-dim": "#c7c6c4",
+                        "surface-container-lowest": "#100e0c",
+                        "primary": "#fbdebe",
+                        "error-container": "#93000a",
+                        "surface-dim": "#151311",
+                        "surface-tint": "#dec2a3",
+                        "inverse-primary": "#705b41"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "metadata": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "headline-sm": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["DM Sans"],
+                        "body-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "metadata": ["14px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom radial gradient for spotlight effect allowed by prompt */
+        .spotlight-bg {
+            background: radial-gradient(circle at center, rgba(30, 27, 25, 0.8) 0%, rgba(21, 19, 17, 1) 70%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="bg-[#131313] h-[56px] w-full sticky top-0 z-50 border-b border-white/10 flex justify-between items-center px-margin-mobile md:px-margin-desktop">
+    <div class="flex items-center">
+        <a class="text-[14px] font-sans font-bold uppercase tracking-[0.25em] text-[#dec2a3]" href="#">THE COLLECTOR</a>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+        <a class="text-[11px] font-medium uppercase tracking-[0.1em] text-[#dec2a3] border-b-2 border-[#dec2a3] pb-1" href="#">RELOJES</a>
+        <a class="text-[11px] font-medium uppercase tracking-[0.1em] text-on-surface-variant hover:text-[#dec2a3] transition-colors duration-200" href="#">JOYERÍA</a>
+        <a class="text-[11px] font-medium uppercase tracking-[0.1em] text-on-surface-variant hover:text-[#dec2a3] transition-colors duration-200" href="#">ARTE</a>
+        <a class="text-[11px] font-medium uppercase tracking-[0.1em] text-on-surface-variant hover:text-[#dec2a3] transition-colors duration-200" href="#">MONEDAS</a>
+    </div>
+
+    <div class="flex items-center gap-5 text-on-surface">
+        <button class="hover:text-[#dec2a3] transition-colors">
+            <span class="material-symbols-outlined text-[20px]">search</span>
+        </button>
+        <button class="hover:text-[#dec2a3] transition-colors relative flex items-center">
+            <span class="material-symbols-outlined text-[20px]">favorite</span>
+            <span class="absolute -top-1.5 -right-1.5 bg-[#dec2a3] text-[#131313] text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">2</span>
+        </button>
+        <div class="w-[28px] h-[28px] rounded-full overflow-hidden border border-outline-variant">
+            <img alt="User avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6xX7NXEccrG2Zg4hV_QGzYsyqd-sG_HrgnrvCnNS70lyL0YhU4hafpHeOkqkIGAqpEU3YnRfYlXQ1yXdFUY8VLTJzCi8iwDMAxAi9Fal7NBH-ApojVl8QTTBASUCoi_bz70U6ZO3vzED5dcrs9V2vh761WayjuMoK4II8_ZzrD4ArCk4YVp9P_dlbcrJTWUh5oopH4l4TrELUKusfyW70DEkYYlr7Q9FNXeLMM-T7Mo_ouyLTu7WmS7jAL8O3rW0KNgZq1ac_DwI">
+        </div>
+        <button class="md:hidden flex items-center hover:text-[#dec2a3]">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+    </div>
+</nav>
+<!-- Main Content: Immersive Cinematic Catalog -->
+<main class="flex-grow flex flex-col w-full relative">
+<!-- Header Section -->
+<header class="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-24 md:py-32 flex flex-col items-center justify-center text-center">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg-mobile md:font-display-lg text-on-surface mb-6 uppercase tracking-widest">Masterworks</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl">A curated selection of the world's most significant timepieces and artifacts. Presented without distraction.</p>
+</header>
+<!-- Cinematic Item 1: Massive Floating Watch -->
+<section class="w-full relative min-h-[80vh] flex items-center justify-center py-20 spotlight-bg group cursor-pointer border-b border-outline-variant">
+<div class="max-w-container-max w-full mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row items-center justify-between relative z-10 gap-12">
+<!-- Text Data: Low contrast to high contrast on hover -->
+<div class="w-full md:w-1/3 flex flex-col items-start transition-opacity duration-700 opacity-60 group-hover:opacity-100 z-20 order-2 md:order-1">
+<div class="flex items-center gap-2 mb-4 border border-outline-variant px-3 py-1 text-label-caps font-label-caps text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                        PROVENANCE VERIFIED
+                    </div>
+<h2 class="text-headline-md font-headline-md text-on-surface mb-2 transition-colors duration-500">Patek Philippe Grandmaster Chime</h2>
+<p class="text-metadata font-metadata text-on-surface-variant mb-8 uppercase tracking-widest">Ref. 6300G-010 — White Gold</p>
+<div class="flex flex-col gap-1 w-full border-t border-outline-variant pt-4">
+<div class="flex justify-between w-full text-metadata font-metadata text-on-surface-variant">
+<span class="">Current Valuation</span>
+<span class="text-primary-fixed-dim">Price upon request</span>
+</div>
+</div><a href="#" class="mt-8 inline-flex items-center gap-3 px-6 py-3 border border-primary/30 bg-primary/5 text-label-caps font-bold text-[#dec2a3] hover:bg-primary/20 hover:border-primary/60 transition-all duration-300 group/link tracking-[0.2em]">
+    <span class="border-r border-primary/30 pr-3">VER DETALLE</span>
+    <span class="material-symbols-outlined text-[18px] transform group-hover/link:translate-x-1 transition-transform">chevron_right</span>
+</a>
+</div>
+<!-- Massive Floating Image -->
+<div class="w-full md:w-2/3 flex justify-center order-1 md:order-2 transform transition-transform duration-1000 group-hover:scale-[1.02]">
+<img alt="Floating Patek Philippe" class="w-full max-w-[80vw] md:max-w-[55vw] h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" data-alt="A hyper-realistic, dramatic studio shot of an exceptionally rare, intricate mechanical luxury watch floating against a pitch-black background. A single, soft overhead spotlight creates a subtle gradient on the dark surface, illuminating the watch's silver and blue metallic components. The aesthetic is high-contrast, moody, and ultra-premium, emphasizing the intricate gears and craftsmanship. Sharp focus, deep shadows, 8k resolution, editorial gallery style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt1Z3bKUCPlhvehxCZku9JpO7myEV5AzvJwUfvzVFzeCpSYRJX2RvETjxueix5jNrVQlsN5wQ-J29UfVyPrrXthCCr5qJYnA3gKHvm1pdhOmL24cf0vVYIvnTXhm1ox--IKNOKNUPqWIBwCvkpyIdIUX2R53Dkeq9DTXLjQbCtRAbsMOVBxQpWv5CvYQhOLIWbyk8xdV3alpTMAhLURHfJwCvUmKyNOCOKE4-x7sLHGxy-CzTxS3BQDTDsFQO_Ip38TaTWt9gaHRg">
+</div>
+</div>
+</section>
+<!-- Cinematic Item 2: Asymmetric Right Aligned -->
+<section class="w-full relative min-h-[80vh] flex items-center justify-center py-20 spotlight-bg group cursor-pointer border-b border-outline-variant">
+<div class="max-w-container-max w-full mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row-reverse items-center justify-between relative z-10 gap-12">
+<!-- Text Data -->
+<div class="w-full md:w-1/3 flex flex-col items-start transition-opacity duration-700 opacity-60 group-hover:opacity-100 z-20 order-2 md:order-1">
+<h2 class="text-headline-md font-headline-md text-on-surface mb-2 transition-colors duration-500">Rolex Daytona "Paul Newman"</h2>
+<p class="text-metadata font-metadata text-on-surface-variant mb-8 uppercase tracking-widest">Ref. 6239 — Exotic Dial</p>
+<div class="flex flex-col gap-1 w-full border-t border-outline-variant pt-4">
+<div class="flex justify-between w-full text-metadata font-metadata text-on-surface-variant">
+<span class="">Last Auctioned</span>
+<span class="text-primary-fixed-dim">$1,250,000 USD</span>
+</div>
+</div><a href="#" class="mt-8 inline-flex items-center gap-3 px-6 py-3 border border-primary/30 bg-primary/5 text-label-caps font-bold text-[#dec2a3] hover:bg-primary/20 hover:border-primary/60 transition-all duration-300 group/link tracking-[0.2em]">
+    <span class="border-r border-primary/30 pr-3">VER DETALLE</span>
+    <span class="material-symbols-outlined text-[18px] transform group-hover/link:translate-x-1 transition-transform">chevron_right</span>
+</a>
+</div>
+<!-- Massive Floating Image -->
+<div class="w-full md:w-[60%] flex justify-center order-1 md:order-2 transform transition-transform duration-1000 group-hover:scale-[1.02]">
+<img alt="Floating Rolex Daytona" class="w-full max-w-[80vw] md:max-w-[50vw] h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" data-alt="A vintage luxury chronograph watch with a distinctive black and white 'panda' dial, elegantly floating in a vast, empty dark void. A dramatic, cinematic rim light traces the edges of the steel case and domed crystal, separating it from the deep, rich black background. The lighting highlights the patinated luminous markers and the texture of the metallic bezel. High-end editorial photography, moody, minimal, emphasizing absolute exclusivity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvFVqmbk_xIhszI_FF2EgrTOBWvuhbHV13s4NFeI_LMnLXAU3uLxtWLMzOYdxHySrn98YCCRRSdtwxWjBjh35bCAyuQyC-yTROPXu--S2CMyFlOOiYteRxjeDCYDWV8eMPEiX2VR1D6TwpXUwOu2J4oTC3IXGUxyLDh4RK5rmv-hAsibKp5UYCm5Q1UnE4e_JprFN5n5x2Ty7-bwli09s4V1wCVD-smyOse52CnryHoQcpL-SYVVmpmbwpmgn0EWuANbleKcNFc-8">
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface dark:bg-surface w-full py-unit*4 border-t border-outline-variant flat no shadows flex justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto mt-20">
+<div class="text-label-caps font-label-caps text-on-surface-variant">
+            © 2024 THE COLLECTOR. ALL RIGHTS RESERVED.
+        </div>
+<div class="flex items-center gap-6">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">PRIVACY</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">TERMS</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">CONTACT</a>
+</div>
+</footer>
+
+
+</body></html>
