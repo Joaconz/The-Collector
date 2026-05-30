@@ -1,190 +1,296 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
+import ScrollReveal from '../components/ui/ScrollReveal';
+import StaggerReveal from '../components/ui/StaggerReveal';
+import ParallaxImage from '../components/ui/ParallaxImage';
+import Marquee from '../components/ui/Marquee';
+
+const CATEGORIES = [
+  {
+    index: '01',
+    slug: 'RELOJES',
+    label: 'RELOJERÍA DE BÓVEDA',
+    headline: 'LA PRECISIÓN COMO ARTE',
+    description:
+      'Piezas horlogeras de las manufacturas más prestigiosas del mundo. Cada movimiento, una declaración de ingenio humano que trasciende su función utilitaria.',
+    img: 'https://picsum.photos/seed/collector-relojes/800/1000',
+    path: '/catalogo?cat=RELOJES',
+    cta: 'EXPLORAR RELOJES',
+  },
+  {
+    index: '02',
+    slug: 'JOYERIA',
+    label: 'ALTA JOYERÍA',
+    headline: 'BRILLANTEZ MÁS ALLÁ DEL ENGASTE',
+    description:
+      'Collares, sortijas y piezas únicas de Cartier, Tiffany & Co. y Van Cleef & Arpels. Pureza certificada por laboratorios GIA autorizados.',
+    img: 'https://picsum.photos/seed/collector-joyeria/800/1000',
+    path: '/catalogo?cat=JOYERIA',
+    cta: 'VER COLECCIÓN',
+  },
+  {
+    index: '03',
+    slug: 'ARTE',
+    label: 'PIEZAS MAESTRAS DE AUTOR',
+    headline: 'OBRAS QUE TRASCIENDEN EL TIEMPO',
+    description:
+      'Litografías y lienzos originales verificados. Cada adquisición incluye reporte notariado de procedencia, trazabilidad de galerías previas e informe de conservación forense.',
+    img: 'https://picsum.photos/seed/collector-arte/800/1000',
+    path: '/catalogo?cat=ARTE',
+    cta: 'EXPLORAR ARTE',
+  },
+  {
+    index: '04',
+    slug: 'NUMISMATICA',
+    label: 'NUMISMÁTICA HISTÓRICA',
+    headline: 'HISTORIA ACUÑADA EN METAL',
+    description:
+      'Monedas y medallas que sobrevivieron imperios. Cada pieza certificada por la American Numismatic Association con ficha técnica de rareza y conservación.',
+    img: 'https://picsum.photos/seed/collector-numismatica/800/1000',
+    path: '/catalogo?cat=NUMISMATICA',
+    cta: 'VER MONEDAS',
+  },
+];
 
 const HomePage = () => {
   return (
     <div className="flex flex-col w-full bg-background overflow-hidden">
-      {/* 1. Hero Section */}
-      <section className="relative h-[90vh] md:h-screen w-full flex items-center px-6 md:px-20">
-        {/* Imagen de fondo con overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=1600&h=1000"
-            alt="Rolex Daytona Close Up"
-            className="w-full h-full object-cover object-center filter brightness-50"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-black/30 to-black/50" />
-        </div>
 
-        {/* Contenido Hero */}
-        <div className="relative z-10 max-w-3xl flex flex-col text-left space-y-6">
-          <span className="font-label-caps text-primary text-[11px] tracking-[0.3em] font-semibold animate-fade-in">
+      {/* ═══════════════════════════════════════════
+          1. HERO — Pieza como protagonista centrada
+      ═══════════════════════════════════════════ */}
+      <section className="relative min-h-[100dvh] w-full flex flex-col items-center justify-between -mt-16 pt-24 pb-12 overflow-hidden">
+
+        {/* Vignette lateral oscura para profundidad */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 65% at 50% 48%, rgba(20,20,19,0) 30%, #131313 85%)',
+          }}
+        />
+
+        {/* Resplandor dorado muy sutil bajo la pieza */}
+        <div
+          className="absolute pointer-events-none z-0"
+          style={{
+            top: '28%', left: '50%',
+            transform: 'translateX(-50%)',
+            width: '520px', height: '520px',
+            background: 'radial-gradient(ellipse at center, rgba(222,194,163,0.055) 0%, transparent 68%)',
+          }}
+        />
+
+        {/* — Eyebrow label — */}
+        <StaggerReveal staggerDelay={0.08} className="relative z-10 flex flex-col items-center text-center space-y-5 px-6">
+          <span className="font-label-caps text-primary text-[11px] tracking-[0.35em]">
             MARKETPLACE DE PROCEDENCIA
           </span>
-          <h1 className="font-display-lg text-white select-none leading-none">
-            EL PINÁCULO DE LA PROCEDENCIA
+
+          <h1
+            className="font-display text-white select-none leading-[1.0] tracking-tight text-center"
+            style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.4rem, 6vw, 5rem)', fontWeight: 600, letterSpacing: '-0.02em' }}
+          >
+            El Pináculo de la Procedencia
           </h1>
-          <p className="font-body-lg text-on-surface-variant max-w-lg">
-            Una curaduría exclusiva de piezas con historia impecable, custodiadas y autenticadas por expertos mundiales para el coleccionista más exigente.
-          </p>
-          <div className="pt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <Link to="/catalogo">
-              <Button variant="primary" className="px-8 py-4">EXPLORAR ADQUISICIONES</Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="outline" className="px-8 py-4">SOLICITAR CONSIGNACIÓN</Button>
-            </Link>
-          </div>
-        </div>
-        
-        {/* Indicador de scroll */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2 opacity-50 hidden md:flex">
-          <span className="font-label-caps text-[9px] tracking-widest text-on-surface-variant">DESLIZAR</span>
-          <span className="w-[1px] h-10 bg-outline-variant animate-pulse" />
-        </div>
-      </section>
+        </StaggerReveal>
 
-      {/* 2. Categorías Principales */}
-      <section className="py-24 px-6 md:px-16 max-w-7xl mx-auto w-full text-center">
-        <span className="font-label-caps text-primary text-[10px] tracking-[0.2em] font-semibold block mb-3">
-          CATEGORÍAS DE BÓVEDA
-        </span>
-        <h2 className="font-headline-md text-white mb-16 uppercase tracking-wider">
-          CURACIÓN EXCLUSIVA
-        </h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            {
-              name: 'RELOJES',
-              img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=300&h=300',
-              path: '/catalogo?cat=RELOJES'
-            },
-            {
-              name: 'JOYERÍA',
-              img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=300&h=300',
-              path: '/catalogo?cat=JOYERIA'
-            },
-            {
-              name: 'ARTE',
-              img: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=300&h=300',
-              path: '/catalogo?cat=ARTE'
-            },
-            {
-              name: 'NUMISMÁTICA',
-              img: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&q=80&w=300&h=300',
-              path: '/catalogo?cat=NUMISMATICA'
-            }
-          ].map((cat) => (
-            <Link
-              key={cat.name}
-              to={cat.path}
-              className="flex flex-col items-center space-y-4 group cursor-pointer"
-            >
-              <div className="w-36 h-36 md:w-44 md:h-44 overflow-hidden bg-surface-container border border-outline-variant/30 transition-all duration-500 transform group-hover:border-primary">
-                <img
-                  src={cat.img}
-                  alt={cat.name}
-                  className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
-                />
-              </div>
-              <span className="font-label-caps text-[11px] tracking-[0.2em] text-on-surface-variant group-hover:text-primary transition-colors">
-                {cat.name}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
+        {/* — Pieza principal — */}
+        <ScrollReveal direction="up" delay={0.2} duration={1.2} distance={50} className="relative z-10 flex-1 flex items-center justify-center w-full px-6">
+          <img
+            src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=85&w=900"
+            alt="Reloj de colección — The Collector"
+            fetchPriority="high"
+            className="animate-float w-[300px] sm:w-[380px] md:w-[460px] lg:w-[540px] object-contain drop-shadow-[0_32px_96px_rgba(0,0,0,0.9)]"
+          />
+        </ScrollReveal>
 
-      {/* 3. Sección Destacados: Arte Alternado */}
-      <section className="py-20 border-t border-outline-variant/15 w-full bg-surface-container-low/30">
-        <div className="max-w-7xl mx-auto px-6 md:px-16 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          {/* Lado Imagen */}
-          <div className="relative group overflow-hidden border border-outline-variant/30">
-            <img
-              src="https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?auto=format&fit=crop&q=80&w=800&h=800"
-              alt="Joan Miro Masterpiece"
-              className="w-full aspect-square object-cover transition-all duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </div>
-          
-          {/* Lado Texto */}
-          <div className="flex flex-col text-left space-y-6">
-            <span className="font-label-caps text-primary text-[10px] tracking-[0.2em] font-semibold">
-              PIEZAS MAESTRAS DE AUTOR
-            </span>
-            <h3 className="font-headline-md text-white uppercase tracking-wider leading-snug">
-              OBRAS MAESTRAS QUE TRASCIENDEN EL TIEMPO
-            </h3>
-            <p className="font-body-md text-on-surface-variant">
-              Nuestra sección de arte cuenta con litografías y lienzos originales verificados. Cada adquisición incluye un reporte notariado de procedencia, trazabilidad de galerías previas e informe de conservación forense.
-            </p>
-            <div className="pt-2">
-              <Link to="/catalogo?cat=ARTE">
-                <Button variant="outline" className="px-8 py-3.5">EXPLORAR ARTE</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* — CTAs — */}
+        <StaggerReveal staggerDelay={0.1} delay={0.5} className="relative z-10 flex flex-col sm:flex-row items-center gap-4 px-6">
+          <Link to="/catalogo">
+            <Button variant="outline" className="px-10 py-3.5 min-w-[200px] text-center">
+              VISITAR MERCADO
+            </Button>
+          </Link>
+          <Link to="/login">
+            <Button variant="outline" className="px-10 py-3.5 min-w-[200px] text-center">
+              VENDER PIEZA
+            </Button>
+          </Link>
+        </StaggerReveal>
 
-      {/* 4. Sección Destacados: Joyería Invertida */}
-      <section className="py-20 border-t border-outline-variant/15 w-full">
-        <div className="max-w-7xl mx-auto px-6 md:px-16 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          {/* Lado Texto */}
-          <div className="flex flex-col text-left space-y-6 order-2 md:order-1">
-            <span className="font-label-caps text-primary text-[10px] tracking-[0.2em] font-semibold">
-              CONFECCIÓN DE ALTA JOYERÍA
-            </span>
-            <h3 className="font-headline-md text-white uppercase tracking-wider leading-snug">
-              BRILLANTEZ MÁS ALLÁ DEL ENGASTE
-            </h3>
-            <p className="font-body-md text-on-surface-variant">
-              Explore collares de alta gama y sortijas de compromiso que reflejan la maestría de casas de diseño legendarias como Cartier, Tiffany & Co. y Van Cleef & Arpels. Pureza garantizada mediante certificados GIA y de laboratorio autorizados.
-            </p>
-            <div className="pt-2">
-              <Link to="/catalogo?cat=JOYERIA">
-                <Button variant="outline" className="px-8 py-3.5">VER COLECCIÓN</Button>
-              </Link>
-            </div>
+        {/* Scroll indicator — bottom center */}
+        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center space-y-2">
+          <div className="relative w-[1px] h-10 bg-outline-variant/20 overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-full bg-primary/60 animate-scroll-line" />
           </div>
-
-          {/* Lado Imagen */}
-          <div className="relative group overflow-hidden border border-outline-variant/30 order-1 md:order-2">
-            <img
-              src="https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&q=80&w=800&h=800"
-              alt="Tiffany Ring"
-              className="w-full aspect-square object-cover transition-all duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Boletín Editorial */}
-      <section className="py-28 px-6 bg-surface-container border-t border-outline-variant/20 text-center w-full flex flex-col items-center">
-        <div className="max-w-2xl flex flex-col space-y-6">
-          <span className="font-label-caps text-primary text-[10px] tracking-[0.3em] font-semibold">
-            ACCESO BAJO MEMBRESÍA
+          <span className="font-label-caps text-[9px] tracking-widest text-on-surface-variant/40">
+            DESLIZAR
           </span>
-          <h3 className="font-headline-md text-white uppercase tracking-widest">
-            SOLICITAR INGRESO EDITORIAL
-          </h3>
-          <p className="font-body-md text-on-surface-variant max-w-lg mx-auto">
-            Únase a nuestro círculo de coleccionistas privados. Reciba notificaciones prioritarias de piezas en consignación directa y pases exclusivos a salas de subastas virtuales.
-          </p>
-          <div className="pt-4 flex flex-col sm:flex-row space-y-3 sm:space-y-0 w-full max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Dirección de correo electrónico"
-              className="bg-[#131313] border border-outline-variant text-on-surface font-body-sm text-sm px-4 py-3.5 flex-grow focus:outline-none focus:border-primary placeholder-outline-variant/50"
-            />
-            <Button variant="primary" className="px-6 py-3.5">UNIRSE AHORA</Button>
-          </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════
+          2. MANIFIESTO — Frase con marquee de fondo
+      ═══════════════════════════════════════════ */}
+      <section className="relative py-36 md:py-52 px-6 md:px-20 overflow-hidden border-t border-outline-variant/10">
+
+        {/* Marquee decorativo de fondo */}
+        <div className="absolute inset-0 flex items-center pointer-events-none overflow-hidden">
+          <Marquee
+            duration={45}
+            className="w-full opacity-[0.025]"
+            contentClassName="items-center"
+          >
+            <span
+              className="font-display font-semibold text-on-surface whitespace-nowrap"
+              style={{ fontSize: 'clamp(5rem, 12vw, 11rem)', letterSpacing: '-0.04em' }}
+            >
+              PROCEDENCIA&nbsp;&nbsp;·&nbsp;&nbsp;AUTENTICIDAD&nbsp;&nbsp;·&nbsp;&nbsp;HISTORIA&nbsp;&nbsp;·&nbsp;&nbsp;
+            </span>
+          </Marquee>
+        </div>
+
+        {/* Contenido principal */}
+        <div className="relative z-10 max-w-5xl">
+          <ScrollReveal direction="left" delay={0} duration={0.6}>
+            <div className="w-16 h-[1px] bg-primary mb-10" />
+          </ScrollReveal>
+
+          <StaggerReveal staggerDelay={0.1} className="flex flex-col space-y-8">
+            <blockquote
+              className="font-display text-white/90 leading-snug tracking-tight"
+              style={{ fontSize: 'clamp(1.6rem, 4vw, 3.2rem)' }}
+            >
+              "El verdadero coleccionista no posee objetos.
+            </blockquote>
+            <blockquote
+              className="font-display text-white/90 leading-snug tracking-tight"
+              style={{ fontSize: 'clamp(1.6rem, 4vw, 3.2rem)' }}
+            >
+              Custodia fragmentos de historia
+            </blockquote>
+            <blockquote
+              className="font-display text-primary/80 leading-snug tracking-tight italic"
+              style={{ fontSize: 'clamp(1.6rem, 4vw, 3.2rem)' }}
+            >
+              que el tiempo le confió."
+            </blockquote>
+            <p className="font-label-caps text-primary text-[10px] tracking-[0.35em] pt-4">
+              — THE COLLECTOR
+            </p>
+          </StaggerReveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          3. CATEGORÍAS INMERSIVAS
+      ═══════════════════════════════════════════ */}
+      {CATEGORIES.map((cat, i) => {
+        const isEven = i % 2 === 0;
+        return (
+          <section
+            key={cat.slug}
+            className="relative border-t border-outline-variant/10 py-20 md:py-32 px-6 md:px-16 w-full"
+          >
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center min-h-[70vh]">
+
+              {/* Columna imagen */}
+              <ScrollReveal
+                direction="up"
+                duration={1}
+                delay={0.05}
+                className={`${isEven ? 'md:order-1' : 'md:order-2'} order-1`}
+              >
+                <ParallaxImage
+                  src={cat.img}
+                  alt={cat.headline}
+                  speed={0.12}
+                  loading="lazy"
+                  className="aspect-[4/5] border border-outline-variant/20 w-full"
+                  imgClassName="h-[120%]"
+                />
+              </ScrollReveal>
+
+              {/* Columna texto */}
+              <div
+                className={`relative ${isEven ? 'md:order-2' : 'md:order-1'} order-2`}
+              >
+                {/* Número de índice como watermark */}
+                <span
+                  className="font-display font-semibold text-on-surface/[0.04] select-none absolute -top-6 -left-2 leading-none pointer-events-none"
+                  style={{ fontSize: 'clamp(5rem, 12vw, 9rem)' }}
+                  aria-hidden="true"
+                >
+                  {cat.index}
+                </span>
+
+                <StaggerReveal staggerDelay={0.07} className="relative z-10 flex flex-col space-y-5">
+                  <span className="font-label-caps text-primary text-[10px] tracking-[0.25em]">
+                    {cat.label}
+                  </span>
+                  <h2 className="font-headline-md text-white uppercase tracking-wider leading-snug">
+                    {cat.headline}
+                  </h2>
+                  <p className="font-body-md text-on-surface-variant max-w-md">
+                    {cat.description}
+                  </p>
+                  <div className="pt-3">
+                    <Link to={cat.path}>
+                      <Button variant="outline" className="px-8 py-3.5">
+                        {cat.cta}
+                      </Button>
+                    </Link>
+                  </div>
+                </StaggerReveal>
+              </div>
+
+            </div>
+          </section>
+        );
+      })}
+
+      {/* ═══════════════════════════════════════════
+          4. NEWSLETTER — Layout asimétrico
+      ═══════════════════════════════════════════ */}
+      <section className="py-28 md:py-36 px-6 md:px-16 bg-surface-container border-t border-outline-variant/20 w-full">
+        <ScrollReveal direction="up" duration={0.9}>
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
+
+            {/* Texto izquierda */}
+            <div className="flex flex-col space-y-5">
+              <span className="font-label-caps text-primary text-[10px] tracking-[0.3em]">
+                ACCESO BAJO MEMBRESÍA
+              </span>
+              <h3 className="font-headline-md text-white uppercase tracking-widest">
+                SOLICITAR INGRESO EDITORIAL
+              </h3>
+              <p className="font-body-md text-on-surface-variant max-w-md">
+                Únase a nuestro círculo de coleccionistas privados. Reciba notificaciones prioritarias de piezas en consignación directa y pases exclusivos a salas de subastas virtuales.
+              </p>
+            </div>
+
+            {/* Formulario derecha */}
+            <div className="flex flex-col justify-center md:pt-16">
+              <div className="flex flex-col sm:flex-row gap-0 w-full max-w-md">
+                <input
+                  type="email"
+                  placeholder="Dirección de correo electrónico"
+                  className="bg-background border border-outline-variant text-on-surface font-body-sm text-sm px-4 py-3.5 flex-grow focus:outline-none focus:border-primary placeholder-outline-variant/50 transition-colors duration-300"
+                />
+                <Button variant="primary" className="px-6 py-3.5 whitespace-nowrap">
+                  UNIRSE AHORA
+                </Button>
+              </div>
+              <p className="font-label-caps text-outline text-[9px] tracking-wider mt-4">
+                SIN SPAM · SOLO PIEZAS EXTRAORDINARIAS
+              </p>
+            </div>
+
+          </div>
+        </ScrollReveal>
+      </section>
+
     </div>
   );
 };

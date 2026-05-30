@@ -1,180 +1,112 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const DRAWER_EASE = [0.32, 0.72, 0, 1];
+
+const SectionLabel = ({ children }) => (
+  <p className="font-label-caps text-[9px] tracking-[0.2em] text-outline/60 px-6 pt-6 pb-1 select-none">
+    {children}
+  </p>
+);
+
+const DrawerLink = ({ to, onClick, children, danger = false }) => (
+  <NavLink
+    to={to}
+    onClick={onClick}
+    className={({ isActive }) =>
+      `block font-label-caps text-[12px] tracking-[0.15em] py-3 px-6 border-l-2 transition-colors duration-200 active:scale-[0.98] ${
+        danger
+          ? 'text-error border-transparent hover:border-error/40 hover:bg-error-container/10'
+          : isActive
+          ? 'text-primary border-primary bg-primary/5'
+          : 'text-on-surface-variant border-transparent hover:text-primary hover:border-primary/40 hover:bg-surface-container-high/40'
+      }`
+    }
+  >
+    {children}
+  </NavLink>
+);
 
 const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const closeButtonRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleLogoutClick = () => {
+  const close = () => setIsOpen(false);
+  const open = () => setIsOpen(true);
+
+  // Escape key + body scroll lock
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  // Focus first element when drawer opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => closeButtonRef.current?.focus(), 50);
+    }
+  }, [isOpen]);
+
+  const handleLogout = () => {
+    close();
     onLogout();
-    setUserDropdownOpen(false);
     navigate('/');
   };
 
-  return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-outline-variant/30 h-16 flex items-center justify-between px-6 md:px-16 transition-all duration-300">
-      {/* Lado izquierdo: Hamburguesa móvil */}
-      <button
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="md:hidden text-on-surface hover:text-primary transition-colors focus:outline-none cursor-pointer"
-        aria-label="Abrir menú"
-      >
-        <span className="material-symbols-outlined text-2xl font-light">
-          {mobileMenuOpen ? 'close' : 'menu'}
-        </span>
-      </button>
+  const handleLinkClick = () => close();
 
-      {/* Marca / Logo */}
-      <div className="flex-1 md:flex-initial text-center md:text-left">
+  // Stagger variants for drawer items
+  const listVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.03, delayChildren: 0.12 } },
+    exit: {},
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, transform: 'translateX(-16px)' },
+    visible: { opacity: 1, transform: 'translateX(0px)', transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } },
+    exit: { opacity: 0, transition: { duration: 0 } },
+  };
+
+  return (
+    <>
+      {/* ── Barra fija ── */}
+      <nav className="fixed top-0 left-0 w-full z-50 h-16 flex items-center justify-between px-6 md:px-16 bg-background/90 backdrop-blur-md border-b border-outline-variant/20 transition-all duration-300">
+
+        {/* Hamburger */}
+        <button
+          onClick={open}
+          aria-label="Abrir menú"
+          aria-expanded={isOpen}
+          className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-[0.95] focus:outline-none"
+        >
+          <span className="material-symbols-outlined text-2xl font-light">menu</span>
+        </button>
+
+        {/* Logo — centrado absoluto */}
         <Link
           to="/"
-          className="font-display text-lg tracking-[0.2em] font-semibold text-primary hover:text-white transition-colors select-none"
+          className="absolute left-1/2 -translate-x-1/2 font-display text-lg tracking-[0.2em] font-semibold text-primary hover:text-white transition-colors select-none whitespace-nowrap"
         >
           THE COLLECTOR
         </Link>
-      </div>
 
-      {/* Categorías centrales (Desktop) */}
-      <div className="hidden md:flex items-center space-x-8">
-        {[
-          { name: 'RELOJES', path: '/catalogo?cat=RELOJES' },
-          { name: 'JOYERÍA', path: '/catalogo?cat=JOYERIA' },
-          { name: 'ARTE', path: '/catalogo?cat=ARTE' },
-          { name: 'NUMISMÁTICA', path: '/catalogo?cat=NUMISMATICA' }
-        ].map((cat) => (
-          <NavLink
-            key={cat.name}
-            to={cat.path}
-            className={({ isActive }) => `
-              font-label-caps text-[11px] tracking-widest relative py-2 transition-colors duration-300
-              ${isActive ? 'text-primary' : 'text-on-surface-variant hover:text-primary'}
-            `}
-          >
-            {({ isActive }) => (
-              <>
-                {cat.name}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-[1px] bg-primary animate-fade-in" />
-                )}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </div>
-
-      {/* Iconos de Acción e Información (Derecha) */}
-      <div className="flex items-center space-x-6">
-        {/* Catálogo de exploración general */}
-        <Link
-          to="/catalogo"
-          className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
-          title="Ver Catálogo"
-        >
-          <span className="material-symbols-outlined text-2xl font-light">explore</span>
-        </Link>
-
-        {/* Lista de deseos / Favoritos (Carrito de compras) */}
-        <Link
-          to="/favoritos"
-          className="text-on-surface-variant hover:text-primary transition-colors relative cursor-pointer"
-          title="Lista de Deseos"
-        >
-          <span className="material-symbols-outlined text-2xl font-light">favorite</span>
-          {favoritosCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 bg-primary text-on-primary font-sans text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-background">
-              {favoritosCount}
-            </span>
-          )}
-        </Link>
-
-        {/* Menú de Usuario / Acceso */}
+        {/* Derecha — avatar o login */}
         {currentUser ? (
-          <div className="relative">
-            <button
-              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className="flex items-center space-x-2 focus:outline-none text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
-            >
-              <img
-                src={currentUser.avatar}
-                alt={currentUser.nombre}
-                className="w-7 h-7 object-cover border border-outline/50 bg-surface-container"
-              />
-              <span className="hidden lg:inline font-label-caps text-[10px] tracking-wider text-on-surface-variant">
-                {currentUser.nombre.split(' ')[0]}
-              </span>
-            </button>
-
-            {/* Dropdown Menu */}
-            {userDropdownOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setUserDropdownOpen(false)}
-                />
-                <div className="absolute right-0 mt-3 w-56 bg-surface-container border border-outline-variant/60 shadow-xl z-20 transition-[transform,opacity] duration-200 ease-out origin-top-right scale-100 opacity-100 starting:scale-95 starting:opacity-0 flex flex-col py-1 text-left">
-                  <div className="px-4 py-3 border-b border-outline-variant/40 bg-surface-container-high/30">
-                    <p className="font-sans text-xs font-semibold text-on-surface">{currentUser.nombre}</p>
-                    <p className="font-sans text-[10px] text-on-surface-variant/70 mt-0.5 truncate">{currentUser.email}</p>
-                    <span className="inline-block mt-2 font-label-caps text-[8px] bg-primary/20 text-primary px-1.5 py-0.5 border border-primary/30">
-                      {currentUser.rol}
-                    </span>
-                  </div>
-
-                  {currentUser.rol === 'VENDEDOR' ? (
-                    <>
-                      <Link
-                        to="/vendedor"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
-                      >
-                        Panel de Control
-                      </Link>
-                      <Link
-                        to="/vendedor/historial"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
-                      >
-                        Historial de Ventas
-                      </Link>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/reservas"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
-                      >
-                        Mis Reservas
-                      </Link>
-                      <Link
-                        to="/ofertas"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
-                      >
-                        Mis Ofertas
-                      </Link>
-                    </>
-                  )}
-
-                  <Link
-                    to="/perfil"
-                    onClick={() => setUserDropdownOpen(false)}
-                    className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.98]"
-                  >
-                    Configurar Perfil
-                  </Link>
-
-                  <button
-                    onClick={handleLogoutClick}
-                    className="px-4 py-2.5 font-label-caps text-[10px] tracking-wider text-error hover:bg-error-container/20 transition-[transform,background-color] duration-150 ease-out border-t border-outline-variant/30 text-left w-full cursor-pointer active:scale-[0.98]"
-                  >
-                    Cerrar Bóveda
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <Link to="/perfil" title="Mi perfil" className="flex items-center">
+            <img
+              src={currentUser.avatar}
+              alt={currentUser.nombre}
+              className="w-8 h-8 object-cover rounded-full border border-outline/40 bg-surface-container hover:border-primary transition-colors"
+            />
+          </Link>
         ) : (
           <Link
             to="/login"
@@ -184,88 +116,167 @@ const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
             <span>ACCEDER</span>
           </Link>
         )}
-      </div>
+      </nav>
 
-      {/* Drawer Móvil (Mobile Menu Overlay) */}
-      {mobileMenuOpen && (
-        <>
-          <div
-            className="fixed inset-0 top-16 bg-black/80 backdrop-blur-sm z-30"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className="absolute top-16 left-0 w-full bg-surface-container border-b border-outline-variant z-40 p-6 flex flex-col space-y-6 md:hidden animate-slide-down">
-            {[
-              { name: 'RELOJES', path: '/catalogo?cat=RELOJES' },
-              { name: 'JOYERÍA', path: '/catalogo?cat=JOYERIA' },
-              { name: 'ARTE', path: '/catalogo?cat=ARTE' },
-              { name: 'NUMISMÁTICA', path: '/catalogo?cat=NUMISMATICA' }
-            ].map((cat) => (
-              <Link
-                key={cat.name}
-                to={cat.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className="font-label-caps text-[13px] tracking-widest text-on-surface-variant hover:text-primary transition-colors text-left"
-              >
-                {cat.name}
-              </Link>
-            ))}
-            
-            {currentUser && (
-              <div className="pt-4 border-t border-outline-variant/40 flex flex-col space-y-4 text-left">
-                {currentUser.rol === 'VENDEDOR' ? (
-                  <>
-                    <Link
-                      to="/vendedor"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
-                    >
-                      PANEL DE CONTROL
-                    </Link>
-                    <Link
-                      to="/vendedor/historial"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
-                    >
-                      HISTORIAL DE VENTAS
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/reservas"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
-                    >
-                      MIS RESERVAS
-                    </Link>
-                    <Link
-                      to="/ofertas"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
-                    >
-                      MIS OFERTAS
-                    </Link>
-                  </>
-                )}
-                <Link
-                  to="/perfil"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="font-label-caps text-[11px] tracking-widest text-on-surface hover:text-primary"
+      {/* ── Drawer lateral ── */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={close}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+              aria-hidden="true"
+            />
+
+            {/* Panel */}
+            <motion.aside
+              key="drawer"
+              initial={{ transform: 'translateX(-100%)' }}
+              animate={{ transform: 'translateX(0%)' }}
+              exit={{ transform: 'translateX(-100%)' }}
+              transition={{ type: 'tween', ease: DRAWER_EASE, duration: 0.35 }}
+              className="fixed top-0 left-0 h-full w-80 md:w-96 bg-surface-container border-r border-outline-variant/30 z-50 flex flex-col overflow-y-auto"
+              aria-label="Menú de navegación"
+            >
+              {/* Header del drawer */}
+              <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-outline-variant/15 flex-shrink-0">
+                <span
+                  className="font-display text-sm tracking-[0.25em] text-primary/50 select-none"
+                  style={{ fontFamily: 'var(--font-display)' }}
                 >
-                  CONFIGURAR PERFIL
-                </Link>
+                  THE COLLECTOR
+                </span>
                 <button
-                  onClick={handleLogoutClick}
-                  className="font-label-caps text-[11px] tracking-widest text-error text-left cursor-pointer"
+                  ref={closeButtonRef}
+                  onClick={close}
+                  aria-label="Cerrar menú"
+                  className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-[0.95] focus:outline-none"
                 >
-                  CERRAR BÓVEDA
+                  <span className="material-symbols-outlined text-xl font-light">close</span>
                 </button>
               </div>
-            )}
-          </div>
-        </>
-      )}
-    </nav>
+
+              {/* Navegación con stagger */}
+              <motion.div
+                variants={listVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="flex flex-col py-2"
+              >
+                {/* Principal */}
+                <motion.div variants={itemVariants}>
+                  <DrawerLink to="/" onClick={handleLinkClick}>INICIO</DrawerLink>
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                  <DrawerLink to="/catalogo" onClick={handleLinkClick}>CATÁLOGO COMPLETO</DrawerLink>
+                </motion.div>
+
+                {/* Categorías */}
+                <motion.div variants={itemVariants}><SectionLabel>CATEGORÍAS</SectionLabel></motion.div>
+                {[
+                  { name: 'RELOJES',     path: '/catalogo?cat=RELOJES' },
+                  { name: 'JOYERÍA',     path: '/catalogo?cat=JOYERIA' },
+                  { name: 'ARTE',        path: '/catalogo?cat=ARTE' },
+                  { name: 'NUMISMÁTICA', path: '/catalogo?cat=NUMISMATICA' },
+                ].map((cat) => (
+                  <motion.div key={cat.name} variants={itemVariants}>
+                    <DrawerLink to={cat.path} onClick={handleLinkClick}>{cat.name}</DrawerLink>
+                  </motion.div>
+                ))}
+
+                {/* Mi Bóveda (solo si logueado) */}
+                {currentUser && (
+                  <>
+                    <motion.div variants={itemVariants}><SectionLabel>MI BÓVEDA</SectionLabel></motion.div>
+
+                    {currentUser.rol === 'VENDEDOR' ? (
+                      <>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/vendedor" onClick={handleLinkClick}>PANEL DE CONTROL</DrawerLink>
+                        </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/vendedor/nueva" onClick={handleLinkClick}>NUEVA PUBLICACIÓN</DrawerLink>
+                        </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/vendedor/historial" onClick={handleLinkClick}>HISTORIAL DE VENTAS</DrawerLink>
+                        </motion.div>
+                      </>
+                    ) : (
+                      <>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/favoritos" onClick={handleLinkClick}>
+                            FAVORITOS{favoritosCount > 0 ? ` (${favoritosCount})` : ''}
+                          </DrawerLink>
+                        </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/reservas" onClick={handleLinkClick}>MIS RESERVAS</DrawerLink>
+                        </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/ofertas" onClick={handleLinkClick}>MIS OFERTAS</DrawerLink>
+                        </motion.div>
+                      </>
+                    )}
+                  </>
+                )}
+
+                {/* Cuenta */}
+                <motion.div variants={itemVariants}><SectionLabel>CUENTA</SectionLabel></motion.div>
+                {currentUser ? (
+                  <>
+                    <motion.div variants={itemVariants}>
+                      <DrawerLink to="/perfil" onClick={handleLinkClick}>CONFIGURAR PERFIL</DrawerLink>
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left block font-label-caps text-[12px] tracking-[0.15em] py-3 px-6 border-l-2 border-transparent text-error hover:border-error/40 hover:bg-error-container/10 transition-colors duration-200 active:scale-[0.98] cursor-pointer"
+                      >
+                        CERRAR BÓVEDA
+                      </button>
+                    </motion.div>
+                  </>
+                ) : (
+                  <motion.div variants={itemVariants}>
+                    <DrawerLink to="/login" onClick={handleLinkClick}>INICIAR SESIÓN</DrawerLink>
+                  </motion.div>
+                )}
+              </motion.div>
+
+              {/* Footer — info de usuario */}
+              {currentUser && (
+                <div className="mt-auto border-t border-outline-variant/20 flex-shrink-0">
+                  <Link
+                    to="/perfil"
+                    onClick={handleLinkClick}
+                    className="flex items-center space-x-3 px-6 py-5 hover:bg-surface-container-high/40 transition-colors duration-200 group"
+                  >
+                    <img
+                      src={currentUser.avatar}
+                      alt={currentUser.nombre}
+                      className="w-8 h-8 object-cover rounded-full border border-outline/40 bg-surface-container-high group-hover:border-primary transition-colors flex-shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-sans text-xs font-semibold text-on-surface truncate group-hover:text-primary transition-colors">{currentUser.nombre}</p>
+                      <p className="font-sans text-[10px] text-on-surface-variant/60 truncate">{currentUser.email}</p>
+                    </div>
+                    <span className="ml-auto flex-shrink-0 font-label-caps text-[8px] bg-primary/20 text-primary px-1.5 py-0.5 border border-primary/30">
+                      {currentUser.rol}
+                    </span>
+                  </Link>
+                </div>
+              )}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
