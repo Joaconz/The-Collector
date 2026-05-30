@@ -98,10 +98,10 @@ const HomePage = () => {
         {/* — Pieza principal — */}
         <ScrollReveal direction="up" delay={0.2} duration={1.2} distance={50} className="relative z-10 flex-1 flex items-center justify-center w-full px-6">
           <img
-            src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=85&w=900"
+            src="/hero-watch.jpg"
             alt="Reloj de colección — The Collector"
             fetchPriority="high"
-            className="animate-float w-[300px] sm:w-[380px] md:w-[460px] lg:w-[540px] object-contain drop-shadow-[0_32px_96px_rgba(0,0,0,0.9)]"
+            className="animate-float w-[300px] sm:w-[380px] md:w-[460px] lg:w-[540px] object-contain drop-shadow-[0_32px_96px_rgba(0,0,0,0.95)]"
           />
         </ScrollReveal>
 
