@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
@@ -96,7 +97,7 @@ const EditarPublicacionPage = () => {
     };
 
     updatePublicacion(pub.id, editado);
-    alert('¡Cambios guardados con éxito! La publicación ha sido actualizada.');
+    toast.success('Cambios guardados. La publicación ha sido actualizada.');
     navigate('/vendedor');
   };
 
@@ -149,13 +150,20 @@ const EditarPublicacionPage = () => {
           
           {tabActiva === 'DETALLES' ? (
             /* CONTENIDO TAB DETALLES */
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              
-              {/* Lado Imagen de Previsualización (md:col-span-4) */}
-              <div className="md:col-span-4 flex flex-col space-y-4">
-                <span className="font-label-caps text-[10px] text-on-surface-variant tracking-wider">PREVISUALIZACIÓN DE PIEZA</span>
-                <div className="w-full aspect-[4/5] bg-black border border-outline-variant overflow-hidden">
+            <div key="DETALLES" className="animate-fade-in-up grid grid-cols-1 md:grid-cols-12 gap-8">
+
+              {/* Imagen — sticky sidebar */}
+              <div className="md:col-span-5 flex flex-col space-y-4 md:sticky md:top-10 md:self-start">
+                <span className="font-label-caps text-[10px] text-on-surface-variant tracking-wider">
+                  PREVISUALIZACIÓN DE PIEZA
+                </span>
+                <div className="relative group w-full aspect-[4/5] bg-black border border-outline-variant overflow-hidden">
                   <img src={imagenUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                    <span className="font-label-caps text-[10px] text-white border border-white/40 px-4 py-2 hover:bg-white/10 transition-colors active:scale-[0.97]">
+                      CAMBIAR IMAGEN
+                    </span>
+                  </div>
                 </div>
                 <Input
                   label="URL DE FOTOGRAFÍA"
@@ -165,73 +173,92 @@ const EditarPublicacionPage = () => {
                 />
               </div>
 
-              {/* Lado Inputs Técnicos (md:col-span-8) */}
-              <div className="md:col-span-8 flex flex-col space-y-6">
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <Input
-                    label="TITULO DE LA PIEZA"
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    error={error && !nombre ? 'Campo obligatorio' : ''}
-                  />
+              {/* Formulario técnico */}
+              <div className="md:col-span-7 flex flex-col space-y-8">
 
-                  <div className="flex flex-col text-left">
-                    <label htmlFor="edit-categoria" className="font-label-caps text-on-surface-variant mb-2.5 text-[11px] tracking-wider">
-                      CATEGORÍA
-                    </label>
-                    <select
-                      id="edit-categoria"
-                      value={categoria}
-                      onChange={(e) => setCategoria(e.target.value)}
-                      className="bg-transparent border-b border-outline-variant py-2 px-0 text-on-surface font-body-md focus:outline-none focus:border-primary transition-colors cursor-pointer"
-                    >
-                      {Object.values(CATEGORIAS).map(cat => (
-                        <option key={cat} value={cat} className="bg-surface-container text-white">{cat}</option>
-                      ))}
-                    </select>
+                {/* IDENTIFICACIÓN */}
+                <div className="flex flex-col space-y-5">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-label-caps text-[9px] text-outline tracking-[0.2em]">IDENTIFICACIÓN</span>
+                    <div className="flex-1 h-px bg-outline-variant/20" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Input
+                      label="TITULO DE LA PIEZA"
+                      type="text"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      error={error && !nombre ? 'Campo obligatorio' : ''}
+                    />
+                    <div className="flex flex-col text-left">
+                      <label htmlFor="edit-categoria" className="font-label-caps text-on-surface-variant mb-2.5 text-[11px] tracking-wider">
+                        CATEGORÍA
+                      </label>
+                      <select
+                        id="edit-categoria"
+                        value={categoria}
+                        onChange={(e) => setCategoria(e.target.value)}
+                        className="bg-transparent border-b border-outline-variant py-2 px-0 text-on-surface font-body-md focus:outline-none focus:border-primary transition-colors cursor-pointer"
+                      >
+                        {Object.values(CATEGORIAS).map(cat => (
+                          <option key={cat} value={cat} className="bg-surface-container text-white">{cat}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <Input
-                    label="MATERIAL DE CONFECCIÓN"
-                    type="text"
-                    value={material}
-                    onChange={(e) => setMaterial(e.target.value)}
-                    error={error && !material ? 'Campo obligatorio' : ''}
-                  />
-                  <Input
-                    label="AÑO DE PRODUCCIÓN"
-                    type="text"
-                    value={anio}
-                    onChange={(e) => setAnio(e.target.value)}
-                    error={error && !anio ? 'Campo obligatorio' : ''}
-                  />
+                {/* MATERIALIDAD */}
+                <div className="flex flex-col space-y-5">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-label-caps text-[9px] text-outline tracking-[0.2em]">MATERIALIDAD</span>
+                    <div className="flex-1 h-px bg-outline-variant/20" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Input
+                      label="MATERIAL DE CONFECCIÓN"
+                      type="text"
+                      value={material}
+                      onChange={(e) => setMaterial(e.target.value)}
+                      error={error && !material ? 'Campo obligatorio' : ''}
+                    />
+                    <Input
+                      label="AÑO DE PRODUCCIÓN"
+                      type="text"
+                      value={anio}
+                      onChange={(e) => setAnio(e.target.value)}
+                      error={error && !anio ? 'Campo obligatorio' : ''}
+                    />
+                  </div>
                 </div>
 
-                <div className="flex flex-col text-left">
-                  <label htmlFor="edit-textarea" className="font-label-caps text-on-surface-variant mb-2.5 text-[11px] tracking-wider">
-                    CRÓNICA, HISTORIA Y PROCEDENCIA DE LA PIEZA
-                  </label>
-                  <textarea
-                    id="edit-textarea"
-                    rows="6"
-                    value={historia}
-                    onChange={(e) => setHistoria(e.target.value)}
-                    className="bg-transparent border-b border-outline-variant py-2 text-on-surface font-body-md focus:outline-none focus:border-primary transition-colors resize-none"
-                  />
+                {/* HISTORIA Y PROCEDENCIA */}
+                <div className="flex flex-col space-y-5">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-label-caps text-[9px] text-outline tracking-[0.2em]">HISTORIA Y PROCEDENCIA</span>
+                    <div className="flex-1 h-px bg-outline-variant/20" />
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <label htmlFor="edit-textarea" className="font-label-caps text-on-surface-variant mb-2.5 text-[11px] tracking-wider">
+                      CRÓNICA, HISTORIA Y PROCEDENCIA DE LA PIEZA
+                    </label>
+                    <textarea
+                      id="edit-textarea"
+                      rows="6"
+                      value={historia}
+                      onChange={(e) => setHistoria(e.target.value)}
+                      className="bg-transparent border-b border-outline-variant py-2 text-on-surface font-body-md focus:outline-none focus:border-primary transition-colors resize-none"
+                    />
+                  </div>
                 </div>
 
               </div>
-
             </div>
           ) : (
             /* CONTENIDO TAB MODALIDAD */
-            <div className="flex flex-col space-y-6">
-              
-              {/* Bloqueo de Modalidad (Stitch Business Logic Guard) */}
+            <div key="MODALIDAD" className="animate-fade-in-up flex flex-col space-y-6">
+
+              {/* Bloqueo de Modalidad */}
               <div className="p-4 border border-primary/30 bg-primary/5 flex items-start space-x-3 text-left">
                 <span className="material-symbols-outlined text-primary text-2xl font-light">lock</span>
                 <div className="flex flex-col space-y-1">

@@ -65,11 +65,10 @@ export const mockPublicaciones = [
     modo: MODO_VENTA.PRECIO_FIJO,
     estado: ESTADO_PUBLICACION.ACTIVA,
     precio: 32500,
-    imagenUrl: "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/watch-movement-calibre.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=600&h=750",
-      "https://images.unsplash.com/photo-1622434641406-a158123450f9?auto=format&fit=crop&q=80&w=600&h=750",
-      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/watch-movement-calibre.jpg",
+      "/images/watch-movement-skeleton.jpg",
     ],
     descripcion: "Rolex Cosmograph Daytona en acero Oystersteel, esfera blanca 'Panda', equipado con el legendario calibre 4130 cronógrafo automático. Bisel Cerachrom negro con escala taquimétrica.",
     historia: "Adquirido originalmente por un coleccionista suizo en 2022. La pieza ha sido preservada en condiciones de bóveda, manteniendo todos sus precintos de fábrica intactos. Incluye caja, documentación original y garantía oficial de 5 años. Se acompaña de un certificado de autenticidad emitido por nuestro maestro relojero de Aura Dolce.",
@@ -95,10 +94,10 @@ export const mockPublicaciones = [
     pujaActual: 145000,
     incrementoMinimo: 5000,
     fechaLimiteSubasta: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 días a partir de hoy
-    imagenUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/watch-movement-skeleton.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600&h=750",
-      "https://images.unsplash.com/photo-1539874754764-5a96559165b0?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/watch-movement-skeleton.jpg",
+      "/images/watch-movement-calibre.jpg",
     ],
     descripcion: "El santo grial del diseño deportivo de lujo. Patek Philippe Nautilus Ref. 5711/1A con la emblemática esfera azul degradada. Bisel satinado y brazalete integrado de ajuste perfecto.",
     historia: "Esta pieza representa una de las últimas unidades producidas en 2021 antes de la descontinuación oficial de la mítica referencia 5711/1A. Proviene de una importante colección privada de Milán, habiendo sido exhibido únicamente en exhibiciones cerradas. La procedencia está 100% documentada con trazabilidad ininterrumpida.",
@@ -121,9 +120,11 @@ export const mockPublicaciones = [
     modo: MODO_VENTA.PRECIO_FIJO,
     estado: ESTADO_PUBLICACION.ACTIVA,
     precio: 78000,
-    imagenUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/jewelry-diamond-necklace.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/jewelry-diamond-necklace.jpg",
+      "/images/jewelry-emerald-necklace.jpg",
+      "/images/jewelry-diamond-set.jpg",
     ],
     descripcion: "Gargantilla Cartier de la línea de alta joyería 'Essential Lines' confeccionada en oro blanco de 18 quilates, engastada con 65 diamantes de talla brillante con un peso total de 8.52 quilates.",
     historia: "Encargado especial para una gala benéfica en Mónaco en el año 2019. Cada diamante ha sido clasificado individualmente por el GIA con color F y pureza VVS1. Se entrega en el legendario estuche rojo de Cartier con todos los papeles de tasación originales y factura de compra.",
@@ -146,10 +147,10 @@ export const mockPublicaciones = [
     modo: MODO_VENTA.PRECIO_FIJO,
     estado: ESTADO_PUBLICACION.ACTIVA,
     precio: 18500,
-    imagenUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/jewelry-sapphire-ring.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=600&h=750",
-      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/jewelry-sapphire-ring.jpg",
+      "/images/jewelry-emerald-brooch.jpg",
     ],
     descripcion: "Anillo Soleste de Tiffany & Co. con un impresionante diamante central de talla cojín rodeado por una doble hilera de diamantes de talla brillante redonda engastados en platino.",
     historia: "Adquirido en la icónica Quinta Avenida de Nueva York en 2018. El diamante central posee certificación oficial de Tiffany con un peso de 1.25 quilates, color E y claridad VS2. Una obra de arte de simetría y brillo.",
@@ -175,10 +176,11 @@ export const mockPublicaciones = [
     pujaActual: 98000,
     incrementoMinimo: 2000,
     fechaLimiteSubasta: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1.5).toISOString(), // 1.5 días
-    imagenUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/painting-landscape-museum.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600&h=750",
-      "https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/painting-landscape-museum.jpg",
+      "/images/painting-seascape-museum.jpg",
+      "/images/art-marble-sculpture.jpg",
     ],
     descripcion: "Litografía a color numerada y firmada a mano por Joan Miró, estampada en papel de Arches de alto gramaje. Lote de tiraje limitado a 50 copias.",
     historia: "Creada por el maestro catalán en 1973. Proviene directamente de la Colección de la Fundación de Arte de Barcelona, contando con sello seco oficial y el número de lote 12/50. La procedencia está ratificada e inscrita en el catálogo razonado de Miró.",
@@ -201,9 +203,10 @@ export const mockPublicaciones = [
     modo: MODO_VENTA.PRECIO_FIJO,
     estado: ESTADO_PUBLICACION.ACTIVA,
     precio: 9500,
-    imagenUrl: "https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/coin-gold-escudo.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/coin-gold-escudo.jpg",
+      "/images/coin-roman-aureus.jpg",
     ],
     descripcion: "Moneda de oro de 8 Escudos acuñada en la Real Casa de Moneda de Madrid en el año 1780, bajo el reinado de Carlos III de España. Ceca 'M' y ensayador 'PJ'.",
     historia: "Hallada en una bóveda de un banco histórico de Sevilla en 1995. Ha recibido la calificación oficial de 'About Uncirculated' (AU-58) por el prestigioso servicio de graduación NGC, lo que representa un estado de conservación excepcional para su edad y tipo.",
@@ -229,9 +232,11 @@ export const mockPublicaciones = [
     pujaActual: 45000,
     incrementoMinimo: 1000,
     fechaLimiteSubasta: new Date(Date.now() + 1000 * 60 * 60 * 12).toISOString(), // Termina en 12 horas
-    imagenUrl: "https://images.unsplash.com/photo-1502920514313-52581002a659?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/coin-silver-denarius.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1502920514313-52581002a659?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/coin-silver-denarius.jpg",
+      "/images/coin-silver-athena.jpg",
+      "/images/coin-silver-cross.jpg",
     ],
     descripcion: "La moneda reina de las acuñaciones de dólares Morgan. El dólar de plata Morgan acuñado en San Francisco en 1893 (1893-S). Acuñación extremadamente limitada.",
     historia: "Proviene de la famosa colección privada 'Red River' de Texas. Esta pieza ha sido certificada por la PCGS con graduación VF-35, garantizando su autenticidad y excelente preservación. Solo se acuñaron 100,000 unidades de este lote.",
@@ -254,9 +259,10 @@ export const mockPublicaciones = [
     modo: MODO_VENTA.PRECIO_FIJO,
     estado: ESTADO_PUBLICACION.VENDIDA,
     precio: 42000,
-    imagenUrl: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&q=80&w=600&h=750",
+    imagenUrl: "/images/watch-pocket-enamel.jpg",
     imagenes: [
-      "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&q=80&w=600&h=750"
+      "/images/watch-pocket-enamel.jpg",
+      "/images/watch-movement-calibre.jpg",
     ],
     descripcion: "Audemars Piguet Royal Oak Ultra-Thin 'Jumbo' en acero inoxidable con la clásica esfera azul 'Petite Tapisserie'. Calibre manufactura 2121.",
     historia: "Comprado originalmente en la boutique AP de Ginebra en 2020. Adjudicado y transferido a un coleccionista argentino. La pieza cuenta con su set completo de estuche de madera lacada, manuales y garantía internacional vigente.",
@@ -461,6 +467,27 @@ export const updateOfertaEstado = (id, nuevoEstado) => {
   }
 };
 
+export const responderOferta = (id, accion, montoContraoferta = null) => {
+  const of = ofertas.find(o => o.id === parseInt(id));
+  if (!of) return;
+  if (accion === 'ACEPTAR') {
+    of.estado = ESTADO_OFERTA.ACEPTADA;
+    addReserva({
+      piezaId: of.piezaId,
+      precioAcordado: of.precioOfertado,
+      vendedor: of.vendedor,
+      tipo: 'Adquisición por Oferta Aceptada',
+      estado: ESTADO_RESERVA.CONFIRMADA
+    });
+  } else if (accion === 'RECHAZAR') {
+    of.estado = ESTADO_OFERTA.RECHAZADA;
+  } else if (accion === 'CONTRAOFERTA') {
+    of.estado = ESTADO_OFERTA.CONTRAOFERTA_RECIBIDA;
+    of.precioContraoferta = montoContraoferta;
+    of.fechaLimite = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
+  }
+};
+
 export const getPujas = () => pujas;
 export const addPuja = (monto, usuario = "Joaquín González") => {
   const newPuja = {
@@ -489,8 +516,8 @@ export const addPublicacion = (pub) => {
     ref: `REF-VEND-${1000 + publicaciones.length}`,
     estado: ESTADO_PUBLICACION.PENDIENTE,
     vendedor: "Aura Dolce Galería",
-    imagenUrl: pub.imagenUrl || "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=600&h=750",
-    imagenes: [pub.imagenUrl || "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=600&h=750"],
+    imagenUrl: pub.imagenUrl || "/images/watch-movement.jpg",
+    imagenes: [pub.imagenUrl || "/images/watch-movement.jpg"],
     ...pub
   };
   publicaciones.unshift(newPub);

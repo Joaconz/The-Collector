@@ -29,6 +29,7 @@ const AppRouter = ({
   ofertas,
   onAddOferta,
   onUpdateOfertaEstado,
+  onResponderOferta,
   pujas,
   onAddPuja
 }) => {
@@ -96,6 +97,7 @@ const AppRouter = ({
             <PanelVendedorPage
               reservas={reservas}
               ofertas={ofertas}
+              onResponderOferta={onResponderOferta}
             />
           ) : (
             <Navigate to="/login" replace />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Toaster } from 'sonner';
 import PageLayout from './components/layout/PageLayout';
 import AppRouter from './routes/AppRouter';
 import {
@@ -10,6 +11,7 @@ import {
   getOfertas,
   addOferta,
   updateOfertaEstado,
+  responderOferta,
   getPujas,
   addPuja
 } from './data/mockData';
@@ -70,11 +72,18 @@ function App() {
     return newOf;
   };
 
-  // Actualizar estado de una Oferta (aceptar/contraofertar)
+  // Actualizar estado de una Oferta (aceptar/contraofertar) — desde lado comprador
   const handleUpdateOfertaEstado = (id, nuevoEstado) => {
     updateOfertaEstado(id, nuevoEstado);
     setOfertas([...getOfertas()]);
     setReservas([...getReservas()]); // Si fue aceptada, se crea una reserva
+  };
+
+  // Responder a una oferta desde el lado vendedor (aceptar / rechazar / contraoferta)
+  const handleResponderOferta = (id, accion, montoContraoferta = null) => {
+    responderOferta(id, accion, montoContraoferta);
+    setOfertas([...getOfertas()]);
+    setReservas([...getReservas()]);
   };
 
   // Registrar puja en subasta
@@ -84,6 +93,8 @@ function App() {
   };
 
   return (
+    <>
+    <Toaster theme="dark" position="bottom-right" richColors closeButton />
     <PageLayout
       currentUser={currentUser}
       onLogout={handleLogout}
@@ -100,10 +111,12 @@ function App() {
         ofertas={ofertas}
         onAddOferta={handleAddOferta}
         onUpdateOfertaEstado={handleUpdateOfertaEstado}
+        onResponderOferta={handleResponderOferta}
         pujas={pujas}
         onAddPuja={handleAddPuja}
       />
     </PageLayout>
+    </>
   );
 }
 
