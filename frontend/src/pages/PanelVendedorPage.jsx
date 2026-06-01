@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import NegociarModal from '../components/forms/NegociarModal';
 import {
   getVendedorPublicaciones,
   ESTADO_PUBLICACION,
@@ -11,10 +13,13 @@ import {
   getPublicacionById
 } from '../data/mockData';
 
-const PanelVendedorPage = () => {
+const PanelVendedorPage = ({ onResponderOferta }) => {
   const [misPublicaciones, setMisPublicaciones] = useState([]);
   const [solicitudesReserva, setSolicitudesReserva] = useState([]);
   const [ofertasRecibidas, setOfertasRecibidas] = useState([]);
+
+  // Estado del modal de negociación (seller side)
+  const [negociarModal, setNegociarModal] = useState({ isOpen: false, oferta: null });
 
   // Estado del modal de confirmación
   const [confirmModal, setConfirmModal] = useState({
@@ -101,8 +106,18 @@ const PanelVendedorPage = () => {
     });
   };
 
-  const handleResponderOferta = (ofId, piezaNombre) => {
-    alert(`Abriendo canal de negociación para la oferta #${ofId} sobre '${piezaNombre}'. (Consulte mock de ofertas).`);
+  const handleResponderOferta = (ofId) => {
+    const oferta = ofertasRecibidas.find(o => o.id === ofId);
+    if (oferta) setNegociarModal({ isOpen: true, oferta });
+  };
+
+  const handleNegociarConfirm = ({ accion, montoContraoferta }) => {
+    onResponderOferta(negociarModal.oferta.id, accion, montoContraoferta);
+    setOfertasRecibidas(prev => prev.filter(o => o.id !== negociarModal.oferta.id));
+    setNegociarModal({ isOpen: false, oferta: null });
+    if (accion === 'ACEPTAR') toast.success('Oferta aceptada. Reserva confirmada.');
+    else if (accion === 'RECHAZAR') toast.info('Propuesta rechazada y notificada al comprador.');
+    else toast.success('Contraoferta enviada. El comprador tiene 24h para responder.');
   };
 
   return (
@@ -205,7 +220,7 @@ const PanelVendedorPage = () => {
                         </div>
                         <div className="flex-shrink-0">
                           <button
-                            onClick={() => handleResponderOferta(of.id, pieza?.nombre)}
+                            onClick={() => handleResponderOferta(of.id)}
                             className="border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all font-label-caps text-[9px] py-2 px-3 cursor-pointer"
                           >
                             REVISAR
@@ -294,6 +309,15 @@ const PanelVendedorPage = () => {
 
       </div>
     </div>
+
+      {/* Modal de Negociación — Responder oferta del vendedor */}
+      <NegociarModal
+        isOpen={negociarModal.isOpen}
+        onClose={() => setNegociarModal({ isOpen: false, oferta: null })}
+        oferta={negociarModal.oferta}
+        pieza={negociarModal.oferta ? getPublicacionById(negociarModal.oferta.piezaId) : null}
+        onResponder={handleNegociarConfirm}
+      />
 
       {/* Modal de Confirmación Transaccional */}
       <ConfirmModal
