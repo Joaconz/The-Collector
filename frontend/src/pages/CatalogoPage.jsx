@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+    import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
@@ -85,7 +85,7 @@ const PiezaSection = ({ pieza, index, isLast, isFavorito, onToggleFavorito, sect
       <div
         className={`relative z-20 w-full md:w-[48%] px-6 md:px-12 py-12 flex flex-col justify-center ${
           isEven
-            ? 'ml-auto pl-8 md:pl-0 md:pr-16'
+            ? 'ml-auto pl-8 md:pl-0 md:pr-16 md:translate-x-10 lg:translate-x-30'
             : 'mr-auto pr-8 md:pr-0 md:pl-16'
         }`}
       >
