@@ -13,7 +13,7 @@ const CATEGORIES = [
     headline: 'LA PRECISIÓN COMO ARTE',
     description:
       'Piezas horlogeras de las manufacturas más prestigiosas del mundo. Cada movimiento, una declaración de ingenio humano que trasciende su función utilitaria.',
-    img: 'https://picsum.photos/seed/collector-relojes/800/1000',
+    img: '/images/watch-movement-calibre.jpg',
     path: '/catalogo?cat=RELOJES',
     cta: 'EXPLORAR RELOJES',
   },
@@ -24,7 +24,7 @@ const CATEGORIES = [
     headline: 'BRILLANTEZ MÁS ALLÁ DEL ENGASTE',
     description:
       'Collares, sortijas y piezas únicas de Cartier, Tiffany & Co. y Van Cleef & Arpels. Pureza certificada por laboratorios GIA autorizados.',
-    img: 'https://picsum.photos/seed/collector-joyeria/800/1000',
+    img: '/images/jewelry-emerald-necklace.jpg',
     path: '/catalogo?cat=JOYERIA',
     cta: 'VER COLECCIÓN',
   },
@@ -35,7 +35,7 @@ const CATEGORIES = [
     headline: 'OBRAS QUE TRASCIENDEN EL TIEMPO',
     description:
       'Litografías y lienzos originales verificados. Cada adquisición incluye reporte notariado de procedencia, trazabilidad de galerías previas e informe de conservación forense.',
-    img: 'https://picsum.photos/seed/collector-arte/800/1000',
+    img: '/images/painting-museum.jpg',
     path: '/catalogo?cat=ARTE',
     cta: 'EXPLORAR ARTE',
   },
@@ -46,7 +46,7 @@ const CATEGORIES = [
     headline: 'HISTORIA ACUÑADA EN METAL',
     description:
       'Monedas y medallas que sobrevivieron imperios. Cada pieza certificada por la American Numismatic Association con ficha técnica de rareza y conservación.',
-    img: 'https://picsum.photos/seed/collector-numismatica/800/1000',
+    img: '/images/coin-roman-aureus.jpg',
     path: '/catalogo?cat=NUMISMATICA',
     cta: 'VER MONEDAS',
   },
@@ -98,10 +98,10 @@ const HomePage = () => {
         {/* — Pieza principal — */}
         <ScrollReveal direction="up" delay={0.2} duration={1.2} distance={50} className="relative z-10 flex-1 flex items-center justify-center w-full px-6">
           <img
-            src="/hero-watch.jpg"
-            alt="Reloj de colección — The Collector"
+            src="/images/watch-pocket-enamel.jpg"
+            alt="Reloj de bolsillo de colección — The Collector"
             fetchPriority="high"
-            className="animate-float w-[300px] sm:w-[380px] md:w-[460px] lg:w-[540px] object-contain drop-shadow-[0_32px_96px_rgba(0,0,0,0.95)]"
+            className="animate-float w-[280px] sm:w-[360px] md:w-[440px] lg:w-[500px] aspect-square object-cover rounded-full border border-outline-variant/30 shadow-[0_32px_96px_rgba(0,0,0,0.95)]"
           />
         </ScrollReveal>
 

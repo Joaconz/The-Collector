@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 
-const PerfilPage = ({ currentUser, onLogin }) => {
+const PerfilPage = ({ currentUser, onLogin, onLogout }) => {
+  const navigate = useNavigate();
   const [nombre, setNombre] = useState(currentUser?.nombre || '');
   const [email] = useState(currentUser?.email || '');
   const [rol] = useState(currentUser?.rol || 'COMPRADOR');
@@ -50,6 +51,11 @@ const PerfilPage = ({ currentUser, onLogin }) => {
     setPassActual('');
     setPassNueva('');
     setPassConfirm('');
+  };
+
+  const handleCerrarSesion = () => {
+    onLogout();
+    navigate('/');
   };
 
   return (
@@ -163,7 +169,14 @@ const PerfilPage = ({ currentUser, onLogin }) => {
           )}
 
           {/* Botones */}
-          <div className="pt-6 border-t border-outline-variant/20 flex justify-end">
+          <div className="pt-6 border-t border-outline-variant/20 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <button
+              type="button"
+              onClick={handleCerrarSesion}
+              className="font-label-caps text-[11px] tracking-[0.2em] text-error hover:text-error/80 transition-colors cursor-pointer"
+            >
+              CERRAR SESIÓN
+            </button>
             <Button type="submit" variant="primary" className="px-10 py-3.5">
               GUARDAR CAMBIOS DEL PERFIL
             </Button>

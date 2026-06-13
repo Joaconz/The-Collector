@@ -150,7 +150,7 @@ const AppRouter = ({
         path="/perfil"
         element={
           currentUser ? (
-            <PerfilPage currentUser={currentUser} onLogin={onLogin} />
+            <PerfilPage currentUser={currentUser} onLogin={onLogin} onLogout={onLogout} />
           ) : (
             <Navigate to="/login" replace />
           )
