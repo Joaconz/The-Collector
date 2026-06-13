@@ -33,6 +33,16 @@ export const ESTADO_OFERTA = {
   RECHAZADA: "RECHAZADA"
 };
 
+export const ESTADO_SUBASTA_PARTICIPACION = {
+  ABIERTA: "ABIERTA",
+  CERRADA: "CERRADA"
+};
+
+export const RESULTADO_SUBASTA = {
+  GANADA: "GANADA",
+  SUPERADA: "SUPERADA"
+};
+
 // Usuarios mock de prueba
 export const mockUsuarios = [
   {
@@ -352,6 +362,65 @@ export const mockPujas = [
   { id: 5, usuario: "Joaquín González", monto: 145000, fecha: "Hace 5 min" } // El usuario actual tiene la mejor puja
 ];
 
+// Participación del usuario actual en Subastas (Mis Subastas - Comprador)
+export const mockMisSubastas = [
+  {
+    id: 401,
+    piezaId: 2, // Patek Philippe Nautilus
+    ref: "SUB-2026-001",
+    pujaUsuario: 145000,
+    pujaLider: 145000,
+    estado: ESTADO_SUBASTA_PARTICIPACION.ABIERTA,
+    resultado: null,
+    fechaLimite: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 días
+    vendedor: "Aura Dolce Galería"
+  },
+  {
+    id: 402,
+    piezaId: 5, // Joan Miró
+    ref: "SUB-2026-002",
+    pujaUsuario: 92000,
+    pujaLider: 98000,
+    estado: ESTADO_SUBASTA_PARTICIPACION.ABIERTA,
+    resultado: null,
+    fechaLimite: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1.5).toISOString(), // 1.5 días
+    vendedor: "Aura Dolce Galería"
+  },
+  {
+    id: 403,
+    piezaId: 7, // Dólar Morgan
+    ref: "SUB-2026-003",
+    pujaUsuario: 44000,
+    pujaLider: 45000,
+    estado: ESTADO_SUBASTA_PARTICIPACION.ABIERTA,
+    resultado: null,
+    fechaLimite: new Date(Date.now() + 1000 * 60 * 60 * 12).toISOString(), // 12 horas
+    vendedor: "Numismática Real"
+  },
+  {
+    id: 404,
+    piezaId: 5, // Joan Miró - subasta anterior ganada
+    ref: "SUB-2025-010",
+    pujaUsuario: 102000,
+    pujaLider: 102000,
+    estado: ESTADO_SUBASTA_PARTICIPACION.CERRADA,
+    resultado: RESULTADO_SUBASTA.GANADA,
+    fechaLimite: "2025-11-20T18:00:00.000Z",
+    vendedor: "Aura Dolce Galería"
+  },
+  {
+    id: 405,
+    piezaId: 7, // Dólar Morgan - subasta anterior perdida
+    ref: "SUB-2025-011",
+    pujaUsuario: 38000,
+    pujaLider: 42000,
+    estado: ESTADO_SUBASTA_PARTICIPACION.CERRADA,
+    resultado: RESULTADO_SUBASTA.SUPERADA,
+    fechaLimite: "2025-10-05T18:00:00.000Z",
+    vendedor: "Numismática Real"
+  }
+];
+
 // Historial de Ventas Completadas (Vendedor: "Aura Dolce Galería")
 export const TIPO_OPERACION = {
   VENTA_DIRECTA: "VENTA_DIRECTA",
@@ -409,6 +478,7 @@ let favoritos = [...mockFavoritos];
 let reservas = [...mockReservas];
 let ofertas = [...mockOfertas];
 let pujas = [...mockPujas];
+let misSubastas = [...mockMisSubastas];
 
 export const getPublicaciones = () => publicaciones;
 export const getPublicacionById = (id) => publicaciones.find(p => p.id === parseInt(id));
@@ -487,6 +557,8 @@ export const responderOferta = (id, accion, montoContraoferta = null) => {
     of.fechaLimite = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
   }
 };
+
+export const getMisSubastas = () => misSubastas;
 
 export const getPujas = () => pujas;
 export const addPuja = (monto, usuario = "Joaquín González") => {

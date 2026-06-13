@@ -10,6 +10,7 @@ import DetallePiezaPage from '../pages/DetallePiezaPage';
 import FavoritosPage from '../pages/FavoritosPage';
 import ReservasPage from '../pages/ReservasPage';
 import OfertasPage from '../pages/OfertasPage';
+import MisSubastasPage from '../pages/MisSubastasPage';
 import PanelVendedorPage from '../pages/PanelVendedorPage';
 import HistorialVentasPage from '../pages/HistorialVentasPage';
 import NuevaPublicacionPage from '../pages/NuevaPublicacionPage';
@@ -31,7 +32,8 @@ const AppRouter = ({
   onUpdateOfertaEstado,
   onResponderOferta,
   pujas,
-  onAddPuja
+  onAddPuja,
+  misSubastas
 }) => {
   return (
     <Routes>
@@ -83,6 +85,16 @@ const AppRouter = ({
               ofertas={ofertas}
               onUpdateOfertaEstado={onUpdateOfertaEstado}
             />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/subastas"
+        element={
+          currentUser ? (
+            <MisSubastasPage misSubastas={misSubastas} />
           ) : (
             <Navigate to="/login" replace />
           )
