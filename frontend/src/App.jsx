@@ -13,7 +13,8 @@ import {
   updateOfertaEstado,
   responderOferta,
   getPujas,
-  addPuja
+  addPuja,
+  getMisSubastas
 } from './data/mockData';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
   const [reservas, setReservas] = useState(getReservas());
   const [ofertas, setOfertas] = useState(getOfertas());
   const [pujas, setPujas] = useState(getPujas());
+  const [misSubastas] = useState(getMisSubastas());
 
   // Manejador de Login
   const handleLogin = (user) => {
@@ -114,6 +116,7 @@ function App() {
         onResponderOferta={handleResponderOferta}
         pujas={pujas}
         onAddPuja={handleAddPuja}
+        misSubastas={misSubastas}
       />
     </PageLayout>
     </>

@@ -19,7 +19,13 @@ const Badge = ({ status = 'ACTIVA', children, className = '' }) => {
     EN_REVISION: 'bg-[#20201f] text-[#cfc5ba] border border-[#4d453d]',
     CONTRAOFERTA_RECIBIDA: 'bg-[#2b2015] text-[#dec2a3] border border-[#4e3a24]',
     ACEPTADA: 'bg-[#142319] text-[#77dd77] border border-[#1b3d2b]',
-    RECHAZADA_OFERTA: 'bg-[#2a1b1b] text-[#ffb4ab] border border-[#4d2727]'
+    RECHAZADA_OFERTA: 'bg-[#2a1b1b] text-[#ffb4ab] border border-[#4d2727]',
+
+    // Subastas
+    ABIERTA: 'bg-[#142319] text-[#a3dec2] border border-[#1b3d2b]',
+    CERRADA: 'bg-[#1b1c1b] text-[#9a8f85] border border-[#2a2a29]',
+    GANADA: 'bg-[#142319] text-[#77dd77] border border-[#1b3d2b]',
+    SUPERADA: 'bg-[#2a1b1b] text-[#ffb4ab] border border-[#4d2727]'
   };
 
   const currentStyle = styles[normalizedStatus] || 'bg-[#20201f] text-[#e5e2e0] border border-[#4d453d]';
