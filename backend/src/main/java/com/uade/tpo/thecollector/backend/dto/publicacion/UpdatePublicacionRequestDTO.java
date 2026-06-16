@@ -2,6 +2,8 @@ package com.uade.tpo.thecollector.backend.dto.publicacion;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
@@ -22,9 +24,17 @@ public class UpdatePublicacionRequestDTO {
 	@Positive(message = "El precio debe ser mayor a 0")
 	private BigDecimal precio;
 
+	private List<String> imagenes;
+	private Map<String, String> especificaciones;
+
 	// Solo para modo SUBASTA
 	@Future(message = "La fecha límite debe ser en el futuro")
 	private LocalDateTime fechaLimiteSubasta;
+
+	@Positive(message = "El incremento mínimo debe ser mayor a 0")
+	private BigDecimal incrementoMinimo;
+
+	private Boolean destacado;
 
 	public String getNombre() {
 		return nombre;
@@ -80,5 +90,37 @@ public class UpdatePublicacionRequestDTO {
 
 	public void setFechaLimiteSubasta(LocalDateTime fechaLimiteSubasta) {
 		this.fechaLimiteSubasta = fechaLimiteSubasta;
+	}
+
+	public List<String> getImagenes() {
+		return imagenes;
+	}
+
+	public void setImagenes(List<String> imagenes) {
+		this.imagenes = imagenes;
+	}
+
+	public Map<String, String> getEspecificaciones() {
+		return especificaciones;
+	}
+
+	public void setEspecificaciones(Map<String, String> especificaciones) {
+		this.especificaciones = especificaciones;
+	}
+
+	public BigDecimal getIncrementoMinimo() {
+		return incrementoMinimo;
+	}
+
+	public void setIncrementoMinimo(BigDecimal incrementoMinimo) {
+		this.incrementoMinimo = incrementoMinimo;
+	}
+
+	public Boolean getDestacado() {
+		return destacado;
+	}
+
+	public void setDestacado(Boolean destacado) {
+		this.destacado = destacado;
 	}
 }

@@ -24,14 +24,6 @@ const AppRouter = ({
   onLogout,
   favoritos,
   onToggleFavorito,
-  reservas,
-  onAddReserva,
-  ofertas,
-  onAddOferta,
-  onUpdateOfertaEstado,
-  onResponderOferta,
-  pujas,
-  onAddPuja
 }) => {
   return (
     <Routes>
@@ -47,29 +39,20 @@ const AppRouter = ({
             currentUser={currentUser}
             favoritos={favoritos}
             onToggleFavorito={onToggleFavorito}
-            onAddReserva={onAddReserva}
-            onAddOferta={onAddOferta}
-            pujas={pujas}
-            onAddPuja={onAddPuja}
           />
         }
       />
 
-      {/* Rutas Comprador (Protección visual opcional, con redirección simple en base a mock) */}
+      {/* Rutas Comprador */}
       <Route
         path="/favoritos"
-        element={
-          <FavoritosPage
-            favoritos={favoritos}
-            onToggleFavorito={onToggleFavorito}
-          />
-        }
+        element={<FavoritosPage onToggleFavorito={onToggleFavorito} />}
       />
       <Route
         path="/reservas"
         element={
           currentUser ? (
-            <ReservasPage reservas={reservas} />
+            <ReservasPage />
           ) : (
             <Navigate to="/login" replace />
           )
@@ -79,10 +62,7 @@ const AppRouter = ({
         path="/ofertas"
         element={
           currentUser ? (
-            <OfertasPage
-              ofertas={ofertas}
-              onUpdateOfertaEstado={onUpdateOfertaEstado}
-            />
+            <OfertasPage />
           ) : (
             <Navigate to="/login" replace />
           )
@@ -94,11 +74,7 @@ const AppRouter = ({
         path="/vendedor"
         element={
           currentUser && currentUser.rol === 'VENDEDOR' ? (
-            <PanelVendedorPage
-              reservas={reservas}
-              ofertas={ofertas}
-              onResponderOferta={onResponderOferta}
-            />
+            <PanelVendedorPage />
           ) : (
             <Navigate to="/login" replace />
           )
@@ -156,7 +132,7 @@ const AppRouter = ({
           )
         }
       />
-      
+
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

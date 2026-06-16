@@ -48,6 +48,12 @@ public class Publicacion {
 	@Column(name = "fecha_publicacion", nullable = false)
 	private LocalDateTime fechaPublicacion;
 
+	@Column(nullable = false)
+	private Boolean destacado = false;
+
+	@Column(name = "incremento_minimo")
+	private BigDecimal incrementoMinimo;
+
 	public Publicacion() {
 	}
 
@@ -134,5 +140,21 @@ public class Publicacion {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+
+	public Boolean getDestacado() {
+		return destacado;
+	}
+
+	public void setDestacado(Boolean destacado) {
+		this.destacado = destacado;
+	}
+
+	public BigDecimal getIncrementoMinimo() {
+		return incrementoMinimo;
+	}
+
+	public void setIncrementoMinimo(BigDecimal incrementoMinimo) {
+		this.incrementoMinimo = incrementoMinimo;
 	}
 }

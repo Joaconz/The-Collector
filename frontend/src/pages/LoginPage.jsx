@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { mockUsuarios } from '../data/mockData';
+import { authService } from '../services/authService';
 
 const LoginPage = ({ onLogin, currentUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Si ya está logueado, redirigir
@@ -21,7 +22,7 @@ const LoginPage = ({ onLogin, currentUser }) => {
     }
   }, [currentUser, navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -30,33 +31,15 @@ const LoginPage = ({ onLogin, currentUser }) => {
       return;
     }
 
-    // Buscar en usuarios mock
-    const matchedUser = mockUsuarios.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (matchedUser) {
-      onLogin(matchedUser);
-      if (matchedUser.rol === 'VENDEDOR') {
-        navigate('/vendedor');
-      } else {
-        navigate('/catalogo');
-      }
-    } else {
-      setError('Credenciales inválidas. Pruebe los botones de acceso rápido.');
-    }
-  };
-
-  // Función de ayuda para rellenar datos y loguearse rápido
-  const quickLogin = (type) => {
-    const user = type === 'comprador' ? mockUsuarios[0] : mockUsuarios[1];
-    setEmail(user.email);
-    setPassword('secreto123');
-    onLogin(user);
-    if (user.rol === 'VENDEDOR') {
-      navigate('/vendedor');
-    } else {
-      navigate('/catalogo');
+    setLoading(true);
+    try {
+      const auth = await authService.login(email, password);
+      onLogin(auth);
+      navigate(auth.rol === 'VENDEDOR' ? '/vendedor' : '/catalogo');
+    } catch (err) {
+      setError(err.message || 'No se pudo iniciar sesión.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -138,35 +121,10 @@ const LoginPage = ({ onLogin, currentUser }) => {
               </div>
             )}
 
-            <Button type="submit" variant="primary" fullWidth className="py-4">
-              INGRESAR A MI BÓVEDA
+            <Button type="submit" variant="primary" fullWidth className="py-4" disabled={loading}>
+              {loading ? 'INGRESANDO...' : 'INGRESAR A MI BÓVEDA'}
             </Button>
           </form>
-
-          {/* Acceso Rápido para Facilitar Pruebas Universitarias */}
-          <div className="pt-6 border-t border-outline-variant/30 space-y-4">
-            <span className="font-label-caps text-primary text-[9px] tracking-wider block font-semibold">
-              ACCESO DE PRUEBA RÁPIDO
-            </span>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => quickLogin('comprador')}
-                className="border border-outline-variant/60 hover:border-primary p-3 flex flex-col items-center justify-center space-y-1 bg-surface-container/30 hover:bg-surface-container transition-all text-left cursor-pointer"
-              >
-                <span className="font-label-caps text-[10px] text-white font-semibold">COMPRADOR</span>
-                <span className="font-sans text-[9px] text-on-surface-variant">Joaquín González</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => quickLogin('vendedor')}
-                className="border border-outline-variant/60 hover:border-primary p-3 flex flex-col items-center justify-center space-y-1 bg-surface-container/30 hover:bg-surface-container transition-all text-left cursor-pointer"
-              >
-                <span className="font-label-caps text-[10px] text-white font-semibold">VENDEDOR</span>
-                <span className="font-sans text-[9px] text-on-surface-variant">Aura Dolce Galería</span>
-              </button>
-            </div>
-          </div>
 
           <div className="text-center pt-2">
             <span className="font-body-sm text-on-surface-variant mr-1">

@@ -1,6 +1,10 @@
 package com.uade.tpo.thecollector.backend.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.*;
 
@@ -39,6 +43,18 @@ public class Producto {
 
 	@Column(name = "imagen_url")
 	private String imagenUrl;
+
+	@ElementCollection
+	@CollectionTable(name = "producto_especificaciones", joinColumns = @JoinColumn(name = "producto_id"))
+	@MapKeyColumn(name = "clave")
+	@Column(name = "valor")
+	private Map<String, String> especificaciones = new LinkedHashMap<>();
+
+	@ElementCollection
+	@CollectionTable(name = "producto_imagenes", joinColumns = @JoinColumn(name = "producto_id"))
+	@OrderColumn(name = "orden")
+	@Column(name = "url")
+	private List<String> imagenes = new ArrayList<>();
 
 	public Producto() {
 	}
@@ -120,5 +136,21 @@ public class Producto {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+
+	public Map<String, String> getEspecificaciones() {
+		return especificaciones;
+	}
+
+	public void setEspecificaciones(Map<String, String> especificaciones) {
+		this.especificaciones = especificaciones;
+	}
+
+	public List<String> getImagenes() {
+		return imagenes;
+	}
+
+	public void setImagenes(List<String> imagenes) {
+		this.imagenes = imagenes;
 	}
 }

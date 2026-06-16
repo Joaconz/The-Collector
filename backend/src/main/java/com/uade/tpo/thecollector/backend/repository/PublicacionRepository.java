@@ -1,6 +1,7 @@
 package com.uade.tpo.thecollector.backend.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -29,4 +30,13 @@ public interface PublicacionRepository extends JpaRepository<Publicacion, Long> 
 	List<Publicacion> findByVendedor(Usuario vendedor);
 
 	boolean existsByIdAndEstado(Long id, EstadoPublicacion estado);
+
+	@Query("""
+			SELECT p FROM Publicacion p
+			WHERE p.modo = 'SUBASTA'
+			AND p.estadoSubasta = 'ABIERTA'
+			AND p.fechaLimiteSubasta IS NOT NULL
+			AND p.fechaLimiteSubasta < :ahora
+			""")
+	List<Publicacion> findSubastasVencidas(@Param("ahora") LocalDateTime ahora);
 }

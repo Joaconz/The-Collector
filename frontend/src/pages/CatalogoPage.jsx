@@ -1,9 +1,13 @@
-    import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import StaggerReveal from '../components/ui/StaggerReveal';
-import { getPublicaciones, CATEGORIAS, MODO_VENTA } from '../data/mockData';
+import { PageLoader, PageError } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { publicacionService } from '../services/publicacionService';
+import { toPublicacion, mapCategoriaToBackend } from '../utils/adapters';
+import { CATEGORIAS, MODO_VENTA } from '../data/mockData';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -119,7 +123,7 @@ const PiezaSection = ({ pieza, index, isLast, isFavorito, onToggleFavorito, sect
 
           {/* Description */}
           <p className="font-body-md text-on-surface-variant max-w-sm leading-relaxed">
-            {truncate(pieza.descripcion)}
+            {truncate(pieza.descripcion || '')}
           </p>
 
           {/* Specs grid */}
@@ -197,7 +201,6 @@ const PiezaSection = ({ pieza, index, isLast, isFavorito, onToggleFavorito, sect
 
 const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [publicacionesList, setPublicacionesList] = useState([]);
   const [categoriaFiltro, setCategoriaFiltro] = useState('TODAS');
   const [busqueda, setBusqueda] = useState('');
   const [modoFiltro, setModoFiltro] = useState('TODOS');
@@ -217,9 +220,18 @@ const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    setPublicacionesList(getPublicaciones());
-  }, []);
+  const { data, loading, error, refetch } = useFetch(
+    () =>
+      publicacionService
+        .getCatalogo({
+          categoria: categoriaFiltro !== 'TODAS' ? mapCategoriaToBackend(categoriaFiltro) : undefined,
+          size: 100,
+        })
+        .then((res) => (res?.content || []).map(toPublicacion)),
+    [categoriaFiltro]
+  );
+
+  const publicacionesList = data || [];
 
   const handleCategoryTab = (catKey) => {
     if (catKey === 'TODAS') {
@@ -233,15 +245,14 @@ const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
   };
 
   const publicacionesFiltradas = publicacionesList.filter((pub) => {
-    const matchesCategory = categoriaFiltro === 'TODAS' || pub.categoria === categoriaFiltro;
     const matchesModo = modoFiltro === 'TODOS' || pub.modo === modoFiltro;
     const text = busqueda.toLowerCase().trim();
     const matchesSearch =
       !text ||
       pub.nombre.toLowerCase().includes(text) ||
       pub.ref.toLowerCase().includes(text) ||
-      pub.descripcion.toLowerCase().includes(text);
-    return matchesCategory && matchesModo && matchesSearch;
+      (pub.descripcion || '').toLowerCase().includes(text);
+    return matchesModo && matchesSearch;
   });
 
   // IntersectionObserver to track active section
@@ -368,52 +379,58 @@ const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
         {/* Count */}
         <div className="px-4 flex-shrink-0">
           <span className="font-label-caps text-[9px] tracking-[0.15em] text-outline whitespace-nowrap">
-            {totalPiezas} PIEZAS
+            {loading ? '...' : `${totalPiezas} PIEZAS`}
           </span>
         </div>
       </div>
 
-      {/* ── Snap scroll container ── */}
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden"
-        style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth', overscrollBehaviorY: 'contain' }}
-      >
-        {publicacionesFiltradas.length > 0 ? (
-          publicacionesFiltradas.map((pieza, i) => (
+      {/* ── Content area ── */}
+      {loading ? (
+        <PageLoader label="Cargando catálogo..." />
+      ) : error ? (
+        <PageError message="No se pudo cargar el catálogo. Verifique su conexión." onRetry={refetch} />
+      ) : (
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+          style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth', overscrollBehaviorY: 'contain' }}
+        >
+          {publicacionesFiltradas.length > 0 ? (
+            publicacionesFiltradas.map((pieza, i) => (
+              <div
+                key={pieza.id}
+                ref={(el) => (sectionRefs.current[i] = el)}
+                style={{ scrollSnapAlign: 'start', height: 'calc(100dvh - 4rem - 3rem)' }}
+                className="relative flex-shrink-0"
+              >
+                <PiezaSection
+                  pieza={pieza}
+                  index={i}
+                  isLast={i === totalPiezas - 1}
+                  isFavorito={favoritos.includes(pieza.id)}
+                  onToggleFavorito={onToggleFavorito}
+                />
+              </div>
+            ))
+          ) : (
             <div
-              key={pieza.id}
-              ref={(el) => (sectionRefs.current[i] = el)}
-              style={{ scrollSnapAlign: 'start', height: 'calc(100dvh - 4rem - 3rem)' }}
-              className="relative flex-shrink-0"
+              className="flex flex-col items-center justify-center gap-5 text-center"
+              style={{ height: 'calc(100dvh - 4rem - 3rem)' }}
             >
-              <PiezaSection
-                pieza={pieza}
-                index={i}
-                isLast={i === totalPiezas - 1}
-                isFavorito={favoritos.includes(pieza.id)}
-                onToggleFavorito={onToggleFavorito}
-              />
+              <span className="material-symbols-outlined text-5xl text-outline-variant/40 font-light">search_off</span>
+              <span className="font-label-caps text-[11px] tracking-wider text-on-surface-variant">
+                No se encontraron piezas con los filtros seleccionados
+              </span>
+              <button
+                onClick={() => { setBusqueda(''); setModoFiltro('TODOS'); handleCategoryTab('TODAS'); setShowSearch(false); }}
+                className="font-label-caps text-[10px] text-primary hover:text-white tracking-widest transition-colors underline cursor-pointer"
+              >
+                RESTABLECER FILTROS
+              </button>
             </div>
-          ))
-        ) : (
-          <div
-            className="flex flex-col items-center justify-center gap-5 text-center"
-            style={{ height: 'calc(100dvh - 4rem - 3rem)' }}
-          >
-            <span className="material-symbols-outlined text-5xl text-outline-variant/40 font-light">search_off</span>
-            <span className="font-label-caps text-[11px] tracking-wider text-on-surface-variant">
-              No se encontraron piezas con los filtros seleccionados
-            </span>
-            <button
-              onClick={() => { setBusqueda(''); setModoFiltro('TODOS'); handleCategoryTab('TODAS'); setShowSearch(false); }}
-              className="font-label-caps text-[10px] text-primary hover:text-white tracking-widest transition-colors underline cursor-pointer"
-            >
-              RESTABLECER FILTROS
-            </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* ── Navigation dots (fixed right side) ── */}
       {totalPiezas > 1 && totalPiezas <= 20 && (

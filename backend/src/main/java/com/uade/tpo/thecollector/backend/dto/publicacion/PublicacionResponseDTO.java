@@ -21,6 +21,10 @@ public class PublicacionResponseDTO {
 	private EstadoSubasta estadoSubasta;
 	private LocalDateTime fechaPublicacion;
 	private ProductoResponseDTO producto;
+	private String ref;
+	private Boolean destacado;
+	private BigDecimal incrementoMinimo;
+	private BigDecimal pujaActual;
 
 	public PublicacionResponseDTO() {
 	}
@@ -36,6 +40,9 @@ public class PublicacionResponseDTO {
 		this.estadoSubasta = publicacion.getEstadoSubasta();
 		this.fechaPublicacion = publicacion.getFechaPublicacion();
 		this.producto = new ProductoResponseDTO(publicacion.getProducto());
+		this.ref = "REF-" + this.id;
+		this.destacado = publicacion.getDestacado();
+		this.incrementoMinimo = publicacion.getIncrementoMinimo();
 	}
 
 	public Long getId() {
@@ -116,5 +123,37 @@ public class PublicacionResponseDTO {
 
 	public void setProducto(ProductoResponseDTO producto) {
 		this.producto = producto;
+	}
+
+	public String getRef() {
+		return ref;
+	}
+
+	public void setRef(String ref) {
+		this.ref = ref;
+	}
+
+	public Boolean getDestacado() {
+		return destacado;
+	}
+
+	public void setDestacado(Boolean destacado) {
+		this.destacado = destacado;
+	}
+
+	public BigDecimal getIncrementoMinimo() {
+		return incrementoMinimo;
+	}
+
+	public void setIncrementoMinimo(BigDecimal incrementoMinimo) {
+		this.incrementoMinimo = incrementoMinimo;
+	}
+
+	public BigDecimal getPujaActual() {
+		return pujaActual;
+	}
+
+	public void setPujaActual(BigDecimal pujaActual) {
+		this.pujaActual = pujaActual;
 	}
 }

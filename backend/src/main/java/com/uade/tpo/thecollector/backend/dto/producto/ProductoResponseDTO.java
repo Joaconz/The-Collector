@@ -1,6 +1,8 @@
 package com.uade.tpo.thecollector.backend.dto.producto;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import com.uade.tpo.thecollector.backend.model.Categoria;
 import com.uade.tpo.thecollector.backend.model.Producto;
@@ -15,6 +17,8 @@ public class ProductoResponseDTO {
 	private Integer stock;
 	private Categoria categoria;
 	private String imagenUrl;
+	private List<String> imagenes;
+	private Map<String, String> especificaciones;
 
 	public ProductoResponseDTO() {
 	}
@@ -28,6 +32,8 @@ public class ProductoResponseDTO {
 		this.stock = producto.getStock();
 		this.categoria = producto.getCategoria();
 		this.imagenUrl = producto.getImagenUrl();
+		this.imagenes = producto.getImagenes();
+		this.especificaciones = producto.getEspecificaciones();
 	}
 
 	public Long getId() {
@@ -92,5 +98,21 @@ public class ProductoResponseDTO {
 
 	public void setImagenUrl(String imagenUrl) {
 		this.imagenUrl = imagenUrl;
+	}
+
+	public List<String> getImagenes() {
+		return imagenes;
+	}
+
+	public void setImagenes(List<String> imagenes) {
+		this.imagenes = imagenes;
+	}
+
+	public Map<String, String> getEspecificaciones() {
+		return especificaciones;
+	}
+
+	public void setEspecificaciones(Map<String, String> especificaciones) {
+		this.especificaciones = especificaciones;
 	}
 }

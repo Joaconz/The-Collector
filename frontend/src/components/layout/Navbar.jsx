@@ -10,6 +10,18 @@ const SectionLabel = ({ children }) => (
   </p>
 );
 
+const UserAvatar = ({ user, className = '' }) => {
+  if (user?.avatar) {
+    return <img src={user.avatar} alt={user.nombre} className={className} />;
+  }
+  const initial = user?.nombre?.trim()?.charAt(0)?.toUpperCase() || '?';
+  return (
+    <div className={`${className} flex items-center justify-center font-label-caps text-primary`}>
+      {initial}
+    </div>
+  );
+};
+
 const DrawerLink = ({ to, onClick, children, danger = false }) => (
   <NavLink
     to={to}
@@ -101,9 +113,8 @@ const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
         {/* Derecha — avatar o login */}
         {currentUser ? (
           <Link to="/perfil" title="Mi perfil" className="flex items-center">
-            <img
-              src={currentUser.avatar}
-              alt={currentUser.nombre}
+            <UserAvatar
+              user={currentUser}
               className="w-8 h-8 object-cover rounded-full border border-outline/40 bg-surface-container hover:border-primary transition-colors"
             />
           </Link>
@@ -257,9 +268,8 @@ const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
                     onClick={handleLinkClick}
                     className="flex items-center space-x-3 px-6 py-5 hover:bg-surface-container-high/40 transition-colors duration-200 group"
                   >
-                    <img
-                      src={currentUser.avatar}
-                      alt={currentUser.nombre}
+                    <UserAvatar
+                      user={currentUser}
                       className="w-8 h-8 object-cover rounded-full border border-outline/40 bg-surface-container-high group-hover:border-primary transition-colors flex-shrink-0"
                     />
                     <div className="min-w-0">
