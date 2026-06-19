@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import { authService } from '../services/authService';
 
 const RegisterPage = ({ onLogin, currentUser }) => {
   const [rol, setRol] = useState('COMPRADOR'); // 'COMPRADOR' | 'VENDEDOR'
@@ -9,6 +10,7 @@ const RegisterPage = ({ onLogin, currentUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Redirigir si ya tiene sesión activa
@@ -22,7 +24,7 @@ const RegisterPage = ({ onLogin, currentUser }) => {
     }
   }, [currentUser, navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -31,25 +33,15 @@ const RegisterPage = ({ onLogin, currentUser }) => {
       return;
     }
 
-    // Crear un usuario mock simulado
-    const newUser = {
-      id: Math.floor(Math.random() * 1000) + 10,
-      nombre,
-      email,
-      rol,
-      avatar: rol === 'VENDEDOR' 
-        ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150"
-        : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
-      antiguedad: "Miembro desde hoy",
-      ubicacion: "Argentina"
-    };
-
-    onLogin(newUser);
-    
-    if (rol === 'VENDEDOR') {
-      navigate('/vendedor');
-    } else {
-      navigate('/catalogo');
+    setLoading(true);
+    try {
+      const auth = await authService.register({ nombre, email, password, rol });
+      onLogin(auth);
+      navigate(auth.rol === 'VENDEDOR' ? '/vendedor' : '/catalogo');
+    } catch (err) {
+      setError(err.message || 'No se pudo completar el registro.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -164,8 +156,8 @@ const RegisterPage = ({ onLogin, currentUser }) => {
               </div>
             )}
 
-            <Button type="submit" variant="primary" fullWidth className="py-4">
-              SOLICITAR ACCESO A BÓVEDA
+            <Button type="submit" variant="primary" fullWidth className="py-4" disabled={loading}>
+              {loading ? 'PROCESANDO...' : 'SOLICITAR ACCESO A BÓVEDA'}
             </Button>
           </form>
 

@@ -27,6 +27,11 @@ public class PublicacionRequestDTO {
 	@Future(message = "La fecha límite debe ser en el futuro")
 	private LocalDateTime fechaLimiteSubasta;
 
+	@Positive(message = "El incremento mínimo debe ser mayor a 0")
+	private BigDecimal incrementoMinimo;
+
+	private Boolean destacado;
+
 	public ModoPublicacion getModo() {
 		return modo;
 	}
@@ -57,5 +62,21 @@ public class PublicacionRequestDTO {
 
 	public void setFechaLimiteSubasta(LocalDateTime fechaLimiteSubasta) {
 		this.fechaLimiteSubasta = fechaLimiteSubasta;
+	}
+
+	public BigDecimal getIncrementoMinimo() {
+		return incrementoMinimo;
+	}
+
+	public void setIncrementoMinimo(BigDecimal incrementoMinimo) {
+		this.incrementoMinimo = incrementoMinimo;
+	}
+
+	public Boolean getDestacado() {
+		return destacado;
+	}
+
+	public void setDestacado(Boolean destacado) {
+		this.destacado = destacado;
 	}
 }

@@ -1,17 +1,43 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import ReservaCard from '../components/cards/ReservaCard';
 import Button from '../components/ui/Button';
+import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { reservaService } from '../services/reservaService';
+import { toReserva } from '../utils/adapters';
 
-const ReservasPage = ({ reservas }) => {
-  // Separamos las reservas para armar un dashboard de primer nivel
-  const reservasActivas = reservas.filter(
-    (r) => r.estado === 'PENDIENTE' || r.estado === 'CONFIRMADA'
+const ReservasPage = () => {
+  const { data, loading, error, refetch, setData } = useFetch(() =>
+    reservaService.getMisReservasComprador().then((list) => (list || []).map(toReserva))
   );
-  
+
+  if (loading) return <PageLoader label="Cargando sus reservas..." />;
+
+  if (error) {
+    if (error.status === 401 || error.status === 403) {
+      return <AccessDenied message="Inicie sesión para ver sus reservas." />;
+    }
+    return <PageError message="No se pudieron cargar sus reservas." onRetry={refetch} />;
+  }
+
+  const reservas = data || [];
+
+  const reservasActivas = reservas.filter((r) => r.estado === 'PENDIENTE');
   const reservasHistorial = reservas.filter(
-    (r) => r.estado === 'COMPLETADA' || r.estado === 'RECHAZADA'
+    (r) => r.estado === 'CONFIRMADA' || r.estado === 'RECHAZADA' || r.estado === 'CANCELADA'
   );
+
+  const handleCancelar = async (id) => {
+    try {
+      await reservaService.cancelar(id);
+      setData((prev) => (prev || []).map((r) => (r.id === id ? { ...r, estado: 'CANCELADA' } : r)));
+      toast.success('Reserva cancelada correctamente.');
+    } catch (err) {
+      toast.error(err.message || 'No se pudo cancelar la reserva.');
+    }
+  };
 
   return (
     <div className="w-full bg-background min-h-screen py-16 px-6 md:px-16 flex flex-col items-center">
@@ -31,7 +57,7 @@ const ReservasPage = ({ reservas }) => {
 
         {reservas.length > 0 ? (
           <div className="flex flex-col space-y-12">
-            
+
             {/* Sección 1: Adquisiciones en Proceso */}
             {reservasActivas.length > 0 && (
               <div className="flex flex-col space-y-6 text-left">
@@ -43,19 +69,19 @@ const ReservasPage = ({ reservas }) => {
                 </div>
                 <div className="flex flex-col space-y-4">
                   {reservasActivas.map((res) => (
-                    <ReservaCard key={res.id} reserva={res} />
+                    <ReservaCard key={res.id} reserva={res} onCancelar={handleCancelar} />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Sección 2: Historial Completado */}
+            {/* Sección 2: Historial */}
             {reservasHistorial.length > 0 && (
               <div className="flex flex-col space-y-6 text-left">
                 <div className="flex items-center space-x-3 pt-6 border-t border-outline-variant/15">
                   <span className="w-1.5 h-1.5 bg-on-surface-variant/40 rounded-full" />
                   <h2 className="font-label-caps text-[11px] text-on-surface-variant/70 tracking-[0.2em] font-bold">
-                    HISTORIAL DE ADQUISICIONES ADJUDICADAS
+                    HISTORIAL DE ADQUISICIONES
                   </h2>
                 </div>
                 <div className="flex flex-col space-y-4">
@@ -65,17 +91,6 @@ const ReservasPage = ({ reservas }) => {
                 </div>
               </div>
             )}
-
-            {/* Botón Cargar Historial */}
-            <div className="pt-6 flex justify-center">
-              <Button
-                variant="outline"
-                onClick={() => alert('Su historial se encuentra completamente cargado y verificado en la cadena de bloques.')}
-                className="px-8"
-              >
-                CARGAR HISTORIAL COMPLETO
-              </Button>
-            </div>
 
           </div>
         ) : (

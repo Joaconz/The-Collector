@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { addPublicacion, CATEGORIAS, MODO_VENTA } from '../data/mockData';
+import { CATEGORIAS, MODO_VENTA } from '../data/mockData';
+import { publicacionService } from '../services/publicacionService';
+import { toPublicacionRequest } from '../utils/adapters';
 
 const NuevaPublicacionPage = () => {
   const [paso, setPaso] = useState(1); // 1 | 2
@@ -24,6 +27,7 @@ const NuevaPublicacionPage = () => {
   const [incrementoMinimo, setIncrementoMinimo] = useState('500');
   const [fechaLimite, setFechaLimite] = useState('');
   const [step2Error, setStep2Error] = useState('');
+  const [publicando, setPublicando] = useState(false);
 
   const handleSiguiente = (e) => {
     e.preventDefault();
@@ -37,7 +41,7 @@ const NuevaPublicacionPage = () => {
     setPaso(2);
   };
 
-  const handlePublicar = (e) => {
+  const handlePublicar = async (e) => {
     e.preventDefault();
     setStep2Error('');
 
@@ -61,28 +65,37 @@ const NuevaPublicacionPage = () => {
       "Estado de Conservación": "Excelente (Inspección Pendiente)"
     };
 
-    // Agregar publicación al mock
-    const nueva = {
+    const imagen = imagenUrl || "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=600&h=750";
+
+    const form = {
       nombre,
       categoria,
       modo,
       especificaciones,
       descripcion: historia.slice(0, 150),
       historia,
-      imagenUrl: imagenUrl || "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=600&h=750",
-      ...(modo === MODO_VENTA.PRECIO_FIJO 
+      imagenUrl: imagen,
+      imagenes: [imagen],
+      stock: 1,
+      ...(modo === MODO_VENTA.PRECIO_FIJO
         ? { precio: parseFloat(precio) }
         : {
             precioBase: parseFloat(precioBase),
-            pujaActual: null,
             incrementoMinimo: parseFloat(incrementoMinimo),
             fechaLimiteSubasta: new Date(fechaLimite).toISOString()
           })
     };
 
-    addPublicacion(nueva);
-    alert('¡Publicación guardada con éxito! Su artículo ha entrado a etapa de validación de procedencia y figurará en su panel.');
-    navigate('/vendedor');
+    setPublicando(true);
+    try {
+      await publicacionService.create(toPublicacionRequest(form));
+      toast.success('¡Publicación creada con éxito! Su artículo ya figura en su panel.');
+      navigate('/vendedor');
+    } catch (err) {
+      setStep2Error(err.message || 'No se pudo crear la publicación. Intente nuevamente.');
+    } finally {
+      setPublicando(false);
+    }
   };
 
   return (
@@ -337,11 +350,11 @@ const NuevaPublicacionPage = () => {
 
             {/* Navegación Stepper */}
             <div className="pt-6 border-t border-outline-variant/20 flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setPaso(1)} className="px-8">
+              <Button type="button" variant="outline" onClick={() => setPaso(1)} className="px-8" disabled={publicando}>
                 ← VOLVER A DETALLES
               </Button>
-              <Button type="submit" variant="primary" className="px-10">
-                PUBLICAR EN EL MARKETPLACE
+              <Button type="submit" variant="primary" className="px-10" disabled={publicando}>
+                {publicando ? 'PUBLICANDO...' : 'PUBLICAR EN EL MARKETPLACE'}
               </Button>
             </div>
 

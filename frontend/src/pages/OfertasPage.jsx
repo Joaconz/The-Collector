@@ -1,16 +1,51 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import OfertaCard from '../components/cards/OfertaCard';
 import Button from '../components/ui/Button';
+import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { ofertaService } from '../services/ofertaService';
+import { toOferta } from '../utils/adapters';
 
-const OfertasPage = ({ ofertas, onUpdateOfertaEstado }) => {
-  const ofertasAccion = ofertas.filter(
-    (o) => o.estado === 'CONTRAOFERTA_RECIBIDA'
+const OfertasPage = () => {
+  const { data, loading, error, refetch, setData } = useFetch(() =>
+    ofertaService.getMisOfertasComprador().then((list) => (list || []).map(toOferta))
   );
-  
-  const ofertasEspera = ofertas.filter(
-    (o) => o.estado === 'EN_REVISION' || o.estado === 'ACEPTADA' || o.estado === 'RECHAZADA'
-  );
+
+  if (loading) return <PageLoader label="Cargando sus ofertas..." />;
+
+  if (error) {
+    if (error.status === 401 || error.status === 403) {
+      return <AccessDenied message="Inicie sesión para ver sus ofertas." />;
+    }
+    return <PageError message="No se pudieron cargar sus ofertas." onRetry={refetch} />;
+  }
+
+  const ofertas = data || [];
+
+  const ofertasAccion = ofertas.filter((o) => o.estado === 'CONTRAOFERTA_RECIBIDA');
+  const ofertasEspera = ofertas.filter((o) => o.estado !== 'CONTRAOFERTA_RECIBIDA');
+
+  const handleAceptarContraoferta = async (id) => {
+    try {
+      await ofertaService.aceptarContraoferta(id);
+      setData((prev) => (prev || []).map((o) => (o.id === id ? { ...o, estado: 'ACEPTADA' } : o)));
+      toast.success('Contraoferta aceptada. Se generó una nueva reserva.');
+    } catch (err) {
+      toast.error(err.message || 'No se pudo aceptar la contraoferta.');
+    }
+  };
+
+  const handleCancelar = async (id) => {
+    try {
+      await ofertaService.cancelar(id);
+      setData((prev) => (prev || []).map((o) => (o.id === id ? { ...o, estado: 'CANCELADA' } : o)));
+      toast.success('Oferta cancelada.');
+    } catch (err) {
+      toast.error(err.message || 'No se pudo cancelar la oferta.');
+    }
+  };
 
   return (
     <div className="w-full bg-background min-h-screen py-16 px-6 md:px-16 flex flex-col items-center">
@@ -30,7 +65,7 @@ const OfertasPage = ({ ofertas, onUpdateOfertaEstado }) => {
 
         {ofertas.length > 0 ? (
           <div className="flex flex-col space-y-12">
-            
+
             {/* Sección 1: Acción Requerida */}
             {ofertasAccion.length > 0 && (
               <div className="flex flex-col space-y-6 text-left animate-pulse-subtle">
@@ -45,7 +80,8 @@ const OfertasPage = ({ ofertas, onUpdateOfertaEstado }) => {
                     <OfertaCard
                       key={of.id}
                       oferta={of}
-                      onUpdateEstado={onUpdateOfertaEstado}
+                      onAceptarContraoferta={handleAceptarContraoferta}
+                      onCancelar={handleCancelar}
                     />
                   ))}
                 </div>
@@ -66,7 +102,8 @@ const OfertasPage = ({ ofertas, onUpdateOfertaEstado }) => {
                     <OfertaCard
                       key={of.id}
                       oferta={of}
-                      onUpdateEstado={onUpdateOfertaEstado}
+                      onAceptarContraoferta={handleAceptarContraoferta}
+                      onCancelar={handleCancelar}
                     />
                   ))}
                 </div>

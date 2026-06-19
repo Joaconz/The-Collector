@@ -1,18 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import PublicacionCard from '../components/cards/PublicacionCard';
 import Button from '../components/ui/Button';
-import { getPublicaciones } from '../data/mockData';
+import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { favoritoService } from '../services/favoritoService';
+import { toFavorito } from '../utils/adapters';
 
-const FavoritosPage = ({ favoritos, onToggleFavorito }) => {
-  const [itemsFavoritos, setItemsFavoritos] = useState([]);
+const FavoritosPage = ({ onToggleFavorito }) => {
+  const { data, loading, error, refetch, setData } = useFetch(() =>
+    favoritoService.getMisFavoritos().then((list) => (list || []).map(toFavorito))
+  );
 
-  // Sincronizar favoritos con la base de datos mock local al cargar/cambiar
-  useEffect(() => {
-    const todos = getPublicaciones();
-    const guardados = todos.filter((p) => favoritos.includes(p.id));
-    setItemsFavoritos(guardados);
-  }, [favoritos]);
+  if (loading) return <PageLoader label="Cargando su lista de deseos..." />;
+
+  if (error) {
+    if (error.status === 401 || error.status === 403) {
+      return <AccessDenied message="Inicie sesión como coleccionista para ver su lista de deseos." />;
+    }
+    return <PageError message="No se pudo cargar su lista de deseos." onRetry={refetch} />;
+  }
+
+  const itemsFavoritos = data || [];
+
+  const handleQuitar = async (id) => {
+    await onToggleFavorito(id);
+    setData((prev) => (prev || []).filter((p) => p.id !== id));
+  };
 
   return (
     <div className="w-full bg-background min-h-screen py-16 px-6 md:px-16 flex flex-col items-center">
@@ -26,9 +40,9 @@ const FavoritosPage = ({ favoritos, onToggleFavorito }) => {
             LISTA DE DESEOS
           </h1>
           <p className="font-body-sm text-on-surface-variant">
-            {favoritos.length === 1
+            {itemsFavoritos.length === 1
               ? '1 ARTÍCULO GUARDADO EN SU BÓVEDA PRIVADA'
-              : `${favoritos.length} ARTÍCULOS GUARDADOS EN SU BÓVEDA PRIVADA`}
+              : `${itemsFavoritos.length} ARTÍCULOS GUARDADOS EN SU BÓVEDA PRIVADA`}
           </p>
         </div>
 
@@ -39,11 +53,11 @@ const FavoritosPage = ({ favoritos, onToggleFavorito }) => {
                 {/* PublicacionCard base */}
                 <PublicacionCard
                   publicacion={pub}
-                  onToggleFavorito={onToggleFavorito}
+                  onToggleFavorito={handleQuitar}
                   isFavorito={true}
                 />
-                
-                {/* Botón de Acción Adicional según el diseño Stitch */}
+
+                {/* Botón de Acción Adicional */}
                 <div className="w-full bg-surface-container/30 border-x border-b border-outline-variant/30 p-4">
                   <Link to={`/publicaciones/${pub.id}`} className="w-full block">
                     {pub.modo === 'SUBASTA' ? (

@@ -1,30 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Badge from '../components/ui/Badge';
+import { toast } from 'sonner';
 import Button from '../components/ui/Button';
-import { getPublicacionById, getPujas, addPuja, resetPujas } from '../data/mockData';
+import { PageLoader, PageError } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { MODO_VENTA } from '../data/mockData';
+import { publicacionService } from '../services/publicacionService';
+import { subastaService } from '../services/subastaService';
+import { toPublicacion, toPuja } from '../utils/adapters';
+
+const formatTimeRemaining = (fechaLimite) => {
+  if (!fechaLimite) return 'Sin fecha límite';
+  const diff = new Date(fechaLimite).getTime() - Date.now();
+  if (diff <= 0) return 'Subasta finalizada';
+  const horas = Math.floor(diff / (1000 * 60 * 60));
+  const dias = Math.floor(horas / 24);
+  if (dias > 0) return `Cierra en ${dias}d ${horas % 24}h`;
+  const minutos = Math.floor((diff / (1000 * 60)) % 60);
+  return `Cierra en ${horas}h ${minutos}m`;
+};
+
+const formatFecha = (fecha) => {
+  if (!fecha) return '';
+  return new Date(fecha).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
+};
 
 const GestionSubastaPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [pub, setPub] = useState(null);
-  const [pujasLog, setPujasLog] = useState([]);
+  const [cerrando, setCerrando] = useState(false);
 
-  // Entrada para simulador de pujas del sistema (para demostrar reactividad de manera ultra inmersiva)
-  const [simuladorMonto, setSimuladorMonto] = useState('');
-
-  useEffect(() => {
-    const item = getPublicacionById(id);
-    if (item) {
-      setPub(item);
-      setPujasLog(getPujas());
-      // Sugerir siguiente puja
-      const base = item.pujaActual || item.precioBase;
-      setSimuladorMonto(base + item.incrementoMinimo);
-    }
+  const { data, loading, error, refetch } = useFetch(async () => {
+    const [pub, pujas] = await Promise.all([
+      publicacionService.getById(id).then(toPublicacion),
+      subastaService.getPujas(id).then((list) => (list || []).map(toPuja)),
+    ]);
+    return { pub, pujas };
   }, [id]);
 
-  if (!pub) {
+  if (loading) return <PageLoader label="Cargando sala de subasta..." />;
+
+  if (error || data?.pub?.modo !== MODO_VENTA.SUBASTA) {
+    if (error && error.status !== 404 && data?.pub?.modo === undefined) {
+      return <PageError message="No se pudo cargar la sala de subasta." onRetry={refetch} />;
+    }
     return (
       <div className="py-24 px-6 text-center max-w-md mx-auto flex flex-col items-center space-y-4">
         <span className="material-symbols-outlined text-4xl text-error font-light">warning</span>
@@ -37,6 +56,8 @@ const GestionSubastaPage = () => {
     );
   }
 
+  const { pub, pujas } = data;
+
   // Formateador de moneda
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('es-AR', {
@@ -46,43 +67,21 @@ const GestionSubastaPage = () => {
     }).format(val);
   };
 
-  const handleSimularPuja = (e) => {
-    e.preventDefault();
-    const monto = parseFloat(simuladorMonto);
-    const precioReferencia = pub.pujaActual || pub.precioBase;
-
-    if (isNaN(monto) || monto <= precioReferencia) {
-      alert(`La puja simulada debe ser superior al precio líder de ${formatCurrency(precioReferencia)} USD.`);
-      return;
+  const handleCerrarSubasta = async () => {
+    setCerrando(true);
+    try {
+      const lider = pujas[0];
+      await subastaService.cerrar(pub.id);
+      if (lider) {
+        toast.success(`¡Subasta finalizada! La pieza '${pub.nombre}' fue adjudicada a ${lider.usuario} por ${formatCurrency(lider.monto)} USD.`);
+      } else {
+        toast.info('Subasta finalizada sin postores. La pieza vuelve a depósito.');
+      }
+      navigate('/vendedor');
+    } catch (err) {
+      toast.error(err.message || 'No se pudo cerrar la subasta.');
+      setCerrando(false);
     }
-
-    // Insertar puja mock
-    const usuariosSimulados = ['PrestigeArt', 'Coleccionista_GVA', 'NumisLover', 'Vicent_M'];
-    const randomUser = usuariosSimulados[Math.floor(Math.random() * usuariosSimulados.length)];
-
-    addPuja(monto, randomUser);
-    setPujasLog(getPujas());
-
-    // Actualizar estado local de la publicación
-    setPub({
-      ...pub,
-      pujaActual: monto
-    });
-
-    setSimuladorMonto(monto + pub.incrementoMinimo);
-  };
-
-  const handleCerrarSubasta = () => {
-    const lider = pujasLog[0];
-    if (lider) {
-      alert(`¡SUBASTA FINALIZADA EXITOSAMENTE!\n\nLa pieza '${pub.nombre}' ha sido adjudicada a: ${lider.usuario} por un valor de ${formatCurrency(lider.monto)} USD.\nSe ha generado la transferencia de procedencia.`);
-    } else {
-      alert('Subasta finalizada sin postores. La pieza volverá a depósito.');
-    }
-
-    // Restablecer pujas mock para la siguiente simulación si es necesario
-    resetPujas();
-    navigate('/vendedor');
   };
 
   return (
@@ -138,7 +137,7 @@ const GestionSubastaPage = () => {
             </div>
           </div>
 
-          {/* Lado Derecho: Monitor de Pujas & Simulador (lg:col-span-5) */}
+          {/* Lado Derecho: Monitor de Pujas (lg:col-span-5) */}
           <div className="lg:col-span-5 flex flex-col space-y-6">
 
             {/* Monitor de Puja Actual */}
@@ -149,41 +148,16 @@ const GestionSubastaPage = () => {
               </div>
 
               <div className="font-display text-4xl md:text-5xl font-bold text-primary tracking-wide">
-                {formatCurrency(pub.pujaActual || pub.precioBase)}
+                {formatCurrency(pub.precio)}
               </div>
 
               <div className="flex justify-between items-center text-xs pt-4 border-t border-outline-variant/20 font-body-sm text-on-surface-variant/70">
-                <span>Postor Líder: <strong className="text-white">{pujasLog[0]?.usuario || 'Sin pujas'}</strong></span>
+                <span>Postor Líder: <strong className="text-white">{pujas[0]?.usuario || 'Sin pujas'}</strong></span>
                 <span className="flex items-center space-x-1 text-error font-semibold">
                   <span className="material-symbols-outlined text-sm font-light">schedule</span>
-                  <span>Cierre en 12h</span>
+                  <span>{formatTimeRemaining(pub.fechaLimiteSubasta)}</span>
                 </span>
               </div>
-            </div>
-
-            {/* Simulador de Puja para demostrar interactividad */}
-            <div className="bg-surface-container-high/30 border border-outline-variant/30 p-5 flex flex-col space-y-4 text-left">
-              <span className="font-label-caps text-primary text-[9px] tracking-widest font-bold">
-                SIMULADOR DE SALA (HERRAMIENTA EVALUACIÓN)
-              </span>
-              <form onSubmit={handleSimularPuja} className="flex space-x-3">
-                <div className="flex-grow flex bg-background border border-outline-variant/50 py-1.5 px-3">
-                  <span className="text-on-surface-variant/50 mr-1 font-body-sm">$</span>
-                  <input
-                    type="number"
-                    value={simuladorMonto}
-                    onChange={(e) => setSimuladorMonto(e.target.value)}
-                    placeholder="Monto puja simulada"
-                    className="bg-transparent border-none text-on-surface font-body-sm w-full focus:outline-none focus:ring-0 p-0 text-sm"
-                  />
-                </div>
-                <Button type="submit" variant="outline" className="py-2 px-4 text-[9px]">
-                  SIMULAR PUJA
-                </Button>
-              </form>
-              <p className="font-body-sm text-[9px] text-on-surface-variant/40 leading-normal">
-                Use este panel para inyectar una puja externa al sistema. La consola recalculará dinámicamente el precio de puja líder y actualizará la bitácora inferior.
-              </p>
             </div>
 
             {/* Bitácora de Pujas en Vivo */}
@@ -193,20 +167,26 @@ const GestionSubastaPage = () => {
               </span>
 
               <div className="border border-outline-variant/30 bg-surface-container/20 max-h-56 overflow-y-auto flex flex-col divide-y divide-outline-variant/10">
-                {pujasLog.map((bid) => (
-                  <div key={bid.id} className="p-3.5 flex justify-between items-center text-xs font-body-sm">
-                    <div className="flex items-center space-x-3">
-                      <span className="material-symbols-outlined text-outline-variant/80 text-sm font-light">account_balance_wallet</span>
-                      <div className="flex flex-col">
-                        <span className="text-white font-medium">{bid.usuario}</span>
-                        <span className="font-body-sm text-[9px] text-on-surface-variant/50 mt-0.5">{bid.fecha}</span>
+                {pujas.length > 0 ? (
+                  pujas.map((bid) => (
+                    <div key={bid.id} className="p-3.5 flex justify-between items-center text-xs font-body-sm">
+                      <div className="flex items-center space-x-3">
+                        <span className="material-symbols-outlined text-outline-variant/80 text-sm font-light">account_balance_wallet</span>
+                        <div className="flex flex-col">
+                          <span className="text-white font-medium">{bid.usuario}</span>
+                          <span className="font-body-sm text-[9px] text-on-surface-variant/50 mt-0.5">{formatFecha(bid.fecha)}</span>
+                        </div>
                       </div>
+                      <span className="font-body-sm text-sm font-semibold text-primary">
+                        {formatCurrency(bid.monto)} USD
+                      </span>
                     </div>
-                    <span className="font-body-sm text-sm font-semibold text-primary">
-                      {formatCurrency(bid.monto)} USD
-                    </span>
+                  ))
+                ) : (
+                  <div className="p-6 text-center font-body-sm text-on-surface-variant/60 text-xs">
+                    Aún no se registraron pujas en esta sala.
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
@@ -216,9 +196,10 @@ const GestionSubastaPage = () => {
                 variant="danger"
                 fullWidth
                 onClick={handleCerrarSubasta}
+                disabled={cerrando}
                 className="py-4 font-bold"
               >
-                CERRAR SALA
+                {cerrando ? 'CERRANDO SALA...' : 'CERRAR SALA'}
               </Button>
             </div>
 

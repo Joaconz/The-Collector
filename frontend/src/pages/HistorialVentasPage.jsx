@@ -1,8 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
-import { getVentasByVendedor, getPublicacionById, TIPO_OPERACION } from '../data/mockData';
+import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { TIPO_OPERACION } from '../data/mockData';
+import { reservaService } from '../services/reservaService';
+import { publicacionService } from '../services/publicacionService';
+import { toReserva, toPublicacion } from '../utils/adapters';
+
+const ORIGEN_TO_TIPO_OPERACION = {
+  DIRECTA: TIPO_OPERACION.VENTA_DIRECTA,
+  OFERTA: TIPO_OPERACION.OFERTA_ACEPTADA,
+  SUBASTA: TIPO_OPERACION.SUBASTA_ADJUDICADA,
+};
 
 // Configuración de badges por tipo de operación
 const TIPO_CONFIG = {
@@ -23,43 +33,61 @@ const TIPO_CONFIG = {
   },
 };
 
+const formatCurrency = (val) =>
+  new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(val || 0);
+
+const formatFecha = (fechaStr) => {
+  if (!fechaStr) return '-';
+  const date = new Date(fechaStr);
+  const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+  return `${date.getDate()} ${meses[date.getMonth()]} ${date.getFullYear()}`;
+};
+
 const HistorialVentasPage = () => {
   const [filtroTipo, setFiltroTipo] = useState('TODOS');
 
-  // Cargar ventas con datos enriquecidos de la pieza
-  const ventas = useMemo(() => {
-    return getVentasByVendedor().map((v) => ({
-      ...v,
-      pieza: getPublicacionById(v.piezaId),
-    }));
+  const { data, loading, error, refetch } = useFetch(async () => {
+    const [reservas, misPublicaciones] = await Promise.all([
+      reservaService.getMisReservasVendedor().then((list) => (list || []).map(toReserva)),
+      publicacionService.getMisPublicaciones().then((list) => (list || []).map(toPublicacion)),
+    ]);
+    return { reservas, misPublicaciones };
   }, []);
 
+  if (loading) return <PageLoader label="Cargando historial de ventas..." />;
+
+  if (error) {
+    if (error.status === 401 || error.status === 403) {
+      return <AccessDenied message="Inicie sesión como vendedor para acceder al historial de ventas." />;
+    }
+    return <PageError message="No se pudo cargar el historial de ventas." onRetry={refetch} />;
+  }
+
+  // Ventas confirmadas, enriquecidas con datos de la pieza y comisión de plataforma
+  const ventas = (data.reservas || [])
+    .filter((r) => r.estado === 'CONFIRMADA')
+    .map((r) => ({
+      ...r,
+      tipoOperacion: ORIGEN_TO_TIPO_OPERACION[r.origen] || TIPO_OPERACION.VENTA_DIRECTA,
+      precioFinal: r.precioAcordado,
+      comision: (r.precioAcordado || 0) * 0.05,
+      fechaVenta: r.fechaRespuesta || r.fecha,
+      comprador: r.compradorNombre,
+      pieza: data.misPublicaciones.find((p) => p.id === r.piezaId),
+    }));
+
   // Ventas filtradas según el tab activo
-  const ventasFiltradas = useMemo(() => {
-    if (filtroTipo === 'TODOS') return ventas;
-    return ventas.filter((v) => v.tipoOperacion === filtroTipo);
-  }, [ventas, filtroTipo]);
+  const ventasFiltradas = filtroTipo === 'TODOS' ? ventas : ventas.filter((v) => v.tipoOperacion === filtroTipo);
 
   // Estadísticas de resumen
-  const stats = useMemo(() => {
-    const totalVendido = ventas.reduce((acc, v) => acc + v.precioFinal, 0);
-    const totalComision = ventas.reduce((acc, v) => acc + v.comision, 0);
-    const ticketPromedio = ventas.length > 0 ? totalVendido / ventas.length : 0;
-    return { totalVendido, totalComision, ticketPromedio, cantidad: ventas.length };
-  }, [ventas]);
-
-  const formatCurrency = (val) =>
-    new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0,
-    }).format(val);
-
-  const formatFecha = (fechaStr) => {
-    const [year, month, day] = fechaStr.split('-');
-    const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
-    return `${day} ${meses[parseInt(month) - 1]} ${year}`;
-  };
+  const totalVendido = ventas.reduce((acc, v) => acc + v.precioFinal, 0);
+  const totalComision = ventas.reduce((acc, v) => acc + v.comision, 0);
+  const ticketPromedio = ventas.length > 0 ? totalVendido / ventas.length : 0;
+  const stats = { totalVendido, totalComision, ticketPromedio, cantidad: ventas.length };
 
   const tabs = [
     { id: 'TODOS', label: 'TODAS' },
@@ -212,7 +240,7 @@ const HistorialVentasPage = () => {
                             </div>
                             <div className="flex flex-col min-w-0">
                               <span className="font-sans text-sm font-semibold text-white truncate max-w-[200px]">
-                                {venta.pieza?.nombre || 'Pieza no disponible'}
+                                {venta.pieza?.nombre || venta.nombreProducto || 'Pieza no disponible'}
                               </span>
                               <span className="font-label-caps text-[8px] text-on-surface-variant/40 tracking-wider mt-0.5">
                                 {venta.ref}

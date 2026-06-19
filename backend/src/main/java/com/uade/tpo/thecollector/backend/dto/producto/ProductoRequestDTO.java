@@ -1,6 +1,8 @@
 package com.uade.tpo.thecollector.backend.dto.producto;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +31,8 @@ public class ProductoRequestDTO {
 	private Categoria categoria;
 
 	private String imagenUrl;
+	private List<String> imagenes;
+	private Map<String, String> especificaciones;
 
 	public String getNombre() {
 		return nombre;
@@ -84,5 +88,21 @@ public class ProductoRequestDTO {
 
 	public void setImagenUrl(String imagenUrl) {
 		this.imagenUrl = imagenUrl;
+	}
+
+	public List<String> getImagenes() {
+		return imagenes;
+	}
+
+	public void setImagenes(List<String> imagenes) {
+		this.imagenes = imagenes;
+	}
+
+	public Map<String, String> getEspecificaciones() {
+		return especificaciones;
+	}
+
+	public void setEspecificaciones(Map<String, String> especificaciones) {
+		this.especificaciones = especificaciones;
 	}
 }

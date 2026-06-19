@@ -3,11 +3,13 @@ package com.uade.tpo.thecollector.backend.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,14 @@ import com.uade.tpo.thecollector.backend.model.EstadoPublicacion;
 import com.uade.tpo.thecollector.backend.model.EstadoReserva;
 import com.uade.tpo.thecollector.backend.model.EstadoSubasta;
 import com.uade.tpo.thecollector.backend.model.ModoPublicacion;
+import com.uade.tpo.thecollector.backend.model.OrigenReserva;
 import com.uade.tpo.thecollector.backend.model.Producto;
 import com.uade.tpo.thecollector.backend.model.Publicacion;
+import com.uade.tpo.thecollector.backend.model.Puja;
+import com.uade.tpo.thecollector.backend.model.Reserva;
 import com.uade.tpo.thecollector.backend.model.Usuario;
 import com.uade.tpo.thecollector.backend.repository.PublicacionRepository;
+import com.uade.tpo.thecollector.backend.repository.PujaRepository;
 import com.uade.tpo.thecollector.backend.repository.ReservaRepository;
 import com.uade.tpo.thecollector.backend.repository.UsuarioRepository;
 
@@ -36,12 +42,14 @@ public class PublicacionService {
 	private final PublicacionRepository publicacionRepository;
 	private final UsuarioRepository usuarioRepository;
 	private final ReservaRepository reservaRepository;
+	private final PujaRepository pujaRepository;
 
 	public PublicacionService(PublicacionRepository publicacionRepository, UsuarioRepository usuarioRepository,
-			ReservaRepository reservaRepository) {
+			ReservaRepository reservaRepository, PujaRepository pujaRepository) {
 		this.publicacionRepository = publicacionRepository;
 		this.usuarioRepository = usuarioRepository;
 		this.reservaRepository = reservaRepository;
+		this.pujaRepository = pujaRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -51,15 +59,20 @@ public class PublicacionService {
 				? Sort.by("producto.precio").ascending()
 				: Sort.by("fechaPublicacion").descending();
 		Pageable pageable = PageRequest.of(page, size, sort);
-		return publicacionRepository.findCatalogo(categoria, precioMin, precioMax, pageable)
-				.map(PublicacionResponseDTO::new);
+		return publicacionRepository.findCatalogo(categoria, precioMin, precioMax, pageable).map(this::toResponseDTO);
+	}
+
+	@Transactional(readOnly = true)
+	public List<PublicacionResponseDTO> getMisPublicaciones() {
+		Usuario vendedor = usuarioAutenticado();
+		return publicacionRepository.findByVendedor(vendedor).stream().map(this::toResponseDTO).toList();
 	}
 
 	@Transactional(readOnly = true)
 	public PublicacionResponseDTO getPublicacionById(Long id) {
 		Publicacion publicacion = publicacionRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Publicación con id " + id + " no encontrada"));
-		return new PublicacionResponseDTO(publicacion);
+		return toResponseDTO(publicacion);
 	}
 
 	@Transactional
@@ -75,6 +88,13 @@ public class PublicacionService {
 				request.getProducto().getStock(), request.getProducto().getCategoria(),
 				request.getProducto().getImagenUrl());
 
+		if (request.getProducto().getImagenes() != null) {
+			producto.setImagenes(request.getProducto().getImagenes());
+		}
+		if (request.getProducto().getEspecificaciones() != null) {
+			producto.setEspecificaciones(request.getProducto().getEspecificaciones());
+		}
+
 		Publicacion publicacion = new Publicacion(producto, vendedor, EstadoPublicacion.ACTIVA, request.getModo(),
 				LocalDateTime.now());
 
@@ -82,10 +102,15 @@ public class PublicacionService {
 			publicacion.setPrecioBase(request.getPrecioBase());
 			publicacion.setFechaLimiteSubasta(request.getFechaLimiteSubasta());
 			publicacion.setEstadoSubasta(EstadoSubasta.ABIERTA);
+			publicacion.setIncrementoMinimo(request.getIncrementoMinimo());
+		}
+
+		if (request.getDestacado() != null) {
+			publicacion.setDestacado(request.getDestacado());
 		}
 
 		publicacion = publicacionRepository.save(publicacion);
-		return new PublicacionResponseDTO(publicacion);
+		return toResponseDTO(publicacion);
 	}
 
 	@Transactional
@@ -106,12 +131,24 @@ public class PublicacionService {
 		if (request.getPrecio() != null) {
 			producto.setPrecio(request.getPrecio());
 		}
+		if (request.getImagenes() != null) {
+			producto.setImagenes(request.getImagenes());
+		}
+		if (request.getEspecificaciones() != null) {
+			producto.setEspecificaciones(request.getEspecificaciones());
+		}
 		if (publicacion.getModo() == ModoPublicacion.SUBASTA && request.getFechaLimiteSubasta() != null) {
 			publicacion.setFechaLimiteSubasta(request.getFechaLimiteSubasta());
 		}
+		if (publicacion.getModo() == ModoPublicacion.SUBASTA && request.getIncrementoMinimo() != null) {
+			publicacion.setIncrementoMinimo(request.getIncrementoMinimo());
+		}
+		if (request.getDestacado() != null) {
+			publicacion.setDestacado(request.getDestacado());
+		}
 
 		publicacion = publicacionRepository.save(publicacion);
-		return new PublicacionResponseDTO(publicacion);
+		return toResponseDTO(publicacion);
 	}
 
 	@Transactional
@@ -123,7 +160,66 @@ public class PublicacionService {
 
 		publicacion.setEstado(request.getEstado());
 		publicacion = publicacionRepository.save(publicacion);
-		return new PublicacionResponseDTO(publicacion);
+		return toResponseDTO(publicacion);
+	}
+
+	@Transactional
+	public PublicacionResponseDTO cerrarSubasta(Long id) {
+		Publicacion publicacion = publicacionRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Publicación con id " + id + " no encontrada"));
+
+		verificarPropiedad(publicacion);
+
+		if (!ModoPublicacion.SUBASTA.equals(publicacion.getModo())) {
+			throw new IllegalArgumentException("La publicación no es una subasta");
+		}
+		if (!EstadoSubasta.ABIERTA.equals(publicacion.getEstadoSubasta())) {
+			throw new IllegalArgumentException("La subasta ya está cerrada");
+		}
+
+		adjudicarSubasta(publicacion);
+		publicacion = publicacionRepository.save(publicacion);
+		return toResponseDTO(publicacion);
+	}
+
+	/**
+	 * Cierra automáticamente las subastas cuya fecha límite ya pasó, adjudicándolas
+	 * al postor líder. Se ejecuta cada minuto.
+	 */
+	@Scheduled(fixedRate = 60000)
+	@Transactional
+	public void cerrarSubastasVencidas() {
+		List<Publicacion> vencidas = publicacionRepository.findSubastasVencidas(LocalDateTime.now());
+		for (Publicacion publicacion : vencidas) {
+			adjudicarSubasta(publicacion);
+			publicacionRepository.save(publicacion);
+		}
+	}
+
+	/**
+	 * Adjudica una subasta: si hay postor líder, genera una reserva CONFIRMADA con
+	 * origen SUBASTA, descuenta stock y marca la pieza como VENDIDA; si no hubo
+	 * pujas, la publicación vuelve a PAUSADA. En todos los casos cierra la subasta.
+	 */
+	private void adjudicarSubasta(Publicacion publicacion) {
+		Puja lider = pujaRepository.findPujaLider(publicacion).orElse(null);
+
+		if (lider != null) {
+			Reserva reserva = new Reserva(lider.getPujador(), publicacion, lider.getMonto(), OrigenReserva.SUBASTA,
+					LocalDateTime.now());
+			reserva.setPuja(lider);
+			reserva.setEstado(EstadoReserva.CONFIRMADA);
+			reserva.setFechaRespuesta(LocalDateTime.now());
+			reservaRepository.save(reserva);
+
+			int nuevoStock = publicacion.getProducto().getStock() - 1;
+			publicacion.getProducto().setStock(Math.max(nuevoStock, 0));
+			publicacion.setEstado(EstadoPublicacion.VENDIDA);
+		} else {
+			publicacion.setEstado(EstadoPublicacion.PAUSADA);
+		}
+
+		publicacion.setEstadoSubasta(EstadoSubasta.CERRADA);
 	}
 
 	@Transactional
@@ -139,6 +235,14 @@ public class PublicacionService {
 
 		publicacion.setActivo(false);
 		publicacionRepository.save(publicacion);
+	}
+
+	private PublicacionResponseDTO toResponseDTO(Publicacion publicacion) {
+		PublicacionResponseDTO dto = new PublicacionResponseDTO(publicacion);
+		if (publicacion.getModo() == ModoPublicacion.SUBASTA) {
+			pujaRepository.findPujaLider(publicacion).ifPresent(puja -> dto.setPujaActual(puja.getMonto()));
+		}
+		return dto;
 	}
 
 	private void validarCamposSubasta(PublicacionRequestDTO request) {

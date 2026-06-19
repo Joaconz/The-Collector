@@ -1,26 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import OfertaModal from '../components/forms/OfertaModal';
 import ConfirmModal from '../components/ui/ConfirmModal';
-import { getPublicacionById, MODO_VENTA, ESTADO_PUBLICACION } from '../data/mockData';
+import { PageLoader, PageError } from '../components/ui/Spinner';
+import { useFetch } from '../hooks/useFetch';
+import { publicacionService } from '../services/publicacionService';
+import { subastaService } from '../services/subastaService';
+import { reservaService } from '../services/reservaService';
+import { ofertaService } from '../services/ofertaService';
+import { toPublicacion } from '../utils/adapters';
+import { MODO_VENTA, ESTADO_PUBLICACION } from '../data/mockData';
 
-const DetallePiezaPage = ({
-  currentUser,
-  favoritos,
-  onToggleFavorito,
-  onAddReserva,
-  onAddOferta,
-  pujas,
-  onAddPuja
-}) => {
+const formatTimeRemaining = (fechaLimite) => {
+  if (!fechaLimite) return '—';
+  const diff = new Date(fechaLimite).getTime() - Date.now();
+  if (diff <= 0) return 'SUBASTA FINALIZADA';
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  return `${days}d ${hours}h ${minutes}m`;
+};
+
+const DetallePiezaPage = ({ currentUser, favoritos, onToggleFavorito }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [pub, setPub] = useState(null);
   const [imagenActiva, setImagenActiva] = useState(0);
   const [ofertaModalOpen, setOfertaModalOpen] = useState(false);
-  
+
+  const { data: pub, loading, error, refetch } = useFetch(
+    () => publicacionService.getById(id).then(toPublicacion),
+    [id]
+  );
+
   // Estado del modal de confirmación (unificado para reserva y puja)
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -39,34 +53,46 @@ const DetallePiezaPage = ({
   const [pujaMonto, setPujaMonto] = useState('');
   const [pujaError, setPujaError] = useState('');
 
-  // Cargar publicación
   useEffect(() => {
-    const item = getPublicacionById(id);
-    if (item) {
-      setPub(item);
-      setImagenActiva(0);
-      // Pre-poblar sugerencia de puja (puja actual + incremento mínimo)
-      if (item.modo === MODO_VENTA.SUBASTA) {
-        const basePrice = item.pujaActual || item.precioBase;
-        setPujaMonto(basePrice + item.incrementoMinimo);
-      }
-    }
-  }, [id, pujas]); // Escucha cambios en 'pujas' para refrescar el precio
+    setImagenActiva(0);
+  }, [id]);
 
-  if (!pub) {
-    return (
-      <div className="py-24 px-6 text-center max-w-md mx-auto flex flex-col items-center space-y-4">
-        <span className="material-symbols-outlined text-4xl text-error font-light">warning</span>
-        <h2 className="font-headline-sm text-white uppercase tracking-wider">PIEZA NO ENCONTRADA</h2>
-        <p className="font-body-sm text-on-surface-variant">El artículo solicitado no figura en los registros de nuestra bóveda digital.</p>
-        <Link to="/catalogo">
-          <Button variant="outline">VOLVER AL CATÁLOGO</Button>
-        </Link>
-      </div>
-    );
+  // Sugerencia inicial de puja (puja actual + incremento mínimo)
+  useEffect(() => {
+    if (pub && pub.modo === MODO_VENTA.SUBASTA && pujaMonto === '') {
+      const basePrice = pub.pujaActual || pub.precioBase;
+      setPujaMonto(basePrice + pub.incrementoMinimo);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pub]);
+
+  if (loading) {
+    return <PageLoader label="Cargando detalle de la pieza..." />;
   }
 
+  if (error) {
+    if (error.status === 404) {
+      return (
+        <div className="py-24 px-6 text-center max-w-md mx-auto flex flex-col items-center space-y-4">
+          <span className="material-symbols-outlined text-4xl text-error font-light">warning</span>
+          <h2 className="font-headline-sm text-white uppercase tracking-wider">PIEZA NO ENCONTRADA</h2>
+          <p className="font-body-sm text-on-surface-variant">El artículo solicitado no figura en los registros de nuestra bóveda digital.</p>
+          <Link to="/catalogo">
+            <Button variant="outline">VOLVER AL CATÁLOGO</Button>
+          </Link>
+        </div>
+      );
+    }
+    return <PageError message="No se pudo cargar la pieza solicitada." onRetry={refetch} />;
+  }
+
+  if (!pub) return null;
+
   const isFav = favoritos.includes(pub.id);
+  const esSubasta = pub.modo === MODO_VENTA.SUBASTA;
+  const subastaAbierta =
+    pub.estadoSubasta === 'ABIERTA' &&
+    (!pub.fechaLimiteSubasta || new Date(pub.fechaLimiteSubasta).getTime() > Date.now());
 
   // Formateador de moneda
   const formatCurrency = (val) => {
@@ -80,7 +106,7 @@ const DetallePiezaPage = ({
   // Manejo de Reserva Directa — abre confirmación antes de ejecutar
   const handleReservaDirecta = () => {
     if (!currentUser) {
-      alert('Debe iniciar sesión para realizar transacciones.');
+      toast.error('Debe iniciar sesión para realizar transacciones.');
       navigate('/login');
       return;
     }
@@ -98,26 +124,36 @@ const DetallePiezaPage = ({
       cancelText: 'CANCELAR',
       icon: 'bookmark_added',
       variant: 'success',
-      onConfirm: () => {
-        onAddReserva(pub.id, pub.precio, pub.vendedor);
-        closeConfirmModal();
-        navigate('/reservas');
+      onConfirm: async () => {
+        try {
+          await reservaService.crear(pub.id);
+          toast.success('Su solicitud de reserva fue enviada al curador.');
+          closeConfirmModal();
+          navigate('/reservas');
+        } catch (err) {
+          toast.error(err.message || 'No se pudo crear la reserva.');
+          closeConfirmModal();
+        }
       },
     });
   };
 
   // Manejo de Oferta
-  const handleOfertaSubmit = (monto) => {
+  const handleOfertaSubmit = async (monto) => {
     if (!currentUser) {
-      alert('Debe iniciar sesión para realizar transacciones.');
+      toast.error('Debe iniciar sesión para realizar transacciones.');
       navigate('/login');
       return;
     }
 
-    onAddOferta(pub.id, pub.precio, monto, pub.vendedor);
-    setOfertaModalOpen(false);
-    alert(`¡Su oferta privada por ${formatCurrency(monto)} ha sido enviada al curador! Se lo ha redirigido a su panel de ofertas.`);
-    navigate('/ofertas');
+    try {
+      await ofertaService.crear(pub.id, monto);
+      setOfertaModalOpen(false);
+      toast.success(`Su oferta privada por ${formatCurrency(monto)} USD ha sido enviada al curador.`);
+      navigate('/ofertas');
+    } catch (err) {
+      toast.error(err.message || 'No se pudo enviar la oferta.');
+    }
   };
 
   // Manejo de Puja (Subasta) — valida primero, luego abre confirmación
@@ -126,7 +162,7 @@ const DetallePiezaPage = ({
     setPujaError('');
 
     if (!currentUser) {
-      alert('Debe iniciar sesión para realizar pujas en salas en vivo.');
+      toast.error('Debe iniciar sesión para realizar pujas en salas en vivo.');
       navigate('/login');
       return;
     }
@@ -155,10 +191,17 @@ const DetallePiezaPage = ({
       cancelText: 'REVISAR',
       icon: 'gavel',
       variant: 'success',
-      onConfirm: () => {
-        onAddPuja(monto);
-        closeConfirmModal();
-        setPujaMonto(monto + pub.incrementoMinimo);
+      onConfirm: async () => {
+        try {
+          await subastaService.addPuja(pub.id, monto);
+          toast.success('Su puja fue registrada como la líder de la subasta.');
+          closeConfirmModal();
+          setPujaMonto(monto + pub.incrementoMinimo);
+          await refetch();
+        } catch (err) {
+          toast.error(err.message || 'No se pudo registrar la puja.');
+          closeConfirmModal();
+        }
       },
     });
   };
@@ -166,7 +209,7 @@ const DetallePiezaPage = ({
   return (
     <div className="w-full bg-background min-h-screen py-10 px-6 md:px-16 flex flex-col items-center">
       <div className="max-w-7xl w-full flex flex-col space-y-10">
-        
+
         {/* 1. Breadcrumbs & Navegación */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-outline-variant/20 pb-4 gap-4 text-left">
           <div className="flex items-center space-x-2 font-label-caps text-[9px] tracking-wider text-on-surface-variant/70">
@@ -178,7 +221,7 @@ const DetallePiezaPage = ({
             <span>/</span>
             <span className="text-primary truncate max-w-[200px]">{pub.nombre}</span>
           </div>
-          
+
           <button
             onClick={() => onToggleFavorito(pub.id)}
             className="flex items-center space-x-2 font-label-caps text-[10px] tracking-wider text-on-surface-variant hover:text-primary transition-colors focus:outline-none cursor-pointer self-start"
@@ -192,7 +235,7 @@ const DetallePiezaPage = ({
 
         {/* 2. Cuerpo de Detalle (Grid 2 columnas) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
+
           {/* Lado Izquierdo: Galería de Imágenes (lg:col-span-7) */}
           <div className="lg:col-span-7 flex flex-col space-y-4">
             {/* Imagen Principal */}
@@ -206,7 +249,7 @@ const DetallePiezaPage = ({
                 <Badge status={pub.estado}>{pub.estado}</Badge>
               </div>
             </div>
-            
+
             {/* Miniaturas */}
             {pub.imagenes && pub.imagenes.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
@@ -228,11 +271,11 @@ const DetallePiezaPage = ({
 
           {/* Lado Derecho: Transacción e Información Básica (lg:col-span-5) */}
           <div className="lg:col-span-5 flex flex-col text-left space-y-8">
-            
+
             {/* Metadatos Básicos */}
             <div className="space-y-3">
               <span className="font-label-caps text-primary text-[10px] tracking-[0.25em] font-semibold block">
-                {pub.modo === MODO_VENTA.SUBASTA ? 'SUBASTA EXCLUSIVA' : 'PIEZA DE ADQUISICIÓN DIRECTA'}
+                {esSubasta ? 'SUBASTA EXCLUSIVA' : 'PIEZA DE ADQUISICIÓN DIRECTA'}
               </span>
               <h1 className="font-display text-3xl md:text-4xl text-white font-semibold leading-tight">
                 {pub.nombre}
@@ -244,8 +287,8 @@ const DetallePiezaPage = ({
 
             {/* Panel de Transacción según Modo */}
             <div className="p-6 bg-surface-container border border-outline-variant/60 flex flex-col space-y-6">
-              
-              {pub.modo === MODO_VENTA.PRECIO_FIJO ? (
+
+              {!esSubasta ? (
                 <>
                   {/* Precio Fijo Layout */}
                   <div className="flex flex-col space-y-1">
@@ -269,7 +312,7 @@ const DetallePiezaPage = ({
                     >
                       SOLICITAR RESERVA DIRECTA
                     </Button>
-                    
+
                     <Button
                       variant="outline"
                       fullWidth
@@ -299,7 +342,7 @@ const DetallePiezaPage = ({
                       </span>
                       <span className="font-body-md text-base text-error flex items-center space-x-1.5 mt-1 font-semibold">
                         <span className="w-1.5 h-1.5 bg-error rounded-full animate-ping" />
-                        <span>0d 12h 30m</span>
+                        <span>{formatTimeRemaining(pub.fechaLimiteSubasta)}</span>
                       </span>
                     </div>
                   </div>
@@ -319,7 +362,7 @@ const DetallePiezaPage = ({
                           onChange={(e) => setPujaMonto(e.target.value)}
                           placeholder="Monto a pujar"
                           className="bg-transparent border-none text-on-surface font-body-md w-full focus:outline-none focus:ring-0 p-0"
-                          disabled={pub.estado !== ESTADO_PUBLICACION.ACTIVA}
+                          disabled={pub.estado !== ESTADO_PUBLICACION.ACTIVA || !subastaAbierta}
                         />
                       </div>
                       <span className="text-on-surface-variant/40 text-[9px] font-body-sm mt-1 block">
@@ -337,9 +380,9 @@ const DetallePiezaPage = ({
                       type="submit"
                       variant="primary"
                       fullWidth
-                      disabled={pub.estado !== ESTADO_PUBLICACION.ACTIVA}
+                      disabled={pub.estado !== ESTADO_PUBLICACION.ACTIVA || !subastaAbierta}
                     >
-                      REGISTRAR PUJA EN VIVO
+                      {subastaAbierta ? 'REGISTRAR PUJA EN VIVO' : 'SUBASTA FINALIZADA'}
                     </Button>
                   </form>
                 </>
@@ -362,7 +405,7 @@ const DetallePiezaPage = ({
           </div>
         </div>
 
-        {/* 3. Historia y Especificaciones de Diseño Stitch (Tabs-like Layout) */}
+        {/* 3. Historia y Especificaciones */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-10 border-t border-outline-variant/20">
           {/* Historia (lg:col-span-7) */}
           <div className="lg:col-span-7 flex flex-col text-left space-y-4">

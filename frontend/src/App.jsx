@@ -1,121 +1,75 @@
-import React, { useState } from 'react';
-import { Toaster } from 'sonner';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Toaster, toast } from 'sonner';
 import PageLayout from './components/layout/PageLayout';
 import AppRouter from './routes/AppRouter';
-import {
-  mockUsuarios,
-  getFavoritos,
-  toggleFavorito,
-  getReservas,
-  addReserva,
-  getOfertas,
-  addOferta,
-  updateOfertaEstado,
-  responderOferta,
-  getPujas,
-  addPuja
-} from './data/mockData';
+import { authService } from './services/authService';
+import { favoritoService } from './services/favoritoService';
+import { toFavorito } from './utils/adapters';
 
 function App() {
-  // Inicializamos el usuario actual con el Comprador Joaquín para simplificar el flujo inicial
-  const [currentUser, setCurrentUser] = useState(mockUsuarios[0]);
-  
-  // Estados para simular la persistencia reactiva durante la sesión de navegación
-  const [favoritos, setFavoritos] = useState([1, 3, 5]); // IDs correspondientes a mockFavoritos
-  const [reservas, setReservas] = useState(getReservas());
-  const [ofertas, setOfertas] = useState(getOfertas());
-  const [pujas, setPujas] = useState(getPujas());
+  const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser());
+  const [favoritos, setFavoritos] = useState([]);
 
-  // Manejador de Login
-  const handleLogin = (user) => {
-    setCurrentUser(user);
-  };
-
-  // Manejador de Logout
-  const handleLogout = () => {
-    setCurrentUser(null);
-  };
-
-  // Manejador de Favoritos (Deseos/Carrito)
-  const handleToggleFavorito = (id) => {
-    const pId = parseInt(id);
-    let updated;
-    if (favoritos.includes(pId)) {
-      updated = favoritos.filter(f => f !== pId);
-    } else {
-      updated = [...favoritos, pId];
+  const cargarFavoritos = useCallback(async () => {
+    if (!currentUser || currentUser.rol !== 'COMPRADOR') {
+      setFavoritos([]);
+      return;
     }
-    setFavoritos(updated);
+    try {
+      const data = await favoritoService.getMisFavoritos();
+      setFavoritos((data || []).map((dto) => toFavorito(dto).id));
+    } catch {
+      setFavoritos([]);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    cargarFavoritos();
+  }, [cargarFavoritos]);
+
+  const handleLogin = (auth) => {
+    setCurrentUser(auth);
   };
 
-  // Manejador de Reservas
-  const handleAddReserva = (piezaId, precioAcordado, vendedor) => {
-    const newRes = addReserva({
-      piezaId,
-      precioAcordado,
-      vendedor,
-      tipo: "Adquisición Directa"
-    });
-    setReservas([...getReservas()]);
-    return newRes;
+  const handleLogout = () => {
+    authService.logout();
+    setCurrentUser(null);
+    setFavoritos([]);
   };
 
-  // Manejador de Ofertas
-  const handleAddOferta = (piezaId, precioOriginal, precioOfertado, vendedor) => {
-    const newOf = addOferta({
-      piezaId,
-      precioOriginal,
-      precioOfertado,
-      vendedor
-    });
-    setOfertas([...getOfertas()]);
-    return newOf;
-  };
+  const handleToggleFavorito = async (id) => {
+    const pId = Number(id);
 
-  // Actualizar estado de una Oferta (aceptar/contraofertar) — desde lado comprador
-  const handleUpdateOfertaEstado = (id, nuevoEstado) => {
-    updateOfertaEstado(id, nuevoEstado);
-    setOfertas([...getOfertas()]);
-    setReservas([...getReservas()]); // Si fue aceptada, se crea una reserva
-  };
+    if (!currentUser || currentUser.rol !== 'COMPRADOR') {
+      toast.error('Inicie sesión como coleccionista para guardar favoritos.');
+      return;
+    }
 
-  // Responder a una oferta desde el lado vendedor (aceptar / rechazar / contraoferta)
-  const handleResponderOferta = (id, accion, montoContraoferta = null) => {
-    responderOferta(id, accion, montoContraoferta);
-    setOfertas([...getOfertas()]);
-    setReservas([...getReservas()]);
-  };
-
-  // Registrar puja en subasta
-  const handleAddPuja = (monto) => {
-    addPuja(monto);
-    setPujas([...getPujas()]);
+    try {
+      if (favoritos.includes(pId)) {
+        await favoritoService.eliminar(pId);
+        setFavoritos((prev) => prev.filter((f) => f !== pId));
+      } else {
+        await favoritoService.agregar(pId);
+        setFavoritos((prev) => [...prev, pId]);
+      }
+    } catch (err) {
+      toast.error(err.message || 'No se pudo actualizar sus favoritos.');
+    }
   };
 
   return (
     <>
-    <Toaster theme="dark" position="bottom-right" richColors closeButton />
-    <PageLayout
-      currentUser={currentUser}
-      onLogout={handleLogout}
-      favoritosCount={favoritos.length}
-    >
-      <AppRouter
-        currentUser={currentUser}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
-        favoritos={favoritos}
-        onToggleFavorito={handleToggleFavorito}
-        reservas={reservas}
-        onAddReserva={handleAddReserva}
-        ofertas={ofertas}
-        onAddOferta={handleAddOferta}
-        onUpdateOfertaEstado={handleUpdateOfertaEstado}
-        onResponderOferta={handleResponderOferta}
-        pujas={pujas}
-        onAddPuja={handleAddPuja}
-      />
-    </PageLayout>
+      <Toaster theme="dark" position="bottom-right" richColors closeButton />
+      <PageLayout currentUser={currentUser} onLogout={handleLogout} favoritosCount={favoritos.length}>
+        <AppRouter
+          currentUser={currentUser}
+          onLogin={handleLogin}
+          onLogout={handleLogout}
+          favoritos={favoritos}
+          onToggleFavorito={handleToggleFavorito}
+        />
+      </PageLayout>
     </>
   );
 }

@@ -1,5 +1,6 @@
 package com.uade.tpo.thecollector.backend.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.uade.tpo.thecollector.backend.dto.reserva.ReservaResponseDTO;
 import com.uade.tpo.thecollector.backend.exception.ResourceNotFoundException;
 import com.uade.tpo.thecollector.backend.model.EstadoOferta;
 import com.uade.tpo.thecollector.backend.model.EstadoPublicacion;
+import com.uade.tpo.thecollector.backend.model.EstadoReserva;
 import com.uade.tpo.thecollector.backend.model.ModoPublicacion;
 import com.uade.tpo.thecollector.backend.model.Oferta;
 import com.uade.tpo.thecollector.backend.model.OrigenReserva;
@@ -94,11 +96,7 @@ public class OfertaService {
 		oferta.setEstado(EstadoOferta.ACEPTADA);
 		ofertaRepository.save(oferta);
 
-		Reserva reserva = new Reserva(oferta.getComprador(), oferta.getPublicacion(), oferta.getPrecioOfertado(),
-				OrigenReserva.OFERTA, LocalDateTime.now());
-		reserva.setOferta(oferta);
-		reserva = reservaRepository.save(reserva);
-		return new ReservaResponseDTO(reserva);
+		return confirmarVentaPorOferta(oferta, oferta.getPrecioOfertado());
 	}
 
 	@Transactional
@@ -122,7 +120,16 @@ public class OfertaService {
 		verificarVendedor(oferta);
 		verificarEstadoPendiente(oferta);
 
-		oferta.setPrecioContraoferta(request.getPrecioContraoferta());
+		BigDecimal precioContraoferta = request.getPrecioContraoferta();
+		BigDecimal precioLista = oferta.getPublicacion().getProducto().getPrecio();
+		if (precioContraoferta.compareTo(oferta.getPrecioOfertado()) <= 0) {
+			throw new IllegalArgumentException("La contraoferta debe ser mayor a la oferta del comprador");
+		}
+		if (precioContraoferta.compareTo(precioLista) >= 0) {
+			throw new IllegalArgumentException("La contraoferta debe ser menor al precio de lista");
+		}
+
+		oferta.setPrecioContraoferta(precioContraoferta);
 		oferta.setEstado(EstadoOferta.CONTRAOFERTA);
 		oferta = ofertaRepository.save(oferta);
 		return new OfertaResponseDTO(oferta);
@@ -141,9 +148,33 @@ public class OfertaService {
 		oferta.setEstado(EstadoOferta.ACEPTADA);
 		ofertaRepository.save(oferta);
 
-		Reserva reserva = new Reserva(oferta.getComprador(), oferta.getPublicacion(), oferta.getPrecioContraoferta(),
-				OrigenReserva.OFERTA, LocalDateTime.now());
+		return confirmarVentaPorOferta(oferta, oferta.getPrecioContraoferta());
+	}
+
+	/**
+	 * Concreta una venta originada en una oferta aceptada: genera una reserva
+	 * CONFIRMADA con origen OFERTA, descuenta stock y marca la pieza como VENDIDA
+	 * cuando el stock llega a cero.
+	 */
+	private ReservaResponseDTO confirmarVentaPorOferta(Oferta oferta, BigDecimal precioAcordado) {
+		Publicacion publicacion = oferta.getPublicacion();
+		if (publicacion.getProducto().getStock() <= 0) {
+			throw new IllegalArgumentException("No hay stock disponible para concretar la venta");
+		}
+
+		Reserva reserva = new Reserva(oferta.getComprador(), publicacion, precioAcordado, OrigenReserva.OFERTA,
+				LocalDateTime.now());
 		reserva.setOferta(oferta);
+		reserva.setEstado(EstadoReserva.CONFIRMADA);
+		reserva.setFechaRespuesta(LocalDateTime.now());
+
+		int nuevoStock = publicacion.getProducto().getStock() - 1;
+		publicacion.getProducto().setStock(nuevoStock);
+		if (nuevoStock == 0) {
+			publicacion.setEstado(EstadoPublicacion.VENDIDA);
+		}
+		publicacionRepository.save(publicacion);
+
 		reserva = reservaRepository.save(reserva);
 		return new ReservaResponseDTO(reserva);
 	}
