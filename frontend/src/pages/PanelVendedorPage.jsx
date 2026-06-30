@@ -1,27 +1,44 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import NegociarModal from '../components/forms/NegociarModal';
 import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
 import { ESTADO_PUBLICACION, MODO_VENTA } from '../data/mockData';
-import { publicacionService } from '../services/publicacionService';
-import { reservaService } from '../services/reservaService';
-import { ofertaService } from '../services/ofertaService';
-import { toPublicacion, toReserva, toOferta } from '../utils/adapters';
+import { fetchMisPublicaciones } from '../features/publicaciones/publicacionesThunks';
+import { selectMisPublicaciones } from '../features/publicaciones/publicacionesSlice';
+import { fetchReservasVendedor, confirmarReserva, rechazarReserva } from '../features/reservas/reservasThunks';
+import { selectReservasVendedor } from '../features/reservas/reservasSlice';
+import {
+  fetchOfertasVendedor,
+  aceptarOferta,
+  rechazarOferta,
+  contraofertar,
+} from '../features/ofertas/ofertasThunks';
+import { selectOfertasVendedor } from '../features/ofertas/ofertasSlice';
 
 const PanelVendedorPage = () => {
-  const { data, loading, error, refetch, setData } = useFetch(async () => {
-    const [misPublicaciones, reservas, ofertas] = await Promise.all([
-      publicacionService.getMisPublicaciones().then((list) => (list || []).map(toPublicacion)),
-      reservaService.getMisReservasVendedor().then((list) => (list || []).map(toReserva)),
-      ofertaService.getMisOfertasVendedor().then((list) => (list || []).map(toOferta)),
-    ]);
-    return { misPublicaciones, reservas, ofertas };
-  }, []);
+  const dispatch = useDispatch();
+  const { data: misPublicaciones, status: pubStatus, error: pubError } = useSelector(selectMisPublicaciones);
+  const { data: reservasVendedor } = useSelector(selectReservasVendedor);
+  const { data: ofertasVendedor } = useSelector(selectOfertasVendedor);
+
+  const loading = pubStatus === 'loading' || pubStatus === 'idle';
+  const error = pubError;
+
+  const cargarPanel = () => {
+    dispatch(fetchMisPublicaciones());
+    dispatch(fetchReservasVendedor());
+    dispatch(fetchOfertasVendedor());
+  };
+
+  useEffect(() => {
+    cargarPanel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   // Estado del modal de negociación (seller side)
   const [negociarModal, setNegociarModal] = useState({ isOpen: false, oferta: null, pieza: null });
@@ -46,12 +63,11 @@ const PanelVendedorPage = () => {
     if (error.status === 401 || error.status === 403) {
       return <AccessDenied message="Inicie sesión como vendedor para acceder al panel de control." />;
     }
-    return <PageError message="No se pudo cargar el panel de control." onRetry={refetch} />;
+    return <PageError message="No se pudo cargar el panel de control." onRetry={cargarPanel} />;
   }
 
-  const misPublicaciones = data?.misPublicaciones || [];
-  const solicitudesReserva = (data?.reservas || []).filter((r) => r.estado === 'PENDIENTE');
-  const ofertasRecibidas = (data?.ofertas || []).filter((o) => o.estado === 'EN_REVISION');
+  const solicitudesReserva = reservasVendedor.filter((r) => r.estado === 'PENDIENTE');
+  const ofertasRecibidas = ofertasVendedor.filter((o) => o.estado === 'EN_REVISION');
 
   // Formateador de moneda
   const formatCurrency = (val) => {
@@ -78,14 +94,10 @@ const PanelVendedorPage = () => {
       variant: 'success',
       onConfirm: async () => {
         try {
-          await reservaService.confirmar(resId);
-          setData((prev) => ({
-            ...prev,
-            reservas: prev.reservas.map((r) => (r.id === resId ? { ...r, estado: 'CONFIRMADA' } : r)),
-          }));
+          await dispatch(confirmarReserva(resId)).unwrap();
           toast.success('Reserva confirmada. Se notificó al comprador.');
         } catch (err) {
-          toast.error(err.message || 'No se pudo confirmar la reserva.');
+          toast.error(err?.message || 'No se pudo confirmar la reserva.');
         }
         closeConfirmModal();
       },
@@ -107,14 +119,10 @@ const PanelVendedorPage = () => {
       variant: 'danger',
       onConfirm: async () => {
         try {
-          await reservaService.rechazar(resId);
-          setData((prev) => ({
-            ...prev,
-            reservas: prev.reservas.map((r) => (r.id === resId ? { ...r, estado: 'RECHAZADA' } : r)),
-          }));
+          await dispatch(rechazarReserva(resId)).unwrap();
           toast.info('Reserva rechazada y notificada al comprador.');
         } catch (err) {
-          toast.error(err.message || 'No se pudo rechazar la reserva.');
+          toast.error(err?.message || 'No se pudo rechazar la reserva.');
         }
         closeConfirmModal();
       },
@@ -139,33 +147,17 @@ const PanelVendedorPage = () => {
     const ofertaId = negociarModal.oferta.id;
     try {
       if (accion === 'ACEPTAR') {
-        await ofertaService.aceptar(ofertaId);
-        setData((prev) => ({
-          ...prev,
-          ofertas: prev.ofertas.map((o) => (o.id === ofertaId ? { ...o, estado: 'ACEPTADA' } : o)),
-        }));
+        await dispatch(aceptarOferta(ofertaId)).unwrap();
         toast.success('Oferta aceptada. Se generó una reserva confirmada.');
       } else if (accion === 'RECHAZAR') {
-        await ofertaService.rechazar(ofertaId);
-        setData((prev) => ({
-          ...prev,
-          ofertas: prev.ofertas.map((o) => (o.id === ofertaId ? { ...o, estado: 'RECHAZADA' } : o)),
-        }));
+        await dispatch(rechazarOferta(ofertaId)).unwrap();
         toast.info('Propuesta rechazada y notificada al comprador.');
       } else {
-        await ofertaService.contraofertar(ofertaId, montoContraoferta);
-        setData((prev) => ({
-          ...prev,
-          ofertas: prev.ofertas.map((o) =>
-            o.id === ofertaId
-              ? { ...o, estado: 'CONTRAOFERTA_RECIBIDA', precioContraoferta: montoContraoferta }
-              : o
-          ),
-        }));
+        await dispatch(contraofertar({ id: ofertaId, precioContraoferta: montoContraoferta })).unwrap();
         toast.success('Contraoferta enviada. El comprador tiene 24h para responder.');
       }
     } catch (err) {
-      toast.error(err.message || 'No se pudo procesar la respuesta.');
+      toast.error(err?.message || 'No se pudo procesar la respuesta.');
     }
     setNegociarModal({ isOpen: false, oferta: null, pieza: null });
   };

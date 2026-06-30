@@ -1,17 +1,21 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import OfertaCard from '../components/cards/OfertaCard';
 import Button from '../components/ui/Button';
 import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
-import { ofertaService } from '../services/ofertaService';
-import { toOferta } from '../utils/adapters';
+import { fetchOfertasComprador, aceptarContraoferta, cancelarOferta } from '../features/ofertas/ofertasThunks';
+import { selectOfertasComprador } from '../features/ofertas/ofertasSlice';
 
 const OfertasPage = () => {
-  const { data, loading, error, refetch, setData } = useFetch(() =>
-    ofertaService.getMisOfertasComprador().then((list) => (list || []).map(toOferta))
-  );
+  const dispatch = useDispatch();
+  const { data: ofertas, status, error } = useSelector(selectOfertasComprador);
+  const loading = status === 'loading' || status === 'idle';
+
+  useEffect(() => {
+    dispatch(fetchOfertasComprador());
+  }, [dispatch]);
 
   if (loading) return <PageLoader label="Cargando sus ofertas..." />;
 
@@ -19,31 +23,27 @@ const OfertasPage = () => {
     if (error.status === 401 || error.status === 403) {
       return <AccessDenied message="Inicie sesión para ver sus ofertas." />;
     }
-    return <PageError message="No se pudieron cargar sus ofertas." onRetry={refetch} />;
+    return <PageError message="No se pudieron cargar sus ofertas." onRetry={() => dispatch(fetchOfertasComprador())} />;
   }
-
-  const ofertas = data || [];
 
   const ofertasAccion = ofertas.filter((o) => o.estado === 'CONTRAOFERTA_RECIBIDA');
   const ofertasEspera = ofertas.filter((o) => o.estado !== 'CONTRAOFERTA_RECIBIDA');
 
   const handleAceptarContraoferta = async (id) => {
     try {
-      await ofertaService.aceptarContraoferta(id);
-      setData((prev) => (prev || []).map((o) => (o.id === id ? { ...o, estado: 'ACEPTADA' } : o)));
+      await dispatch(aceptarContraoferta(id)).unwrap();
       toast.success('Contraoferta aceptada. Se generó una nueva reserva.');
     } catch (err) {
-      toast.error(err.message || 'No se pudo aceptar la contraoferta.');
+      toast.error(err?.message || 'No se pudo aceptar la contraoferta.');
     }
   };
 
   const handleCancelar = async (id) => {
     try {
-      await ofertaService.cancelar(id);
-      setData((prev) => (prev || []).map((o) => (o.id === id ? { ...o, estado: 'CANCELADA' } : o)));
+      await dispatch(cancelarOferta(id)).unwrap();
       toast.success('Oferta cancelada.');
     } catch (err) {
-      toast.error(err.message || 'No se pudo cancelar la oferta.');
+      toast.error(err?.message || 'No se pudo cancelar la oferta.');
     }
   };
 

@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { CATEGORIAS, MODO_VENTA } from '../data/mockData';
-import { publicacionService } from '../services/publicacionService';
+import { createPublicacion } from '../features/publicaciones/publicacionesThunks';
+import { selectPublicacionMutacion } from '../features/publicaciones/publicacionesSlice';
 import { toPublicacionRequest } from '../utils/adapters';
 
 const NuevaPublicacionPage = () => {
   const [paso, setPaso] = useState(1); // 1 | 2
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const publicando = useSelector(selectPublicacionMutacion).status === 'loading';
 
   // Paso 1 Form Estados
   const [nombre, setNombre] = useState('');
@@ -27,7 +31,6 @@ const NuevaPublicacionPage = () => {
   const [incrementoMinimo, setIncrementoMinimo] = useState('500');
   const [fechaLimite, setFechaLimite] = useState('');
   const [step2Error, setStep2Error] = useState('');
-  const [publicando, setPublicando] = useState(false);
 
   const handleSiguiente = (e) => {
     e.preventDefault();
@@ -86,15 +89,12 @@ const NuevaPublicacionPage = () => {
           })
     };
 
-    setPublicando(true);
     try {
-      await publicacionService.create(toPublicacionRequest(form));
+      await dispatch(createPublicacion(toPublicacionRequest(form))).unwrap();
       toast.success('¡Publicación creada con éxito! Su artículo ya figura en su panel.');
       navigate('/vendedor');
     } catch (err) {
-      setStep2Error(err.message || 'No se pudo crear la publicación. Intente nuevamente.');
-    } finally {
-      setPublicando(false);
+      setStep2Error(err?.message || 'No se pudo crear la publicación. Intente nuevamente.');
     }
   };
 

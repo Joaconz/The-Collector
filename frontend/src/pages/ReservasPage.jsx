@@ -1,17 +1,21 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import ReservaCard from '../components/cards/ReservaCard';
 import Button from '../components/ui/Button';
 import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
-import { reservaService } from '../services/reservaService';
-import { toReserva } from '../utils/adapters';
+import { fetchReservasComprador, cancelarReserva } from '../features/reservas/reservasThunks';
+import { selectReservasComprador } from '../features/reservas/reservasSlice';
 
 const ReservasPage = () => {
-  const { data, loading, error, refetch, setData } = useFetch(() =>
-    reservaService.getMisReservasComprador().then((list) => (list || []).map(toReserva))
-  );
+  const dispatch = useDispatch();
+  const { data: reservas, status, error } = useSelector(selectReservasComprador);
+  const loading = status === 'loading' || status === 'idle';
+
+  useEffect(() => {
+    dispatch(fetchReservasComprador());
+  }, [dispatch]);
 
   if (loading) return <PageLoader label="Cargando sus reservas..." />;
 
@@ -19,10 +23,8 @@ const ReservasPage = () => {
     if (error.status === 401 || error.status === 403) {
       return <AccessDenied message="Inicie sesión para ver sus reservas." />;
     }
-    return <PageError message="No se pudieron cargar sus reservas." onRetry={refetch} />;
+    return <PageError message="No se pudieron cargar sus reservas." onRetry={() => dispatch(fetchReservasComprador())} />;
   }
-
-  const reservas = data || [];
 
   const reservasActivas = reservas.filter((r) => r.estado === 'PENDIENTE');
   const reservasHistorial = reservas.filter(
@@ -31,11 +33,10 @@ const ReservasPage = () => {
 
   const handleCancelar = async (id) => {
     try {
-      await reservaService.cancelar(id);
-      setData((prev) => (prev || []).map((r) => (r.id === id ? { ...r, estado: 'CANCELADA' } : r)));
+      await dispatch(cancelarReserva(id)).unwrap();
       toast.success('Reserva cancelada correctamente.');
     } catch (err) {
-      toast.error(err.message || 'No se pudo cancelar la reserva.');
+      toast.error(err?.message || 'No se pudo cancelar la reserva.');
     }
   };
 

@@ -1,12 +1,15 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Badge from '../components/ui/Badge';
+import { selectCurrentUser, logout } from '../features/auth/authSlice';
 
-const PerfilPage = ({ currentUser, onLogout }) => {
+const PerfilPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
 
   const handleCerrarSesion = () => {
-    onLogout();
+    dispatch(logout());
     navigate('/');
   };
 
