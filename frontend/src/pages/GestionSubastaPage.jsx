@@ -9,17 +9,7 @@ import { fetchPublicacionById } from '../features/publicaciones/publicacionesThu
 import { selectDetalle } from '../features/publicaciones/publicacionesSlice';
 import { fetchPujas, cerrarSubasta } from '../features/subastas/subastasThunks';
 import { selectPujas } from '../features/subastas/subastasSlice';
-
-const formatTimeRemaining = (fechaLimite) => {
-  if (!fechaLimite) return 'Sin fecha límite';
-  const diff = new Date(fechaLimite).getTime() - Date.now();
-  if (diff <= 0) return 'Subasta finalizada';
-  const horas = Math.floor(diff / (1000 * 60 * 60));
-  const dias = Math.floor(horas / 24);
-  if (dias > 0) return `Cierra en ${dias}d ${horas % 24}h`;
-  const minutos = Math.floor((diff / (1000 * 60)) % 60);
-  return `Cierra en ${horas}h ${minutos}m`;
-};
+import { useCountdown } from '../hooks/useCountdown';
 
 const formatFecha = (fecha) => {
   if (!fecha) return '';
@@ -35,6 +25,7 @@ const GestionSubastaPage = () => {
   const { data: pub, status, error } = useSelector(selectDetalle);
   const { data: pujas } = useSelector(selectPujas);
   const loading = status === 'loading' || status === 'idle';
+  const countdown = useCountdown(pub?.fechaLimiteSubasta);
 
   const cargarSala = () => {
     dispatch(fetchPublicacionById(id));
@@ -159,9 +150,9 @@ const GestionSubastaPage = () => {
 
               <div className="flex justify-between items-center text-xs pt-4 border-t border-outline-variant/20 font-body-sm text-on-surface-variant/70">
                 <span>Postor Líder: <strong className="text-white">{pujas[0]?.usuario || 'Sin pujas'}</strong></span>
-                <span className="flex items-center space-x-1 text-error font-semibold">
+                <span className={`flex items-center space-x-1 font-semibold ${countdown.finalizada ? 'text-on-surface-variant' : 'text-error'}`}>
                   <span className="material-symbols-outlined text-sm font-light">schedule</span>
-                  <span>{formatTimeRemaining(pub.fechaLimiteSubasta)}</span>
+                  <span>{pub.fechaLimiteSubasta ? countdown.texto : 'Sin fecha límite'}</span>
                 </span>
               </div>
             </div>

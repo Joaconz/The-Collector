@@ -28,6 +28,8 @@ export const fetchPublicacionById = createAsyncThunk(
   }
 );
 
+const TTL = 5 * 60 * 1000;
+
 // GET /api/publicaciones/mias
 export const fetchMisPublicaciones = createAsyncThunk(
   'publicaciones/fetchMias',
@@ -38,6 +40,12 @@ export const fetchMisPublicaciones = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { status, lastFetched } = getState().publicaciones.mias;
+      return !(status === 'succeeded' && Date.now() - lastFetched < TTL);
+    },
   }
 );
 

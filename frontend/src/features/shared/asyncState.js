@@ -6,6 +6,7 @@ export const createAsyncSection = (data) => ({
   data,
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
+  lastFetched: 0,
 });
 
 /**
@@ -31,6 +32,7 @@ export const addAsyncCases = (builder, thunk, section, onSuccess) => {
     })
     .addCase(thunk.fulfilled, (state, action) => {
       state[section].status = 'succeeded';
+      state[section].lastFetched = Date.now();
       if (onSuccess) onSuccess(state, action);
     })
     .addCase(thunk.rejected, (state, action) => {

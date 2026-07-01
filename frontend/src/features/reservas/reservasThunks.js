@@ -3,6 +3,8 @@ import { reservaService } from '../../services/reservaService';
 import { toReserva } from '../../utils/adapters';
 import { toRejectedPayload } from '../shared/asyncState';
 
+const TTL = 5 * 60 * 1000;
+
 // GET /api/reservas/comprador
 export const fetchReservasComprador = createAsyncThunk(
   'reservas/fetchComprador',
@@ -13,6 +15,12 @@ export const fetchReservasComprador = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { status, lastFetched } = getState().reservas.comprador;
+      return !(status === 'succeeded' && Date.now() - lastFetched < TTL);
+    },
   }
 );
 
@@ -26,6 +34,12 @@ export const fetchReservasVendedor = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { status, lastFetched } = getState().reservas.vendedor;
+      return !(status === 'succeeded' && Date.now() - lastFetched < TTL);
+    },
   }
 );
 

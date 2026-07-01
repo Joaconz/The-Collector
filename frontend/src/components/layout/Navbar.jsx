@@ -238,6 +238,9 @@ const Navbar = () => {
                         <motion.div variants={itemVariants}>
                           <DrawerLink to="/ofertas" onClick={handleLinkClick}>MIS OFERTAS</DrawerLink>
                         </motion.div>
+                        <motion.div variants={itemVariants}>
+                          <DrawerLink to="/subastas" onClick={handleLinkClick}>MIS SUBASTAS</DrawerLink>
+                        </motion.div>
                       </>
                     )}
                   </>

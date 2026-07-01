@@ -19,6 +19,7 @@ import com.uade.tpo.thecollector.backend.dto.publicacion.UpdateEstadoRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.publicacion.UpdatePublicacionRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.puja.PujaRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.puja.PujaResponseDTO;
+import com.uade.tpo.thecollector.backend.dto.subasta.MisSubastaResponseDTO;
 import com.uade.tpo.thecollector.backend.model.Categoria;
 import com.uade.tpo.thecollector.backend.service.PublicacionService;
 import com.uade.tpo.thecollector.backend.service.PujaService;
@@ -43,6 +44,13 @@ public class PublicacionController {
 		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Publicaciones obtenidas correctamente",
 				publicacionService.getPublicaciones(categoria, precioMin, precioMax, orden, page, size),
 				LocalDateTime.now()));
+	}
+
+	@GetMapping("/mis-subastas")
+	@PreAuthorize("hasRole('COMPRADOR')")
+	public ResponseEntity<ApiResponseDTO<List<MisSubastaResponseDTO>>> getMisSubastas() {
+		return ResponseEntity.ok(new ApiResponseDTO<>(HttpStatus.OK.value(), "Subastas obtenidas correctamente",
+				pujaService.getMisSubastas(), LocalDateTime.now()));
 	}
 
 	@GetMapping("/mias")

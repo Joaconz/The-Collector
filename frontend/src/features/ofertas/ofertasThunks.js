@@ -3,6 +3,8 @@ import { ofertaService } from '../../services/ofertaService';
 import { toOferta } from '../../utils/adapters';
 import { toRejectedPayload } from '../shared/asyncState';
 
+const TTL = 5 * 60 * 1000;
+
 // GET /api/ofertas/comprador
 export const fetchOfertasComprador = createAsyncThunk(
   'ofertas/fetchComprador',
@@ -13,6 +15,12 @@ export const fetchOfertasComprador = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { status, lastFetched } = getState().ofertas.comprador;
+      return !(status === 'succeeded' && Date.now() - lastFetched < TTL);
+    },
   }
 );
 
@@ -26,6 +34,12 @@ export const fetchOfertasVendedor = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { status, lastFetched } = getState().ofertas.vendedor;
+      return !(status === 'succeeded' && Date.now() - lastFetched < TTL);
+    },
   }
 );
 

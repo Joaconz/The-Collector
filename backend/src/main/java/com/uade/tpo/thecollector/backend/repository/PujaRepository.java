@@ -1,5 +1,6 @@
 package com.uade.tpo.thecollector.backend.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,11 @@ public interface PujaRepository extends JpaRepository<Puja, Long> {
 	Optional<Puja> findUltimaPuja(@Param("publicacion") Publicacion publicacion);
 
 	boolean existsByPublicacionAndPujador(Publicacion publicacion, Usuario pujador);
+
+	@Query("SELECT DISTINCT p.publicacion FROM Puja p WHERE p.pujador = :pujador")
+	List<Publicacion> findPublicacionesParticipadas(@Param("pujador") Usuario pujador);
+
+	@Query("SELECT MAX(p.monto) FROM Puja p WHERE p.publicacion = :publicacion AND p.pujador = :pujador")
+	Optional<BigDecimal> findMaxMontoUsuario(@Param("publicacion") Publicacion publicacion,
+			@Param("pujador") Usuario pujador);
 }
