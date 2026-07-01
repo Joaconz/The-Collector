@@ -14,17 +14,8 @@ import { crearOferta } from '../features/ofertas/ofertasThunks';
 import { registrarPuja } from '../features/subastas/subastasThunks';
 import { selectCurrentUser } from '../features/auth/authSlice';
 import { useFavoritos } from '../hooks/useFavoritos';
+import { useCountdown } from '../hooks/useCountdown';
 import { MODO_VENTA, ESTADO_PUBLICACION } from '../data/mockData';
-
-const formatTimeRemaining = (fechaLimite) => {
-  if (!fechaLimite) return '—';
-  const diff = new Date(fechaLimite).getTime() - Date.now();
-  if (diff <= 0) return 'SUBASTA FINALIZADA';
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  return `${days}d ${hours}h ${minutes}m`;
-};
 
 const DetallePiezaPage = () => {
   const { id } = useParams();
@@ -75,6 +66,9 @@ const DetallePiezaPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pub]);
 
+  // Countdown reactivo — se llama incondicionalmente (hook) y usa null cuando no hay pub
+  const countdown = useCountdown(pub?.fechaLimiteSubasta ?? null);
+
   if (loading) {
     return <PageLoader label="Cargando detalle de la pieza..." />;
   }
@@ -99,9 +93,10 @@ const DetallePiezaPage = () => {
 
   const isFav = favoritos.includes(pub.id);
   const esSubasta = pub.modo === MODO_VENTA.SUBASTA;
+  // subastaAbierta se deriva del countdown reactivo para que el botón cambie en vivo al llegar a 0
   const subastaAbierta =
     pub.estadoSubasta === 'ABIERTA' &&
-    (!pub.fechaLimiteSubasta || new Date(pub.fechaLimiteSubasta).getTime() > Date.now());
+    (!pub.fechaLimiteSubasta || !countdown.finalizada);
 
   // Formateador de moneda
   const formatCurrency = (val) => {
@@ -349,9 +344,9 @@ const DetallePiezaPage = () => {
                       <span className="font-label-caps text-on-surface-variant text-[9px] tracking-widest">
                         TIEMPO RESTANTE
                       </span>
-                      <span className="font-body-md text-base text-error flex items-center space-x-1.5 mt-1 font-semibold">
-                        <span className="w-1.5 h-1.5 bg-error rounded-full animate-ping" />
-                        <span>{formatTimeRemaining(pub.fechaLimiteSubasta)}</span>
+                      <span className={`font-body-md text-base flex items-center space-x-1.5 mt-1 font-semibold ${countdown.finalizada ? 'text-on-surface-variant' : 'text-error'}`}>
+                        {!countdown.finalizada && <span className="w-1.5 h-1.5 bg-error rounded-full animate-ping" />}
+                        <span>{countdown.texto}</span>
                       </span>
                     </div>
                   </div>

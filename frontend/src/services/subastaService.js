@@ -12,4 +12,8 @@ export const subastaService = {
   cerrar(publicacionId) {
     return api.post(`/publicaciones/${publicacionId}/cerrar-subasta`);
   },
+
+  getMisSubastas() {
+    return api.get('/publicaciones/mis-subastas');
+  },
 };

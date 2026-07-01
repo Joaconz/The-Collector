@@ -2,6 +2,7 @@ package com.uade.tpo.thecollector.backend.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.thecollector.backend.dto.puja.PujaRequestDTO;
 import com.uade.tpo.thecollector.backend.dto.puja.PujaResponseDTO;
+import com.uade.tpo.thecollector.backend.dto.publicacion.PublicacionResponseDTO;
+import com.uade.tpo.thecollector.backend.dto.subasta.MisSubastaResponseDTO;
 import com.uade.tpo.thecollector.backend.exception.ResourceNotFoundException;
 import com.uade.tpo.thecollector.backend.model.EstadoSubasta;
 import com.uade.tpo.thecollector.backend.model.ModoPublicacion;
@@ -76,6 +79,33 @@ public class PujaService {
 				() -> new ResourceNotFoundException("Publicación con id " + publicacionId + " no encontrada"));
 		return pujaRepository.findByPublicacionOrderByMontoDesc(publicacion).stream().map(PujaResponseDTO::new)
 				.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public List<MisSubastaResponseDTO> getMisSubastas() {
+		Usuario pujador = usuarioAutenticado();
+		List<Publicacion> participadas = pujaRepository.findPublicacionesParticipadas(pujador);
+		List<MisSubastaResponseDTO> resultado = new ArrayList<>();
+
+		for (Publicacion pub : participadas) {
+			PublicacionResponseDTO pubDto = new PublicacionResponseDTO(pub);
+			pujaRepository.findPujaLider(pub).ifPresent(lider -> pubDto.setPujaActual(lider.getMonto()));
+
+			BigDecimal miPuja = pujaRepository.findMaxMontoUsuario(pub, pujador).orElse(BigDecimal.ZERO);
+			BigDecimal pujaLider = pubDto.getPujaActual() != null ? pubDto.getPujaActual() : pub.getPrecioBase();
+
+			String resultadoSubasta = null;
+			if (pub.getEstadoSubasta() == com.uade.tpo.thecollector.backend.model.EstadoSubasta.CERRADA) {
+				Puja lider = pujaRepository.findPujaLider(pub).orElse(null);
+				resultadoSubasta = (lider != null && lider.getPujador().getId().equals(pujador.getId()))
+						? "GANADA"
+						: "NO_ADJUDICADA";
+			}
+
+			resultado.add(new MisSubastaResponseDTO(pubDto, miPuja, pujaLider, resultadoSubasta));
+		}
+
+		return resultado;
 	}
 
 	private Usuario usuarioAutenticado() {

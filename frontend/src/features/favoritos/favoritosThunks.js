@@ -3,6 +3,8 @@ import { favoritoService } from '../../services/favoritoService';
 import { toFavorito } from '../../utils/adapters';
 import { toRejectedPayload } from '../shared/asyncState';
 
+const TTL = 5 * 60 * 1000;
+
 // GET /api/favoritos
 export const fetchFavoritos = createAsyncThunk(
   'favoritos/fetchAll',
@@ -13,6 +15,12 @@ export const fetchFavoritos = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { status, lastFetched } = getState().favoritos.lista;
+      return !(status === 'succeeded' && Date.now() - lastFetched < TTL);
+    },
   }
 );
 

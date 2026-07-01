@@ -188,3 +188,20 @@ export function toPuja(dto) {
     fecha: dto.fechaPuja,
   };
 }
+
+export function toMisSubasta(dto) {
+  if (!dto) return null;
+  const pub = toPublicacion(dto.publicacion);
+  return {
+    id: pub.id,
+    pieza: pub,
+    piezaId: pub.id,
+    ref: pub.ref,
+    vendedor: pub.vendedor,
+    pujaUsuario: dto.pujaUsuario,
+    pujaLider: dto.pujaLider,
+    estado: dto.publicacion?.estadoSubasta ?? null,
+    resultado: dto.resultado,
+    fechaLimite: dto.publicacion?.fechaLimiteSubasta ?? null,
+  };
+}

@@ -16,6 +16,7 @@ import HistorialVentasPage from '../pages/HistorialVentasPage';
 import NuevaPublicacionPage from '../pages/NuevaPublicacionPage';
 import EditarPublicacionPage from '../pages/EditarPublicacionPage';
 import GestionSubastaPage from '../pages/GestionSubastaPage';
+import MisSubastasPage from '../pages/MisSubastasPage';
 import PerfilPage from '../pages/PerfilPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
@@ -31,6 +32,14 @@ const AppRouter = () => {
 
       {/* Rutas Comprador */}
       <Route path="/favoritos" element={<FavoritosPage />} />
+      <Route
+        path="/subastas"
+        element={
+          <ProtectedRoute rol="COMPRADOR">
+            <MisSubastasPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/reservas"
         element={
