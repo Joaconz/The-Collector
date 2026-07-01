@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import { PageLoader, PageError } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
 import { CATEGORIAS, MODO_VENTA } from '../data/mockData';
-import { publicacionService } from '../services/publicacionService';
-import { toPublicacion, toUpdatePublicacionRequest } from '../utils/adapters';
+import { fetchPublicacionById, updatePublicacion } from '../features/publicaciones/publicacionesThunks';
+import { selectDetalle, selectPublicacionMutacion } from '../features/publicaciones/publicacionesSlice';
+import { toUpdatePublicacionRequest } from '../utils/adapters';
 
 const EditarPublicacionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: pub, loading, error: fetchError } = useFetch(
-    () => publicacionService.getById(id).then(toPublicacion),
-    [id]
-  );
+  const dispatch = useDispatch();
+  const { data: pub, status, error: fetchError } = useSelector(selectDetalle);
+  const loading = status === 'loading' || status === 'idle';
+  const guardando = useSelector(selectPublicacionMutacion).status === 'loading';
+
+  useEffect(() => {
+    dispatch(fetchPublicacionById(id));
+  }, [dispatch, id]);
 
   // Tab activa
   const [tabActiva, setTabActiva] = useState('DETALLES'); // 'DETALLES' | 'MODALIDAD'
@@ -36,10 +41,10 @@ const EditarPublicacionPage = () => {
   const [fechaLimite, setFechaLimite] = useState('');
 
   const [error, setError] = useState('');
-  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
-    if (!pub) return;
+    // Evita poblar el formulario con un detalle aún no recargado para este id.
+    if (!pub || String(pub.id) !== String(id)) return;
     setNombre(pub.nombre);
     setCategoria(pub.categoria);
     setHistoria(pub.historia || '');
@@ -56,7 +61,7 @@ const EditarPublicacionPage = () => {
       const date = new Date(pub.fechaLimiteSubasta);
       setFechaLimite(date.toISOString().slice(0, 16));
     }
-  }, [pub]);
+  }, [pub, id]);
 
   if (loading) return <PageLoader label="Cargando publicación..." />;
 
@@ -73,7 +78,7 @@ const EditarPublicacionPage = () => {
         </div>
       );
     }
-    return <PageError message="No se pudo cargar la publicación." onRetry={() => window.location.reload()} />;
+    return <PageError message="No se pudo cargar la publicación." onRetry={() => dispatch(fetchPublicacionById(id))} />;
   }
 
   const handleGuardar = async (e) => {
@@ -109,15 +114,12 @@ const EditarPublicacionPage = () => {
           })
     };
 
-    setGuardando(true);
     try {
-      await publicacionService.update(pub.id, toUpdatePublicacionRequest(form));
+      await dispatch(updatePublicacion({ id: pub.id, request: toUpdatePublicacionRequest(form) })).unwrap();
       toast.success('Cambios guardados. La publicación ha sido actualizada.');
       navigate('/vendedor');
     } catch (err) {
-      setError(err.message || 'No se pudieron guardar los cambios.');
-    } finally {
-      setGuardando(false);
+      setError(err?.message || 'No se pudieron guardar los cambios.');
     }
   };
 

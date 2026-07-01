@@ -1,5 +1,6 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+
+import ProtectedRoute from '../components/layout/ProtectedRoute';
 
 // Importación de Páginas
 import HomePage from '../pages/HomePage';
@@ -18,54 +19,32 @@ import GestionSubastaPage from '../pages/GestionSubastaPage';
 import PerfilPage from '../pages/PerfilPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
-const AppRouter = ({
-  currentUser,
-  onLogin,
-  onLogout,
-  favoritos,
-  onToggleFavorito,
-}) => {
+const AppRouter = () => {
   return (
     <Routes>
       {/* Rutas Públicas */}
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage onLogin={onLogin} currentUser={currentUser} />} />
-      <Route path="/register" element={<RegisterPage onLogin={onLogin} currentUser={currentUser} />} />
-      <Route path="/catalogo" element={<CatalogoPage favoritos={favoritos} onToggleFavorito={onToggleFavorito} />} />
-      <Route
-        path="/publicaciones/:id"
-        element={
-          <DetallePiezaPage
-            currentUser={currentUser}
-            favoritos={favoritos}
-            onToggleFavorito={onToggleFavorito}
-          />
-        }
-      />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/catalogo" element={<CatalogoPage />} />
+      <Route path="/publicaciones/:id" element={<DetallePiezaPage />} />
 
       {/* Rutas Comprador */}
-      <Route
-        path="/favoritos"
-        element={<FavoritosPage onToggleFavorito={onToggleFavorito} />}
-      />
+      <Route path="/favoritos" element={<FavoritosPage />} />
       <Route
         path="/reservas"
         element={
-          currentUser ? (
+          <ProtectedRoute>
             <ReservasPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/ofertas"
         element={
-          currentUser ? (
+          <ProtectedRoute>
             <OfertasPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
 
@@ -73,51 +52,41 @@ const AppRouter = ({
       <Route
         path="/vendedor"
         element={
-          currentUser && currentUser.rol === 'VENDEDOR' ? (
+          <ProtectedRoute rol="VENDEDOR">
             <PanelVendedorPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/vendedor/historial"
         element={
-          currentUser && currentUser.rol === 'VENDEDOR' ? (
+          <ProtectedRoute rol="VENDEDOR">
             <HistorialVentasPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/vendedor/nueva"
         element={
-          currentUser && currentUser.rol === 'VENDEDOR' ? (
+          <ProtectedRoute rol="VENDEDOR">
             <NuevaPublicacionPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/vendedor/:id/editar"
         element={
-          currentUser && currentUser.rol === 'VENDEDOR' ? (
+          <ProtectedRoute rol="VENDEDOR">
             <EditarPublicacionPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
       <Route
         path="/vendedor/:id/subasta"
         element={
-          currentUser && currentUser.rol === 'VENDEDOR' ? (
+          <ProtectedRoute rol="VENDEDOR">
             <GestionSubastaPage />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          </ProtectedRoute>
         }
       />
 
@@ -125,11 +94,9 @@ const AppRouter = ({
       <Route
         path="/perfil"
         element={
-          currentUser ? (
-            <PerfilPage currentUser={currentUser} onLogin={onLogin} onLogout={onLogout} />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          <ProtectedRoute>
+            <PerfilPage />
+          </ProtectedRoute>
         }
       />
 

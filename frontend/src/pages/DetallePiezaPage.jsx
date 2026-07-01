@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import OfertaModal from '../components/forms/OfertaModal';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import { PageLoader, PageError } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
-import { publicacionService } from '../services/publicacionService';
-import { subastaService } from '../services/subastaService';
-import { reservaService } from '../services/reservaService';
-import { ofertaService } from '../services/ofertaService';
-import { toPublicacion } from '../utils/adapters';
+import { fetchPublicacionById } from '../features/publicaciones/publicacionesThunks';
+import { selectDetalle } from '../features/publicaciones/publicacionesSlice';
+import { crearReserva } from '../features/reservas/reservasThunks';
+import { crearOferta } from '../features/ofertas/ofertasThunks';
+import { registrarPuja } from '../features/subastas/subastasThunks';
+import { selectCurrentUser } from '../features/auth/authSlice';
+import { useFavoritos } from '../hooks/useFavoritos';
 import { MODO_VENTA, ESTADO_PUBLICACION } from '../data/mockData';
 
 const formatTimeRemaining = (fechaLimite) => {
@@ -24,16 +26,22 @@ const formatTimeRemaining = (fechaLimite) => {
   return `${days}d ${hours}h ${minutes}m`;
 };
 
-const DetallePiezaPage = ({ currentUser, favoritos, onToggleFavorito }) => {
+const DetallePiezaPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
+  const { favoritos, onToggleFavorito } = useFavoritos();
   const [imagenActiva, setImagenActiva] = useState(0);
   const [ofertaModalOpen, setOfertaModalOpen] = useState(false);
 
-  const { data: pub, loading, error, refetch } = useFetch(
-    () => publicacionService.getById(id).then(toPublicacion),
-    [id]
-  );
+  const { data: pub, status, error } = useSelector(selectDetalle);
+  const loading = status === 'loading' || status === 'idle';
+  const refetch = () => dispatch(fetchPublicacionById(id));
+
+  useEffect(() => {
+    dispatch(fetchPublicacionById(id));
+  }, [dispatch, id]);
 
   // Estado del modal de confirmación (unificado para reserva y puja)
   const [confirmModal, setConfirmModal] = useState({
@@ -55,6 +63,7 @@ const DetallePiezaPage = ({ currentUser, favoritos, onToggleFavorito }) => {
 
   useEffect(() => {
     setImagenActiva(0);
+    setPujaMonto('');
   }, [id]);
 
   // Sugerencia inicial de puja (puja actual + incremento mínimo)
@@ -126,12 +135,12 @@ const DetallePiezaPage = ({ currentUser, favoritos, onToggleFavorito }) => {
       variant: 'success',
       onConfirm: async () => {
         try {
-          await reservaService.crear(pub.id);
+          await dispatch(crearReserva(pub.id)).unwrap();
           toast.success('Su solicitud de reserva fue enviada al curador.');
           closeConfirmModal();
           navigate('/reservas');
         } catch (err) {
-          toast.error(err.message || 'No se pudo crear la reserva.');
+          toast.error(err?.message || 'No se pudo crear la reserva.');
           closeConfirmModal();
         }
       },
@@ -147,12 +156,12 @@ const DetallePiezaPage = ({ currentUser, favoritos, onToggleFavorito }) => {
     }
 
     try {
-      await ofertaService.crear(pub.id, monto);
+      await dispatch(crearOferta({ publicacionId: pub.id, precioOfertado: monto })).unwrap();
       setOfertaModalOpen(false);
       toast.success(`Su oferta privada por ${formatCurrency(monto)} USD ha sido enviada al curador.`);
       navigate('/ofertas');
     } catch (err) {
-      toast.error(err.message || 'No se pudo enviar la oferta.');
+      toast.error(err?.message || 'No se pudo enviar la oferta.');
     }
   };
 
@@ -193,13 +202,13 @@ const DetallePiezaPage = ({ currentUser, favoritos, onToggleFavorito }) => {
       variant: 'success',
       onConfirm: async () => {
         try {
-          await subastaService.addPuja(pub.id, monto);
+          await dispatch(registrarPuja({ publicacionId: pub.id, monto })).unwrap();
           toast.success('Su puja fue registrada como la líder de la subasta.');
           closeConfirmModal();
           setPujaMonto(monto + pub.incrementoMinimo);
-          await refetch();
+          await dispatch(fetchPublicacionById(pub.id));
         } catch (err) {
-          toast.error(err.message || 'No se pudo registrar la puja.');
+          toast.error(err?.message || 'No se pudo registrar la puja.');
           closeConfirmModal();
         }
       },

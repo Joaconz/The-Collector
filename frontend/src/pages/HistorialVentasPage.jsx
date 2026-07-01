@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../components/ui/Button';
 import { PageLoader, PageError, AccessDenied } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
 import { TIPO_OPERACION } from '../data/mockData';
-import { reservaService } from '../services/reservaService';
-import { publicacionService } from '../services/publicacionService';
-import { toReserva, toPublicacion } from '../utils/adapters';
+import { fetchReservasVendedor } from '../features/reservas/reservasThunks';
+import { selectReservasVendedor } from '../features/reservas/reservasSlice';
+import { fetchMisPublicaciones } from '../features/publicaciones/publicacionesThunks';
+import { selectMisPublicaciones } from '../features/publicaciones/publicacionesSlice';
 
 const ORIGEN_TO_TIPO_OPERACION = {
   DIRECTA: TIPO_OPERACION.VENTA_DIRECTA,
@@ -49,14 +50,22 @@ const formatFecha = (fechaStr) => {
 
 const HistorialVentasPage = () => {
   const [filtroTipo, setFiltroTipo] = useState('TODOS');
+  const dispatch = useDispatch();
+  const { data: reservas, status: resStatus, error: resError } = useSelector(selectReservasVendedor);
+  const { data: misPublicaciones, status: pubStatus } = useSelector(selectMisPublicaciones);
 
-  const { data, loading, error, refetch } = useFetch(async () => {
-    const [reservas, misPublicaciones] = await Promise.all([
-      reservaService.getMisReservasVendedor().then((list) => (list || []).map(toReserva)),
-      publicacionService.getMisPublicaciones().then((list) => (list || []).map(toPublicacion)),
-    ]);
-    return { reservas, misPublicaciones };
-  }, []);
+  const loading = resStatus === 'loading' || resStatus === 'idle' || pubStatus === 'loading' || pubStatus === 'idle';
+  const error = resError;
+
+  const cargarHistorial = () => {
+    dispatch(fetchReservasVendedor());
+    dispatch(fetchMisPublicaciones());
+  };
+
+  useEffect(() => {
+    cargarHistorial();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   if (loading) return <PageLoader label="Cargando historial de ventas..." />;
 
@@ -64,11 +73,11 @@ const HistorialVentasPage = () => {
     if (error.status === 401 || error.status === 403) {
       return <AccessDenied message="Inicie sesión como vendedor para acceder al historial de ventas." />;
     }
-    return <PageError message="No se pudo cargar el historial de ventas." onRetry={refetch} />;
+    return <PageError message="No se pudo cargar el historial de ventas." onRetry={cargarHistorial} />;
   }
 
   // Ventas confirmadas, enriquecidas con datos de la pieza y comisión de plataforma
-  const ventas = (data.reservas || [])
+  const ventas = reservas
     .filter((r) => r.estado === 'CONFIRMADA')
     .map((r) => ({
       ...r,
@@ -77,7 +86,7 @@ const HistorialVentasPage = () => {
       comision: (r.precioAcordado || 0) * 0.05,
       fechaVenta: r.fechaRespuesta || r.fecha,
       comprador: r.compradorNombre,
-      pieza: data.misPublicaciones.find((p) => p.id === r.piezaId),
+      pieza: misPublicaciones.find((p) => p.id === r.piezaId),
     }));
 
   // Ventas filtradas según el tab activo

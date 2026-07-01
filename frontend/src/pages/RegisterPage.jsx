@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { authService } from '../services/authService';
+import { register } from '../features/auth/authThunks';
+import { selectCurrentUser, selectAuthStatus } from '../features/auth/authSlice';
 
-const RegisterPage = ({ onLogin, currentUser }) => {
+const RegisterPage = () => {
   const [rol, setRol] = useState('COMPRADOR'); // 'COMPRADOR' | 'VENDEDOR'
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
+  const loading = useSelector(selectAuthStatus) === 'loading';
 
   // Redirigir si ya tiene sesión activa
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentUser) {
-      if (currentUser.rol === 'VENDEDOR') {
-        navigate('/vendedor');
-      } else {
-        navigate('/catalogo');
-      }
+      navigate(currentUser.rol === 'VENDEDOR' ? '/vendedor' : '/catalogo');
     }
   }, [currentUser, navigate]);
 
@@ -33,15 +33,11 @@ const RegisterPage = ({ onLogin, currentUser }) => {
       return;
     }
 
-    setLoading(true);
     try {
-      const auth = await authService.register({ nombre, email, password, rol });
-      onLogin(auth);
+      const auth = await dispatch(register({ nombre, email, password, rol })).unwrap();
       navigate(auth.rol === 'VENDEDOR' ? '/vendedor' : '/catalogo');
     } catch (err) {
-      setError(err.message || 'No se pudo completar el registro.');
-    } finally {
-      setLoading(false);
+      setError(err?.message || 'No se pudo completar el registro.');
     }
   };
 

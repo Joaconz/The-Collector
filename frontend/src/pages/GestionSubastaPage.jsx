@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../components/ui/Button';
 import { PageLoader, PageError } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
 import { MODO_VENTA } from '../data/mockData';
-import { publicacionService } from '../services/publicacionService';
-import { subastaService } from '../services/subastaService';
-import { toPublicacion, toPuja } from '../utils/adapters';
+import { fetchPublicacionById } from '../features/publicaciones/publicacionesThunks';
+import { selectDetalle } from '../features/publicaciones/publicacionesSlice';
+import { fetchPujas, cerrarSubasta } from '../features/subastas/subastasThunks';
+import { selectPujas } from '../features/subastas/subastasSlice';
 
 const formatTimeRemaining = (fechaLimite) => {
   if (!fechaLimite) return 'Sin fecha límite';
@@ -28,21 +29,28 @@ const formatFecha = (fecha) => {
 const GestionSubastaPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [cerrando, setCerrando] = useState(false);
 
-  const { data, loading, error, refetch } = useFetch(async () => {
-    const [pub, pujas] = await Promise.all([
-      publicacionService.getById(id).then(toPublicacion),
-      subastaService.getPujas(id).then((list) => (list || []).map(toPuja)),
-    ]);
-    return { pub, pujas };
-  }, [id]);
+  const { data: pub, status, error } = useSelector(selectDetalle);
+  const { data: pujas } = useSelector(selectPujas);
+  const loading = status === 'loading' || status === 'idle';
+
+  const cargarSala = () => {
+    dispatch(fetchPublicacionById(id));
+    dispatch(fetchPujas(id));
+  };
+
+  useEffect(() => {
+    cargarSala();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, id]);
 
   if (loading) return <PageLoader label="Cargando sala de subasta..." />;
 
-  if (error || data?.pub?.modo !== MODO_VENTA.SUBASTA) {
-    if (error && error.status !== 404 && data?.pub?.modo === undefined) {
-      return <PageError message="No se pudo cargar la sala de subasta." onRetry={refetch} />;
+  if (error || pub?.modo !== MODO_VENTA.SUBASTA) {
+    if (error && error.status !== 404 && pub?.modo === undefined) {
+      return <PageError message="No se pudo cargar la sala de subasta." onRetry={cargarSala} />;
     }
     return (
       <div className="py-24 px-6 text-center max-w-md mx-auto flex flex-col items-center space-y-4">
@@ -55,8 +63,6 @@ const GestionSubastaPage = () => {
       </div>
     );
   }
-
-  const { pub, pujas } = data;
 
   // Formateador de moneda
   const formatCurrency = (val) => {
@@ -71,7 +77,7 @@ const GestionSubastaPage = () => {
     setCerrando(true);
     try {
       const lider = pujas[0];
-      await subastaService.cerrar(pub.id);
+      await dispatch(cerrarSubasta(pub.id)).unwrap();
       if (lider) {
         toast.success(`¡Subasta finalizada! La pieza '${pub.nombre}' fue adjudicada a ${lider.usuario} por ${formatCurrency(lider.monto)} USD.`);
       } else {

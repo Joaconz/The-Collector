@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCurrentUser, logout } from '../../features/auth/authSlice';
+import { selectFavoritoIds } from '../../features/favoritos/favoritosSlice';
 
 const DRAWER_EASE = [0.32, 0.72, 0, 1];
 
@@ -40,10 +43,13 @@ const DrawerLink = ({ to, onClick, children, danger = false }) => (
   </NavLink>
 );
 
-const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const closeButtonRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
+  const favoritosCount = useSelector(selectFavoritoIds).length;
 
   const close = () => setIsOpen(false);
   const open = () => setIsOpen(true);
@@ -69,7 +75,7 @@ const Navbar = ({ currentUser, onLogout, favoritosCount = 0 }) => {
 
   const handleLogout = () => {
     close();
-    onLogout();
+    dispatch(logout());
     navigate('/');
   };
 

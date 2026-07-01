@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../components/ui/Button';
 import StaggerReveal from '../components/ui/StaggerReveal';
 import { PageLoader, PageError } from '../components/ui/Spinner';
-import { useFetch } from '../hooks/useFetch';
-import { publicacionService } from '../services/publicacionService';
-import { toPublicacion, mapCategoriaToBackend } from '../utils/adapters';
+import { fetchCatalogo } from '../features/publicaciones/publicacionesThunks';
+import { selectCatalogo } from '../features/publicaciones/publicacionesSlice';
+import { useFavoritos } from '../hooks/useFavoritos';
+import { mapCategoriaToBackend } from '../utils/adapters';
 import { CATEGORIAS, MODO_VENTA } from '../data/mockData';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -199,7 +201,9 @@ const PiezaSection = ({ pieza, index, isLast, isFavorito, onToggleFavorito, sect
 
 // ── CatalogoPage ────────────────────────────────────────────────────────────
 
-const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
+const CatalogoPage = () => {
+  const dispatch = useDispatch();
+  const { favoritos, onToggleFavorito } = useFavoritos();
   const [searchParams, setSearchParams] = useSearchParams();
   const [categoriaFiltro, setCategoriaFiltro] = useState('TODAS');
   const [busqueda, setBusqueda] = useState('');
@@ -220,18 +224,21 @@ const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
     }
   }, [searchParams]);
 
-  const { data, loading, error, refetch } = useFetch(
-    () =>
-      publicacionService
-        .getCatalogo({
-          categoria: categoriaFiltro !== 'TODAS' ? mapCategoriaToBackend(categoriaFiltro) : undefined,
-          size: 100,
-        })
-        .then((res) => (res?.content || []).map(toPublicacion)),
-    [categoriaFiltro]
-  );
+  const { data: publicacionesList, status, error } = useSelector(selectCatalogo);
+  const loading = status === 'loading' || status === 'idle';
 
-  const publicacionesList = data || [];
+  const cargarCatalogo = useCallback(() => {
+    dispatch(
+      fetchCatalogo({
+        categoria: categoriaFiltro !== 'TODAS' ? mapCategoriaToBackend(categoriaFiltro) : undefined,
+        size: 100,
+      })
+    );
+  }, [dispatch, categoriaFiltro]);
+
+  useEffect(() => {
+    cargarCatalogo();
+  }, [cargarCatalogo]);
 
   const handleCategoryTab = (catKey) => {
     if (catKey === 'TODAS') {
@@ -388,7 +395,7 @@ const CatalogoPage = ({ favoritos = [], onToggleFavorito }) => {
       {loading ? (
         <PageLoader label="Cargando catálogo..." />
       ) : error ? (
-        <PageError message="No se pudo cargar el catálogo. Verifique su conexión." onRetry={refetch} />
+        <PageError message="No se pudo cargar el catálogo. Verifique su conexión." onRetry={cargarCatalogo} />
       ) : (
         <div
           ref={scrollContainerRef}
