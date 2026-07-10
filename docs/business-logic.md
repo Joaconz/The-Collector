@@ -1,8 +1,9 @@
 # Business Logic — The Collector
 
 Este documento describe en detalle los flujos de negocio, los estados de cada entidad,
-y las reglas que el backend debe hacer cumplir. Es la fuente de verdad para cualquier
-decisión de implementación en la capa de servicio.
+y las reglas que el backend hace cumplir hoy (verificadas contra `PublicacionService`,
+`PujaService`, `OfertaService`, `ReservaService` y `CarritoService`). Es la fuente de verdad
+para cualquier decisión de implementación en la capa de servicio.
 
 ---
 
@@ -10,23 +11,28 @@ decisión de implementación en la capa de servicio.
 
 ### Modelo de roles
 
-The Collector usa un modelo de roles flexible. El rol inicial se elige al registrarse,
-pero un usuario puede actuar en ambos contextos.
+The Collector usa un modelo de roles flexible. El rol inicial se elige al registrarse
+(`Rol`: `COMPRADOR` o `VENDEDOR`), pero un usuario puede actuar en ambos contextos.
 
 | Acción | COMPRADOR | VENDEDOR |
 |---|---|---|
 | Ver catálogo y detalle de pieza | ✅ | ✅ |
-| Agregar a lista de deseos | ✅ | ✅ |
+| Agregar a lista de deseos / carrito | ✅ | ✅ |
 | Comprar / ofertar / pujar | ✅ | ✅ (en publicaciones ajenas) |
-| Publicar piezas | ✅ (rol extendido) | ✅ |
-| Confirmar / rechazar reservas propias | ❌ | ✅ |
+| Publicar piezas | ❌ (requiere rol VENDEDOR) | ✅ |
+| Confirmar / rechazar reservas directas propias | ❌ | ✅ |
 | Gestionar ofertas recibidas | ❌ | ✅ |
 | Cerrar subasta propia | ❌ | ✅ |
 
+`POST /api/publicaciones` exige `hasRole('VENDEDOR')` a nivel de controller. No hay endpoint
+para que un `COMPRADOR` "actúe como vendedor" sin cambiar de rol registrado.
+
 ### Restricción absoluta
 
-**Ningún usuario puede comprar, ofertar, ni pujar sobre sus propias publicaciones.**
-Esta validación debe hacerse en la capa de servicio del backend, no solo en el frontend.
+**Ningún usuario puede comprar, ofertar, ni pujar sobre sus propias publicaciones.** Esta
+validación se hace en la capa de servicio (`PublicacionService`, `OfertaService`, `PujaService`,
+`ReservaService`, `CarritoService`), comparando el `id` del vendedor de la publicación contra el
+usuario autenticado.
 
 ---
 
@@ -37,37 +43,74 @@ vez publicada.
 
 | Modo | Descripción |
 |---|---|
-| `PRECIO_FIJO` | Precio fijo con posibilidad de oferta privada entre comprador y vendedor |
-| `SUBASTA` | Precio base público, cualquier usuario autenticado puede pujar |
+| `PRECIO_FIJO` | Precio fijo con posibilidad de compra directa (carrito o reserva), o de oferta privada entre comprador y vendedor |
+| `SUBASTA` | Precio base público, incremento mínimo, fecha límite; cualquier usuario autenticado puede pujar |
 
 ---
 
-## Flujo 1: Compra directa (modo PRECIO_FIJO)
+## Flujo 1: Compra directa vía Carrito (modo PRECIO_FIJO)
 
-El camino más simple. El comprador decide pagar el precio publicado sin negociar.
+El camino más rápido: no genera `Reserva`, no requiere aprobación del vendedor.
 
 ```
 COMPRADOR                          SISTEMA
     │                                  │
-    ├─ Compra directa ────────────────►│
-    │                                  ├─ Verifica: publicacion.estado == ACTIVA
-    │                                  ├─ Verifica: producto.stock > 0
-    │                                  ├─ Verifica: comprador != vendedor
-    │                                  ├─ Crea Reserva (estado: PENDIENTE)
-    │                                  ├─ Bloquea stock
-    │◄─ Reserva creada ────────────────┤
-    │                                  │
-    │                             VENDEDOR confirma o rechaza
-    │                                  │
-    │◄─ CONFIRMADA: stock descontado ──┤
-    │   o RECHAZADA: stock liberado    │
+    ├─ Agrega piezas al carrito ──────►│  Verifica: publicacion.estado == ACTIVA,
+    │                                  │  producto.stock > 0, comprador != vendedor,
+    │                                  │  no está ya en el carrito
+    ├─ Checkout ───────────────────────►│
+    │                                  ├─ Por cada ítem: verifica estado/stock de nuevo
+    │                                  ├─ Descuenta stock (-1) por ítem
+    │                                  ├─ Si stock llega a 0 → publicación VENDIDA
+    │                                  └─ Vacía el carrito
 ```
+
+No hay entidad `Reserva` ni `Orden` involucrada en este camino: la transacción queda
+representada únicamente por el descuento de stock.
 
 ---
 
-## Flujo 2: Oferta privada (modo PRECIO_FIJO)
+## Flujo 2: Reserva directa (modo PRECIO_FIJO, requiere aprobación)
 
-Negociación privada entre comprador y vendedor. Nadie más puede ver esta oferta.
+Alternativa a la compra vía carrito, iniciada desde el detalle de la pieza
+("Solicitar Reserva Directa"). Es el único camino de `Reserva` que pasa por un estado
+intermedio `PENDIENTE` a la espera del vendedor.
+
+```
+COMPRADOR                          SISTEMA                         VENDEDOR
+    │                                  │                                │
+    ├─ Compra directa ────────────────►│                                │
+    │                                  ├─ Verifica: publicacion.estado == ACTIVA
+    │                                  ├─ Verifica: producto.stock > 0
+    │                                  ├─ Verifica: comprador != vendedor
+    │                                  ├─ Verifica: modo == PRECIO_FIJO
+    │                                  │  (en SUBASTA no se admiten reservas manuales)
+    │                                  ├─ Verifica: no hay otra Reserva PENDIENTE
+    │                                  │  del mismo comprador sobre la publicación
+    │                                  ├─ Crea Reserva (origen=DIRECTA, estado=PENDIENTE)
+    │◄─ Reserva creada ────────────────┤
+    │                                  │                           Ve reserva pendiente
+    │                                  │                           Confirma o Rechaza
+    │                                  │◄───────────────────────────────┤
+    │◄─ CONFIRMADA: descuenta stock,   │
+    │   VENDIDA si stock llega a 0 ────┤
+    │   o RECHAZADA: sin cambio de stock
+```
+
+**Importante:** el stock no queda "bloqueado" al crear la reserva — solo se verifica que sea
+mayor a 0 en ese momento. El descuento real ocurre recién al confirmar. El código actual no
+implementa ningún mecanismo de lock (pesimista u optimista) para evitar que dos compradores
+reserven la última unidad en simultáneo; es una condición de carrera latente, no cubierta por
+tests ni por lógica explícita.
+
+---
+
+## Flujo 3: Oferta privada (modo PRECIO_FIJO)
+
+Negociación privada entre comprador y vendedor. Nadie más puede ver esta oferta. A diferencia
+del flujo de reserva directa, **aceptar una oferta genera una reserva ya `CONFIRMADA`**: no hay
+un segundo paso de aprobación del vendedor sobre la reserva resultante (el vendedor ya dio su
+aprobación al aceptar la oferta).
 
 ```
 COMPRADOR                          VENDEDOR
@@ -75,13 +118,14 @@ COMPRADOR                          VENDEDOR
     ├─ Hace oferta (precio X) ────────►│
     │  estado: PENDIENTE               │
     │                                 ├─ ACEPTA
-    │                                 │   └─ Crea Reserva (precio = X)
+    │                                 │   └─ Crea Reserva CONFIRMADA (precio = X, origen=OFERTA)
+    │                                 │       Descuenta stock, VENDIDA si llega a 0
     │                                 ├─ RECHAZA
     │                                 │   └─ Oferta cerrada
     │                                 ├─ CONTRAOFERTA (precio Y)
     │◄─────────────────────────────────┤
     ├─ ACEPTA contraoferta             │
-    │   └─ Crea Reserva (precio = Y)  │
+    │   └─ Crea Reserva CONFIRMADA (precio = Y, origen=OFERTA)
     ├─ CANCELA oferta                  │
     │   └─ Oferta cerrada             │
 ```
@@ -89,49 +133,54 @@ COMPRADOR                          VENDEDOR
 ### Estados de Oferta
 
 ```
-PENDIENTE ──► ACEPTADA      (vendedor acepta oferta original)
+PENDIENTE ──► ACEPTADA      (vendedor acepta oferta original → Reserva CONFIRMADA)
           ──► RECHAZADA     (vendedor rechaza)
           ──► CONTRAOFERTA  (vendedor propone nuevo precio)
-                 └──► ACEPTADA   (comprador acepta contraoferta)
+                 └──► ACEPTADA   (comprador acepta contraoferta → Reserva CONFIRMADA)
                  └──► CANCELADA  (comprador cancela)
           ──► CANCELADA     (comprador cancela antes de respuesta)
 ```
 
 ### Reglas de Oferta
 
-- No puede haber más de una oferta `PENDIENTE` o en estado `CONTRAOFERTA` del mismo
+- Solo aplica a publicaciones en modo `PRECIO_FIJO` y en estado `ACTIVA`.
+- No puede haber más de una oferta en estado `PENDIENTE` o `CONTRAOFERTA` del mismo
   comprador sobre la misma publicación.
-- El precio ofertado debe ser mayor a cero.
-- El precio ofertado no puede superar el precio publicado (oferta implica negociación a
-  la baja; si el comprador quiere pagar más, usa la compra directa o puja en subasta).
-- Solo el vendedor dueño de la publicación puede responder una oferta.
+- El precio ofertado debe ser mayor a cero y **estrictamente menor** al precio publicado
+  (`precioOfertado < producto.precio`; una oferta igual o mayor se rechaza con 422 — para pagar
+  el precio de lista o más se usa el carrito/reserva directa, o la puja en subasta).
+- La contraoferta del vendedor debe ser **mayor** al precio ofertado por el comprador y
+  **menor** al precio de lista.
+- Solo el vendedor dueño de la publicación puede responder (aceptar/rechazar/contraofertar)
+  una oferta.
 - Solo el comprador que hizo la oferta puede cancelarla o aceptar una contraoferta.
+- Si no hay stock disponible al momento de aceptar (oferta o contraoferta), la aceptación falla.
 
 ---
 
-## Flujo 3: Subasta pública (modo SUBASTA)
+## Flujo 4: Subasta pública (modo SUBASTA)
 
 ```
-VENDEDOR                           SISTEMA                        PUJADORES
-    │                                  │                               │
-    ├─ Publica en modo SUBASTA ───────►│                               │
-    │  precio_base, fecha_limite       │                               │
-    │  (máximo 3 meses desde hoy)      │                               │
-    │                                  │◄─ Puja (monto > puja actual) ─┤
-    │                                  │   Valida monto > precio_base  │
-    │                                  │   Valida pujador != vendedor  │
-    │                                  │   Registra puja               │
-    │                                  │──► Notifica nueva puja líder ►│
-    │                                  │                               │
-    ├─ Cierra subasta ────────────────►│                               │
-    │  (o vence fecha_limite)          │                               │
-    │                                  ├─ Si hay puja ganadora:        │
-    │                                  │   Crea Reserva automática     │
-    │                                  │   (precio = monto puja)       │
-    │                                  ├─ Si no hubo pujas:            │
-    │                                  │   Publicación vuelve a ACTIVA │
-    │◄─ Ve reserva en su panel ────────┤                               │
-    ├─ CONFIRMA o RECHAZA              │                               │
+VENDEDOR                       SISTEMA                          PUJADORES
+    │                              │                                  │
+    ├─ Publica en modo SUBASTA ───►│                                  │
+    │  precioBase, incrementoMinimo,                                  │
+    │  fechaLimiteSubasta (≤ 3 meses desde hoy)                       │
+    │                              │◄─ Puja (monto ≥ líder/base + incrementoMinimo) ─┤
+    │                              │   Valida pujador != vendedor                    │
+    │                              │   Valida subasta ABIERTA y no vencida           │
+    │                              │   Registra puja                                 │
+    │                              │                                                  │
+    ├─ Cierra manualmente ────────►│                                                  │
+    │  (o vence fechaLimiteSubasta,│
+    │   detectado por job cada 60s)│
+    │                              ├─ Adjudica de inmediato:
+    │                              │   Si hay puja líder:
+    │                              │     Crea Reserva CONFIRMADA (origen=SUBASTA, precio=monto)
+    │                              │     Descuenta stock → publicación VENDIDA
+    │                              │   Si no hubo pujas:
+    │                              │     Publicación → PAUSADA
+    │                              │   estadoSubasta → CERRADA
 ```
 
 ### Estados de Subasta
@@ -142,79 +191,86 @@ campos adicionales en `Publicacion`:
 | Campo | Tipo | Descripción |
 |---|---|---|
 | `modo` | Enum | `PRECIO_FIJO` o `SUBASTA` |
-| `precioBase` | Decimal | Solo relevante en modo SUBASTA |
-| `fechaLimiteSubasta` | DateTime | Fecha máxima de cierre (hasta 3 meses) |
+| `precioBase` | BigDecimal | Obligatorio en modo SUBASTA |
+| `incrementoMinimo` | BigDecimal | Monto mínimo que cada nueva puja debe superar a la anterior |
+| `fechaLimiteSubasta` | LocalDateTime | Fecha máxima de cierre (hasta 3 meses desde la publicación) |
 | `estadoSubasta` | Enum | `ABIERTA`, `CERRADA` |
-| `pujaActual` | Decimal | Monto de la puja líder actual (nullable) |
-| `pujadorActual` | Usuario | Quien lidera la subasta (nullable) |
+| `pujaActual` (calculado, no persistido) | BigDecimal | Monto de la puja líder, calculado en el `PublicacionResponseDTO` a partir del historial de `Puja` |
 
 ### Reglas de Subasta
 
-- La `fechaLimiteSubasta` no puede superar 3 meses desde la fecha de publicación.
-- Cada nueva puja debe superar la puja anterior (o el precio base si no hubo pujas).
+- `fechaLimiteSubasta` no puede superar 3 meses (90 días) desde la fecha de creación.
+- Cada nueva puja debe ser mayor o igual a `(puja líder actual o precioBase) + incrementoMinimo`.
 - Un usuario no puede pujar sobre su propia subasta.
-- Un usuario no puede hacer dos pujas consecutivas sin que alguien más puje en el medio
-  (no se puede "autopujar" para subir el precio artificialmente).
-- El vendedor puede cerrar la subasta en cualquier momento antes de la fecha límite.
-- Al vencer la fecha límite, el sistema cierra la subasta automáticamente.
-- Si hay puja ganadora al cierre: se crea Reserva automática con estado `PENDIENTE`.
-- El vendedor puede confirmar o rechazar esa reserva (igual que en cualquier otra reserva).
-- Si el vendedor rechaza: la publicación vuelve a estado `ACTIVA` con `estadoSubasta = CERRADA`.
-  La pieza no se re-subasta automáticamente; el vendedor debe crear una nueva publicación
-  o editar la existente si quiere volver a intentarlo.
+- No se puede pujar si la subasta no está `ABIERTA`, o si ya venció `fechaLimiteSubasta`.
+- El vendedor puede cerrar la subasta en cualquier momento (`POST /{id}/cerrar-subasta`) antes
+  de la fecha límite.
+- Un job programado (`@Scheduled(fixedRate = 60000)`) cierra automáticamente las subastas
+  cuya `fechaLimiteSubasta` ya pasó.
+- **La adjudicación es inmediata y automática al cierre** (manual o por vencimiento): si hay
+  puja líder se genera la `Reserva` ya `CONFIRMADA` y se descuenta el stock en el mismo paso; si
+  no hubo pujas, la publicación pasa a `PAUSADA` (no vuelve a `ACTIVA` automáticamente — el
+  vendedor debe reactivarla manualmente, por ejemplo cambiando el estado o editando la
+  publicación). **No existe** un paso separado de "el vendedor confirma o rechaza la reserva de
+  subasta": para cuando la reserva aparece en el panel del vendedor ya está `CONFIRMADA`.
 
 ---
 
-## Flujo 4: Reserva (estados y transiciones)
+## Flujo 5: Reserva (estados y transiciones)
 
-La `Reserva` es la entidad central del proceso de compra. Toda transacción pasa por aquí.
-
-### Diagrama de estados
+La `Reserva` es la entidad central de la transacción. Su comportamiento depende del `origen`:
 
 ```
                     ┌─────────────┐
-                    │   PENDIENTE  │
+   origen=DIRECTA   │   PENDIENTE  │
                     └──────┬──────┘
                            │
               ┌────────────┼────────────┐
               ▼            ▼            ▼
         CONFIRMADA      RECHAZADA   CANCELADA
        (vendedor)       (vendedor)  (comprador)
+
+   origen=OFERTA / SUBASTA  →  nace directamente en CONFIRMADA
 ```
 
 ### Reglas de Reserva
 
 | Transición | Quién | Efecto en stock |
 |---|---|---|
-| Crear reserva | Comprador | Stock bloqueado (no decrementado) |
-| Confirmar | Vendedor (dueño) | Stock decrementado. Si llega a 0 → publicación `VENDIDA` |
-| Rechazar | Vendedor (dueño) | Stock liberado |
-| Cancelar | Comprador | Stock liberado |
+| Crear reserva directa | Comprador | Ninguno todavía; solo se verifica `stock > 0` |
+| Confirmar (solo origen DIRECTA) | Vendedor (dueño) | Stock decrementado. Si llega a 0 → publicación `VENDIDA` |
+| Rechazar (solo origen DIRECTA) | Vendedor (dueño) | Ninguno (nunca se había descontado) |
+| Cancelar (solo origen DIRECTA, mientras PENDIENTE) | Comprador | Ninguno |
+| Oferta/contraoferta aceptada | Sistema (automático) | Stock decrementado en el mismo paso, ya `CONFIRMADA` |
+| Cierre de subasta con puja líder | Sistema (automático) | Stock decrementado en el mismo paso, ya `CONFIRMADA` |
 
-**Validaciones al crear una reserva:**
+**Validaciones al crear una reserva directa (`POST /api/reservas`):**
 - `publicacion.estado` debe ser `ACTIVA`.
 - `producto.stock` debe ser mayor a 0.
 - El comprador no puede ser el mismo usuario que el vendedor de la publicación.
-- En modo `SUBASTA`: no se puede crear una reserva manual; solo se crea automáticamente
-  al cerrar la subasta.
+- La publicación debe estar en modo `PRECIO_FIJO` (en modo `SUBASTA` no se admiten reservas
+  manuales; solo se generan al cerrar la subasta).
 - No puede existir otra reserva `PENDIENTE` del mismo comprador sobre la misma publicación.
 
 ---
 
-## Lista de deseos (Favoritos)
+## Lista de deseos (Favoritos) y Carrito
 
-La lista de deseos es una colección personal del comprador. No tiene efecto en el stock
-ni en la disponibilidad de la pieza.
+### Favoritos
 
-### Reglas
-
-- Un usuario no puede agregar la misma publicación dos veces (unique constraint en BD).
+- Un usuario no puede agregar la misma publicación dos veces (verificado en el service antes
+  de insertar; también hay unique constraint implícita en el repositorio).
 - Se puede agregar una publicación de cualquier modo (precio fijo o subasta).
-- Al eliminar una publicación del marketplace, los favoritos asociados se eliminan
-  en cascada.
-- Desde la lista de deseos el comprador puede iniciar cualquier acción disponible
-  según el modo de la publicación: compra directa, oferta privada, o ir a la página
-  de subasta.
+- No hay reglas adicionales de negocio sobre favoritos (no afecta stock ni disponibilidad).
+
+### Carrito
+
+- Un ítem no puede agregarse dos veces al carrito del mismo comprador.
+- No se puede agregar una publicación propia, pausada/vendida, o sin stock.
+- El checkout descuenta stock por cada ítem y vacía el carrito; si algún ítem ya no está
+  disponible al momento del checkout, toda la operación falla (no hay checkout parcial).
+- El carrito no genera `Reserva`: es un camino de compra directo e inmediato, independiente
+  del flujo de reservas.
 
 ---
 
@@ -229,34 +285,40 @@ ni en la disponibilidad de la pieza.
 | `email` | String | Único |
 | `password` | String | BCrypt, nunca se devuelve en respuestas |
 | `rol` | Enum | `COMPRADOR`, `VENDEDOR` |
-| `fechaRegistro` | DateTime | |
+| `fechaRegistro` | LocalDate | |
 
 ### Producto
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | `id` | Long | PK |
+| `activo` | Boolean | Soft-delete (`@SQLRestriction("activo = true")`) |
 | `nombre` | String | |
 | `descripcion` | String | |
 | `historia` | Text | Narrativa larga, campo diferenciador |
-| `precio` | Decimal | Precio de referencia |
+| `precio` | BigDecimal | Precio de referencia (precio fijo o base de negociación) |
 | `stock` | Integer | Típicamente 1 |
 | `categoria` | Enum | `RELOJ`, `JOYERIA`, `ARTE`, `NUMISMATICA`, `OTRO` |
-| `imagenUrl` | String | |
+| `imagenUrl` | String | Imagen principal |
+| `imagenes` | List\<String\> | Galería completa |
+| `especificaciones` | Map\<String, String\> | Ficha técnica libre (clave → valor) |
 
 ### Publicacion
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | `id` | Long | PK |
-| `producto` | Producto | OneToOne |
+| `activo` | Boolean | Soft-delete |
+| `producto` | Producto | OneToOne, cascade ALL |
 | `vendedor` | Usuario | ManyToOne |
 | `modo` | Enum | `PRECIO_FIJO`, `SUBASTA` |
 | `estado` | Enum | `ACTIVA`, `PAUSADA`, `VENDIDA` |
-| `precioBase` | Decimal | Solo modo SUBASTA |
-| `fechaLimiteSubasta` | DateTime | Solo modo SUBASTA |
+| `destacado` | Boolean | Marca de destaque en catálogo/home |
+| `precioBase` | BigDecimal | Solo modo SUBASTA |
+| `incrementoMinimo` | BigDecimal | Solo modo SUBASTA |
+| `fechaLimiteSubasta` | LocalDateTime | Solo modo SUBASTA |
 | `estadoSubasta` | Enum | `ABIERTA`, `CERRADA` — solo modo SUBASTA |
-| `fechaPublicacion` | DateTime | |
+| `fechaPublicacion` | LocalDateTime | |
 
 ### Puja
 
@@ -265,11 +327,29 @@ ni en la disponibilidad de la pieza.
 | `id` | Long | PK |
 | `publicacion` | Publicacion | ManyToOne |
 | `pujador` | Usuario | ManyToOne |
-| `monto` | Decimal | Debe superar la puja anterior |
-| `fechaPuja` | DateTime | |
+| `monto` | BigDecimal | Debe superar la puja anterior (o precioBase) por al menos `incrementoMinimo` |
+| `fechaPuja` | LocalDateTime | |
 
 La puja ganadora es siempre la de mayor `monto` sobre una publicación dada. No se borra
 el historial de pujas al cerrar la subasta.
+
+### Favorito
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| `id` | Long | PK |
+| `comprador` | Usuario | ManyToOne |
+| `publicacion` | Publicacion | ManyToOne |
+| `fechaAgregado` | LocalDateTime | |
+
+### CarritoItem
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| `id` | Long | PK |
+| `comprador` | Usuario | ManyToOne |
+| `publicacion` | Publicacion | ManyToOne |
+| `fechaAgregado` | LocalDateTime | |
 
 ### Oferta
 
@@ -278,10 +358,10 @@ el historial de pujas al cerrar la subasta.
 | `id` | Long | PK |
 | `comprador` | Usuario | ManyToOne |
 | `publicacion` | Publicacion | ManyToOne — solo modo PRECIO_FIJO |
-| `precioOfertado` | Decimal | |
-| `precioContraoferta` | Decimal | Nullable |
+| `precioOfertado` | BigDecimal | Estrictamente menor al precio de lista |
+| `precioContraoferta` | BigDecimal | Nullable |
 | `estado` | Enum | `PENDIENTE`, `ACEPTADA`, `RECHAZADA`, `CONTRAOFERTA`, `CANCELADA` |
-| `fechaOferta` | DateTime | |
+| `fechaOferta` | LocalDateTime | |
 
 ### Reserva
 
@@ -290,29 +370,29 @@ el historial de pujas al cerrar la subasta.
 | `id` | Long | PK |
 | `comprador` | Usuario | ManyToOne |
 | `publicacion` | Publicacion | ManyToOne |
-| `precioAcordado` | Decimal | Precio final de la transacción |
+| `precioAcordado` | BigDecimal | Precio final de la transacción |
 | `estado` | Enum | `PENDIENTE`, `CONFIRMADA`, `RECHAZADA`, `CANCELADA` |
-| `origen` | Enum | `DIRECTA`, `OFERTA`, `SUBASTA` — para trazabilidad |
-| `oferta` | Oferta | Nullable FK — si vino de una oferta aceptada |
+| `origen` | Enum | `DIRECTA`, `OFERTA`, `SUBASTA` |
+| `oferta` | Oferta | Nullable FK — si vino de una oferta/contraoferta aceptada |
 | `puja` | Puja | Nullable FK — si vino del cierre de una subasta |
-| `fechaReserva` | DateTime | |
-| `fechaRespuesta` | DateTime | Nullable — cuando el vendedor responde |
+| `fechaReserva` | LocalDateTime | |
+| `fechaRespuesta` | LocalDateTime | Nullable — cuando queda resuelta (confirmación automática o manual) |
 
 ---
 
-## Casos límite a tener en cuenta
+## Casos límite conocidos (estado real del código, no aspiracional)
 
-1. **Publicación pausada durante una subasta activa.** Si el vendedor pausa la publicación,
-   las pujas existentes quedan registradas pero no se pueden hacer nuevas. Al reactivar,
-   la subasta continúa desde donde estaba.
-
-2. **Dos compradores intentan reservar simultáneamente.** El sistema debe usar una
-   transacción con lock pesimista (`@Lock(LockModeType.PESSIMISTIC_WRITE)`) al verificar
-   y bloquear el stock para evitar condiciones de carrera.
-
-3. **Subasta vence sin pujas.** La publicación vuelve a `ACTIVA` sin crear reserva.
-   El vendedor puede extender la fecha límite o cambiar el precio base (editando la publicación).
-
-4. **Oferta sobre publicación que luego pasa a modo VENDIDA.** Si la publicación se vende
-   mientras hay una oferta `PENDIENTE`, esa oferta debe pasar automáticamente a `CANCELADA`.
-   Esto se resuelve en el servicio de confirmación de reserva.
+1. **Concurrencia en reserva directa.** No hay lock pesimista ni optimista sobre `Producto` al
+   crear o confirmar una reserva directa. Dos compradores podrían crear sendas reservas
+   `PENDIENTE` sobre la última unidad; solo al confirmar la primera se descuenta stock, y la
+   segunda confirmación fallaría porque el stock ya sería 0 — pero el service no valida
+   explícitamente stock al confirmar, así que puede quedar en negativo si esto no se corrige.
+2. **Publicación pausada durante una subasta activa.** El job de cierre automático solo filtra
+   por `modo=SUBASTA`, `estadoSubasta=ABIERTA` y `fechaLimiteSubasta` vencida — no excluye
+   publicaciones `PAUSADA`, por lo que una subasta pausada igual podría adjudicarse al vencer.
+3. **Subasta vence sin pujas.** La publicación pasa a `PAUSADA` (no a `ACTIVA`). El vendedor
+   debe reactivarla manualmente (`PATCH /estado`) o editarla para volver a intentarlo.
+4. **Oferta sobre publicación vendida por otro camino.** Si la publicación se vende (vía
+   carrito, reserva directa u otra oferta) mientras hay una oferta `PENDIENTE` de otro
+   comprador, esa oferta **no** se cancela automáticamente; al intentar aceptarla más tarde,
+   fallará por falta de stock.
