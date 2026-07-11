@@ -167,18 +167,6 @@ export function toFavorito(dto) {
   };
 }
 
-export function toCarritoItem(dto) {
-  if (!dto) return null;
-  return {
-    id: dto.id,
-    piezaId: dto.publicacionId,
-    nombre: dto.nombreProducto,
-    precio: dto.precio,
-    imagenUrl: dto.imagenUrl,
-    fechaAgregado: dto.fechaAgregado,
-  };
-}
-
 export function toPuja(dto) {
   if (!dto) return null;
   return {
