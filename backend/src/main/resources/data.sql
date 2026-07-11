@@ -1,13 +1,14 @@
 -- =========================================================
--- Usuarios de prueba
+-- Usuarios de demo
 -- (idempotente: el email es único, se omite si ya existe)
+-- Password en texto plano para ambos: Demo2026!
 -- =========================================================
 INSERT INTO usuarios (nombre, email, password, rol, fecha_registro)
-VALUES ('Juan Perez', 'juan.perez@example.com', '$2a$10$uWbkDJT.2KD8x1FJx7FJIuL8HNh.J3bYF1yI/TE2JllKoSL3VKZUC', 'COMPRADOR', '2026-03-26')
+VALUES ('Juan Perez', 'juan.perez@example.com', '$2a$10$WO3Tt3wmqSpY18u8hfEAXugCP8JhgFtpj2o5112KuWQ7JwpHIufzi', 'COMPRADOR', '2026-03-26')
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO usuarios (nombre, email, password, rol, fecha_registro)
-VALUES ('Maria Garcia', 'maria.g@example.com', '$2a$10$uWbkDJT.2KD8x1FJx7FJIuL8HNh.J3bYF1yI/TE2JllKoSL3VKZUC', 'VENDEDOR', '2026-03-25')
+VALUES ('Maria Garcia', 'maria.g@example.com', '$2a$10$WO3Tt3wmqSpY18u8hfEAXugCP8JhgFtpj2o5112KuWQ7JwpHIufzi', 'VENDEDOR', '2026-03-25')
 ON CONFLICT (email) DO NOTHING;
 
 -- =========================================================
