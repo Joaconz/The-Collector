@@ -180,7 +180,7 @@ const EditarPublicacionPage = () => {
                   PREVISUALIZACIÓN DE PIEZA
                 </span>
                 <div className="relative group w-full aspect-[4/5] bg-black border border-outline-variant overflow-hidden">
-                  <img src={imagenUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={imagenUrl || undefined} alt="Preview" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                     <span className="font-label-caps text-[10px] text-white border border-white/40 px-4 py-2 hover:bg-white/10 transition-colors active:scale-[0.97]">
                       CAMBIAR IMAGEN

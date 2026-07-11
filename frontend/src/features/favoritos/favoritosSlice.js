@@ -25,6 +25,11 @@ const favoritosSlice = createSlice({
         const { id, added } = action.payload;
         if (added) {
           if (!state.ids.includes(id)) state.ids.push(id);
+          // No tenemos acá el objeto completo del favorito (el toggle sólo
+          // devuelve el id), así que invalidamos la caché de la lista para
+          // que la próxima visita a "Lista de deseos" traiga datos frescos
+          // en vez de servir el TTL cacheado.
+          state.lista.status = 'idle';
         } else {
           state.ids = state.ids.filter((favId) => favId !== id);
           state.lista.data = state.lista.data.filter((f) => f.id !== id);

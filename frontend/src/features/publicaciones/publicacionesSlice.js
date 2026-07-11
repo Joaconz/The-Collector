@@ -9,6 +9,7 @@ import {
   updateEstadoPublicacion,
   deletePublicacion,
 } from './publicacionesThunks';
+import { cerrarSubasta } from '../subastas/subastasThunks';
 
 const initialState = {
   catalogo: createAsyncSection([]), // lista pública
@@ -56,6 +57,16 @@ const publicacionesSlice = createSlice({
     });
     addAsyncCases(builder, deletePublicacion, 'mutacion', (state, action) => {
       state.mias.data = state.mias.data.filter((p) => p.id !== action.payload);
+    });
+
+    // Cerrar una subasta vive en el slice `subastas`, pero cambia el estado
+    // de la publicación (VENDIDA/PAUSADA + CERRADA): reflejamos ese cambio
+    // acá para que el panel de vendedor no la siga mostrando como activa.
+    builder.addCase(cerrarSubasta.fulfilled, (state, action) => {
+      const updated = action.payload;
+      if (!updated) return;
+      state.mias.data = state.mias.data.map((p) => (p.id === updated.id ? updated : p));
+      if (state.detalle.data?.id === updated.id) state.detalle.data = updated;
     });
   },
 });
