@@ -40,7 +40,9 @@ const ofertasSlice = createSlice({
     addAsyncCases(builder, cancelarOferta, 'mutacion', (state, action) => {
       state.comprador.data = patchOferta(state.comprador.data, action.payload);
     });
-    addAsyncCases(builder, crearOferta, 'mutacion', () => {});
+    addAsyncCases(builder, crearOferta, 'mutacion', (state, action) => {
+      if (action.payload) state.comprador.data.unshift(action.payload);
+    });
 
     // Mutaciones del vendedor
     addAsyncCases(builder, aceptarOferta, 'mutacion', (state, action) => {

@@ -31,7 +31,9 @@ const reservasSlice = createSlice({
     });
 
     // Comprador
-    addAsyncCases(builder, crearReserva, 'mutacion', () => {});
+    addAsyncCases(builder, crearReserva, 'mutacion', (state, action) => {
+      if (action.payload) state.comprador.data.unshift(action.payload);
+    });
     addAsyncCases(builder, cancelarReserva, 'mutacion', (state, action) => {
       state.comprador.data = patchReserva(state.comprador.data, action.payload);
     });

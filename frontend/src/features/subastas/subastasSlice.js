@@ -26,6 +26,10 @@ const subastasSlice = createSlice({
     // Una puja nueva queda como líder al tope de la bitácora.
     addAsyncCases(builder, registrarPuja, 'mutacion', (state, action) => {
       if (action.payload) state.pujas.data.unshift(action.payload);
+      // La nueva puja puede cambiar la posición del usuario (líder/superado)
+      // en "Mis Subastas"; no tenemos acá el objeto MisSubasta completo para
+      // parchearlo, así que invalidamos la caché para forzar un fetch fresco.
+      state.misSubastas.status = 'idle';
     });
     addAsyncCases(builder, cerrarSubasta, 'mutacion', () => {});
   },

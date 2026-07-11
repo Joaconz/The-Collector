@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { subastaService } from '../../services/subastaService';
-import { toPuja, toMisSubasta } from '../../utils/adapters';
+import { toPuja, toMisSubasta, toPublicacion } from '../../utils/adapters';
 import { toRejectedPayload } from '../shared/asyncState';
 
 const TTL = 5 * 60 * 1000;
@@ -54,8 +54,7 @@ export const cerrarSubasta = createAsyncThunk(
   'subastas/cerrar',
   async (publicacionId, { rejectWithValue }) => {
     try {
-      await subastaService.cerrar(publicacionId);
-      return publicacionId;
+      return toPublicacion(await subastaService.cerrar(publicacionId));
     } catch (err) {
       return rejectWithValue(toRejectedPayload(err));
     }
